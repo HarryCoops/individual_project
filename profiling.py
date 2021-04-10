@@ -34,6 +34,21 @@ Profiling Tools
 - pympler
 """
 
+def generate_cprofile(agent_config, env_config, num_episodes):
+    # Set up agent and env
+    env = load_environment(env_config)
+    agent = load_agent(agent_config)
+    evaluation = Evaluation(
+            env,
+            agent,
+            num_episodes=num_episodes,
+            display_env=False,
+            display_agent=False,
+            display_rewards=False
+    )
+    
+    evaluation.train()
+
 # Make agent and env
 env_config = "configs/HighwayEnv/env.json"
 agent_config = "configs/HighwayEnv/agents/DQNAgent/ddqn.json"

@@ -1,0 +1,15 @@
+Notes
+
+10/4/21
+
+For the first profiling we can focus on a single environment and run different models on the environment. We can then see how the complexity of the model impacts the runtime of the training and if its significant compared to the computation involved in simulating the environment.
+
+The first environment can be highway-env0 - the base version.
+Iterate through all of the models in configs/HighwayEnv/agents and run each for some number of episodes, say 10 to begin with.
+Use the cProfile to get a profile and save it as a CSV, along with the env_config and agent_config.
+Structure of the results:
+results
+   agent_name-env_name
+       agent_config.json
+       env_config.json
+       cProfile.csv
