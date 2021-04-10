@@ -11,9 +11,14 @@ from rl_agents.agents.common.factory import load_agent, load_environment
 from tqdm import trange
 
 # Profiling 
+import io
 import cProfile
 import pstats
 
+
+# Torch setup
+import torch
+torch.cuda.set_device(2)
 """
 Notes:
 - What does "expanding terminal states" mean?
@@ -44,16 +49,30 @@ pr.enable()
 evaluation.train()
 
 # Save profiling result
-pr.disable()
+result = io.StringIO()
+ps = pstats.Stats(pr,stream=result)
+ps.sort_stats("cumulative")
+ps.print_stats()
+result=result.getvalue()
+# chop the string into a csv-like buffer
+result='ncalls'+result.split('ncalls')[-1]
+result='\n'.join([','.join(line.rstrip().split(None,5)) for line in result.split('\n')])
+# save it to disk
+         
+with open('test.csv', 'w+') as f:
+    f.write(result)
+"""
 with open("profilingStatsAsText.txt", "w") as f:
     ps = pstats.Stats(pr, stream=f)
     ps.sort_stats('cumulative')
     ps.print_stats()
+"""
 
-
-env = record_videos(env)
 
 # Test
+env = load_environment(env_config)
+env.configure({"offscreen_rendering": True})
+agent = load_agent(agent_config, env)
 evaluation = Evaluation(env, agent, num_episodes=3, recover=True)
 evaluation.test()
 env.close()

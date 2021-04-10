@@ -1,0 +1,4 @@
+[rl_agents.trainer.evaluation:INFO] Loaded DQNAgent model from out/HighwayEnv/DQNAgent/saved_models/latest.tar 
+[rl_agents.trainer.evaluation:INFO] Episode 0 score: 6.0 
+[rl_agents.trainer.evaluation:INFO] Episode 1 score: 1.9 
+[rl_agents.trainer.evaluation:INFO] Episode 2 score: 1.0 
