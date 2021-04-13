@@ -17,7 +17,7 @@ import json
 import cProfile
 import pstats
 
-from pathlib import PurePath
+from pathlib import Path
 
 # Torch setup
 import torch
@@ -40,23 +40,26 @@ Profiling Tools
 def generate_cprofile(agent_config, env_config, num_episodes):
     # Set up agent and env
     env = load_environment(env_config)
-    agent = load_agent(agent_config)
-    evaluation = Evaluation(
+    agent = load_agent(agent_config, env)    
+    
+    # Profiling 
+    pr = cProfile.Profile()
+    pr.enable()
+    try:
+        evaluation = Evaluation(
             env,
             agent,
             num_episodes=num_episodes,
             display_env=False,
             display_agent=False,
             display_rewards=False
-    )
-        
-    # Set up profiling
-    pr = cProfile.Profile()
-    pr.enable()
+        )
+        # Train 
+        evaluation.train()
+    except:
+        pass
 
-    # Train
-    evaluation.train()
-
+    pr.disable()
     # Save profiling result
     result = io.StringIO()
     ps = pstats.Stats(pr,stream=result)
@@ -66,15 +69,17 @@ def generate_cprofile(agent_config, env_config, num_episodes):
 
 
 env_config = "configs/HighwayEnv/env.json"
-agent_configs = [(PurePath(p), d, f) for p, d, f in os.walk("configs/HighwayEnv/agents")]
-base_dir = PurePath("results", "highwayenv_0")
-base_dir.mkdir(parents=True)
+agent_configs = [(Path(p), d, f) for p, d, f in os.walk("configs/HighwayEnv/agents")]
+base_dir = Path("results", "highwayenv_0")
+base_dir.mkdir(parents=True, exist_ok=True)
 
 for path, dirs, files in agent_configs:
     save_dir = base_dir / path.parts[-1]
+    save_dir.mkdir(parents=True, exist_ok=True)
     for f_p in files:
         agent_config = path / f_p
-        results, agent_config_dict, env_config_dict = generate_cprofile(agent_config, env_config, 2)
+        print(f"Training for agent {agent_config}")
+        result, agent_config_dict, env_config_dict = generate_cprofile(agent_config, env_config, 2)
 
         # chop the string into a csv-like buffer
         result='ncalls'+result.split('ncalls')[-1]

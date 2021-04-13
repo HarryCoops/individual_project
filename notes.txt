@@ -13,3 +13,12 @@ results
        agent_config.json
        env_config.json
        cProfile.csv
+
+Doing this results in two problems:
+ 1. Some of the agents are not compatable with all the environment configurations (for example, the attention DQN is not compatible with the default highway env)
+ 2. Some of the CSVs in the agent configuration folders are not agent_configurations but instead benchmark configurations, which doesn't work with my script in its current state)
+Possible fixes:
+ 1. Edit the script to ignore agent exceptions (currently doing that) and also benchmark configurations (not currently doing)
+ 2. Use the benchmark and evaluate scripts provided with rl-agents and manually specify all of the agent / environment configurations
+I think (2) might be better.
+In order to do (2) I need to get a better idea of which agents work with which envs, I might need to read some papers to get this knowledge.
