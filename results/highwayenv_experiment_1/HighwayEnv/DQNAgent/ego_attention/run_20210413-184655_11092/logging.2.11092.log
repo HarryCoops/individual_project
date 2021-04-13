@@ -1,6 +1,0 @@
-[rl_agents.trainer.evaluation:INFO] Episode 0 score: 5.8 
-[rl_agents.trainer.evaluation:INFO] Episode 1 score: 13.1 
-[rl_agents.trainer.evaluation:INFO] Episode 2 score: 0.9 
-[rl_agents.trainer.evaluation:INFO] Episode 3 score: 0.8 
-[rl_agents.trainer.evaluation:INFO] Episode 4 score: 9.4 
-[rl_agents.trainer.evaluation:INFO] Saved DQNAgent model to /home/harry/project/project_code/results/highwayenv_experiment_1/HighwayEnv/DQNAgent/ego_attention/run_20210413-184655_11092/checkpoint-final.tar 

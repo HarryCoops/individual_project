@@ -16,6 +16,7 @@ import os
 import json
 import cProfile
 import pstats
+from pyinstrument import Profiler
 
 from pathlib import Path
 """
@@ -32,6 +33,32 @@ Profiling Tools
 - line_profiler
 - pympler
 """
+
+def generate_pyins_profile(agent_config, env_config, num_episodes, directory=None):
+    # Set up agent and env
+    env = load_environment(env_config)
+    agent = load_agent(agent_config, env)    
+    
+    # Profiling 
+    pr = Profiler()
+    pr.start()
+
+    evaluation = Evaluation(
+        env,
+        agent,
+        num_episodes=num_episodes,
+        display_env=False,
+        display_agent=False,
+        display_rewards=False,
+        directory=directory
+    )
+    # Train 
+    evaluation.train()
+
+    pr.stop()
+    # Return profiling result
+    return pr.output_html()
+
 
 def generate_cprofile(agent_config, env_config, num_episodes, directory=None):
     # Set up agent and env
@@ -67,7 +94,7 @@ def run_profiling(config, base_dir):
     for agent_config, env_config in zip(agent_configs, env_configs):
         agent_path = Path(agent_config)
         env_path = Path(env_config)
-        save_dir = base_dir / env_path.parts[-2] / agent_path.parts[-2] / agent_path.stem
+        save_dir = base_dir / env_path.parts[-2] / env_path.stem / agent_path.parts[-2] / agent_path.stem
         save_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"Training for agent {agent_config}")
@@ -78,12 +105,19 @@ def run_profiling(config, base_dir):
         # Chop the string into a csv-like buffer
         result = "ncalls" + result.split("ncalls")[-1]
         result = "\n".join([",".join(line.rstrip().split(None,5)) for line in result.split('\n')])
+
+        pyins_result_html = generate_pyins_profile(
+            agent_config, env_config, config["num_episodes"], directory=save_dir
+        )
         
         # Save profile and config info to disk
-        profile_path = save_dir / "cProfile.csv"
+        pyins_profile_path = save_dir / "pyins_profile.html"
+        cprofile_path = save_dir / "cProfile.csv"
         agent_config_path = save_dir / "agent_config.json"
         env_config_path = save_dir / "env_config.json"
-        with profile_path.open("w") as f:
+        with pyins_profile_path.open("w") as f:
+            f.write(pyins_result_html)
+        with cprofile_path.open("w") as f:
             f.write(result)
         with agent_config_path.open("w") as f:
             json.dump(agent_config_dict, f)
@@ -99,18 +133,26 @@ def run_profiling(config, base_dir):
 
 if __name__ == "__main__":
     agent_configs = [
-    "configs/HighwayEnv/agents/DQNAgent/ddqn.json",
-    "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
-    "configs/HighwayEnv/agents/DQNAgent/ego_attention.json"
+        "configs/HighwayEnv/agents/DQNAgent/ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/ego_attention.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
     ]
     env_configs = [
         "configs/HighwayEnv/env.json",
         "configs/HighwayEnv/env.json",
         "configs/HighwayEnv/env_obs_attention.json",
+        "configs/HighwayEnv/env_multi_agent.json",
+        "configs/HighwayEnv/env_medium.json",
+        "configs/HighwayEnv/env_easy.json",
+        "configs/HighwayEnv/env_linear.json",
     ]
     base_dir = Path("results", "highwayenv_experiment_1")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 5
+    num_episodes = 100
     config = {
         "agent_configs": agent_configs,
         "env_configs": env_configs,
