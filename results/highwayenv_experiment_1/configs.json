@@ -1,0 +1,21 @@
+{
+    "agent_configs": [
+        "configs/HighwayEnv/agents/DQNAgent/ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/ego_attention.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json"
+    ],
+    "env_configs": [
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env_obs_attention.json",
+        "configs/HighwayEnv/env_multi_agent.json",
+        "configs/HighwayEnv/env_medium.json",
+        "configs/HighwayEnv/env_easy.json",
+        "configs/HighwayEnv/env_linear.json"
+    ],
+    "num_episodes": 100
+}
