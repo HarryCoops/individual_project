@@ -9,5 +9,5 @@
         "configs/HighwayEnv/env.json",
         "configs/HighwayEnv/env_obs_attention.json"
     ],
-    "num_episodes": 2
+    "num_episodes": 5
 }

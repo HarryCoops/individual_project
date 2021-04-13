@@ -33,7 +33,7 @@ Profiling Tools
 - pympler
 """
 
-def generate_cprofile(agent_config, env_config, num_episodes):
+def generate_cprofile(agent_config, env_config, num_episodes, directory=None):
     # Set up agent and env
     env = load_environment(env_config)
     agent = load_agent(agent_config, env)    
@@ -47,7 +47,8 @@ def generate_cprofile(agent_config, env_config, num_episodes):
         num_episodes=num_episodes,
         display_env=False,
         display_agent=False,
-        display_rewards=False
+        display_rewards=False,
+        directory=directory
     )
     # Train 
     evaluation.train()
@@ -72,7 +73,7 @@ env_configs = [
 ]
 base_dir = Path("results", "highwayenv_experiment_1")
 base_dir.mkdir(parents=True, exist_ok=True)
-num_episodes = 2
+num_episodes = 5
 configs = {
     "agent_configs": agent_configs,
     "env_configs": env_configs,
@@ -87,7 +88,7 @@ for agent_config, env_config in zip(agent_configs, env_configs):
 
     print(f"Training for agent {agent_config}")
     result, agent_config_dict, env_config_dict = generate_cprofile(
-        agent_config, env_config, configs["num_episodes"]
+        agent_config, env_config, configs["num_episodes"], directory=save_dir
     )
 
     # Chop the string into a csv-like buffer
