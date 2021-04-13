@@ -150,7 +150,7 @@ if __name__ == "__main__":
         "configs/HighwayEnv/env_easy.json",
         "configs/HighwayEnv/env_linear.json",
     ]
-    base_dir = Path("results", "highwayenv_experiment_1")
+    base_dir = Path("results", "highwayenv_experiment_2")
     base_dir.mkdir(parents=True, exist_ok=True)
     num_episodes = 100
     config = {
