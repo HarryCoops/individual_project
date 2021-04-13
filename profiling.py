@@ -18,10 +18,6 @@ import cProfile
 import pstats
 
 from pathlib import Path
-
-# Torch setup
-import torch
-torch.cuda.set_device(2)
 """
 Notes:
 - What does "expanding terminal states" mean?
@@ -45,19 +41,16 @@ def generate_cprofile(agent_config, env_config, num_episodes):
     # Profiling 
     pr = cProfile.Profile()
     pr.enable()
-    try:
-        evaluation = Evaluation(
-            env,
-            agent,
-            num_episodes=num_episodes,
-            display_env=False,
-            display_agent=False,
-            display_rewards=False
-        )
-        # Train 
-        evaluation.train()
-    except:
-        pass
+    evaluation = Evaluation(
+        env,
+        agent,
+        num_episodes=num_episodes,
+        display_env=False,
+        display_agent=False,
+        display_rewards=False
+    )
+    # Train 
+    evaluation.train()
 
     pr.disable()
     # Save profiling result
@@ -67,31 +60,54 @@ def generate_cprofile(agent_config, env_config, num_episodes):
     ps.print_stats()
     return result.getvalue(), agent.config, env.config
 
-
-env_config = "configs/HighwayEnv/env.json"
-agent_configs = [(Path(p), d, f) for p, d, f in os.walk("configs/HighwayEnv/agents")]
-base_dir = Path("results", "highwayenv_0")
+agent_configs = [
+    "configs/HighwayEnv/agents/DQNAgent/ddqn.json",
+    "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+    "configs/HighwayEnv/agents/DQNAgent/ego_attention.json"
+]
+env_configs = [
+    "configs/HighwayEnv/env.json",
+    "configs/HighwayEnv/env.json",
+    "configs/HighwayEnv/env_obs_attention.json",
+]
+base_dir = Path("results", "highwayenv_experiment_1")
 base_dir.mkdir(parents=True, exist_ok=True)
+num_episodes = 2
+configs = {
+    "agent_configs": agent_configs,
+    "env_configs": env_configs,
+    "num_episodes": num_episodes
+}
 
-for path, dirs, files in agent_configs:
-    save_dir = base_dir / path.parts[-1]
+for agent_config, env_config in zip(agent_configs, env_configs):
+    agent_path = Path(agent_config)
+    env_path = Path(env_config)
+    save_dir = base_dir / env_path.parts[-2] / agent_path.parts[-2] / agent_path.stem
     save_dir.mkdir(parents=True, exist_ok=True)
-    for f_p in files:
-        agent_config = path / f_p
-        print(f"Training for agent {agent_config}")
-        result, agent_config_dict, env_config_dict = generate_cprofile(agent_config, env_config, 2)
 
-        # chop the string into a csv-like buffer
-        result='ncalls'+result.split('ncalls')[-1]
-        result='\n'.join([','.join(line.rstrip().split(None,5)) for line in result.split('\n')])
-        # save it to disk
-        
-        profile_path = save_dir / "cProfile.csv"
-        agent_config_path = save_dir / "agent_config.json"
-        env_config_path = save_dir / "env_config.json"
-        with profile_path.open("w") as f:
-            f.write(result)
-        with agent_config_path.open("w") as f:
-            f.write(json.dumps(agent_config_dict))
-        with env_config_path.open("w") as f:
-            f.write(json.dumps(env_config_dict))
+    print(f"Training for agent {agent_config}")
+    result, agent_config_dict, env_config_dict = generate_cprofile(
+        agent_config, env_config, configs["num_episodes"]
+    )
+
+    # Chop the string into a csv-like buffer
+    result = "ncalls" + result.split("ncalls")[-1]
+    result = "\n".join([",".join(line.rstrip().split(None,5)) for line in result.split('\n')])
+    
+    # Save profile and config info to disk
+    profile_path = save_dir / "cProfile.csv"
+    agent_config_path = save_dir / "agent_config.json"
+    env_config_path = save_dir / "env_config.json"
+    with profile_path.open("w") as f:
+        f.write(result)
+    with agent_config_path.open("w") as f:
+        json.dump(agent_config_dict, f)
+    with env_config_path.open("w") as f:
+        json.dump(env_config_dict, f)
+
+info_path = base_dir / "info.txt"
+with info_path.open("w") as f:
+    f.write(str(os.uname()))
+configs_path = base_dir / "configs.json"
+with configs_path.open("w") as f:
+    json.dump(configs, f, indent=4)

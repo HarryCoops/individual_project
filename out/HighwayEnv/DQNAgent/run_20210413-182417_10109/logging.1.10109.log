@@ -1,0 +1,3 @@
+[rl_agents.trainer.evaluation:INFO] Episode 0 score: 3.0 
+[rl_agents.trainer.evaluation:INFO] Episode 1 score: 4.0 
+[rl_agents.trainer.evaluation:INFO] Saved DQNAgent model to /home/harry/project/project_code/out/HighwayEnv/DQNAgent/run_20210413-182459_10109/checkpoint-final.tar 
