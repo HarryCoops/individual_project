@@ -5,7 +5,7 @@ import gym
 import highway_env
 import numpy as np
 
-from stable_baselines3 import HER, SAC, DDPG
+from stable_baselines3 import HER, SAC, DDPG, PPO
 from stable_baselines3.common.noise import NormalActionNoise
 
 # Visualisation
@@ -135,15 +135,12 @@ def run_profiling(config, base_dir):
 
 if __name__ == "__main__":
     # SAC hyperparams:
-    env_config = "configs/HighwayEnv/env.json"
+    env_config = "configs/HighwayEnv/env_continuous.json"
     env_path = Path(env_config)
     env = load_environment(env_config)
-    model = HER('MlpPolicy', env, SAC, n_sampled_goal=4,
-        goal_selection_strategy='future', online_sampling=True,
-        verbose=1, buffer_size=int(1e6),
-        learning_rate=1e-3,
-        gamma=0.95, batch_size=256,
-        policy_kwargs=dict(net_arch=[256, 256, 256]), max_episode_length=100
+    
+    model = PPO("MlpPolicy", env, n_steps=128,
+         ent_coef=0.01, verbose=1
     )
     base_dir = Path("results", "stable_baselines_highway_experiment_1")
     base_dir.mkdir(parents=True, exist_ok=True)
