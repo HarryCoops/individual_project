@@ -135,7 +135,7 @@ def run_profiling(config, base_dir):
 
 if __name__ == "__main__":
     # SAC hyperparams:
-    env_config = "configs/ParkingEnv/env.json"
+    env_config = "configs/HighwayEnv/env.json"
     env_path = Path(env_config)
     env = load_environment(env_config)
     model = HER('MlpPolicy', env, SAC, n_sampled_goal=4,
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         gamma=0.95, batch_size=256,
         policy_kwargs=dict(net_arch=[256, 256, 256]), max_episode_length=100
     )
-    base_dir = Path("results", "stable_baselines_parking_experiment_1")
+    base_dir = Path("results", "stable_baselines_highway_experiment_1")
     base_dir.mkdir(parents=True, exist_ok=True)
     save_dir = base_dir / env_path.parts[-2] / env_path.stem / "HER_MlpPolicy"
     save_dir.mkdir(parents=True, exist_ok=True)
