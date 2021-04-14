@@ -1,11 +1,12 @@
 # Environment
 import gym
 import highway_env
+import gym
+import highway_env
+import numpy as np
 
-# Agent
-from rl_agents.trainer.evaluation import Evaluation
-from rl_agents.agents.common.factory import agent_factory
-from rl_agents.agents.common.factory import load_agent, load_environment
+from stable_baselines3 import HER, SAC, DDPG
+from stable_baselines3.common.noise import NormalActionNoise
 
 # Visualisation
 from tqdm import trange
@@ -88,7 +89,7 @@ def generate_cprofile(agent_config, env_config, num_episodes, directory=None):
     ps.print_stats()
     return result.getvalue(), agent.config, env.config
 
-def run_rl_agnents_profiling(config, base_dir):
+def run_profiling(config, base_dir):
     agent_configs = config["agent_configs"]
     env_configs = config["env_configs"]
     for agent_config, env_config in zip(agent_configs, env_configs):
@@ -132,22 +133,31 @@ def run_rl_agnents_profiling(config, base_dir):
         json.dump(config, f, indent=4)
 
 if __name__ == "__main__":
-    agent_configs = [
-       "configs/ParkingEnv/OpenLoopAgent/baseline.json",
-       "configs/ParkingEnv/RandomUniformAgent/random.json",
-       "configs/ParkingEnv/random.json"
-    ]
-    env_configs = [
-        "configs/ParkingEnv/env.json",
-        "configs/ParkingEnv/env.json",
-        "configs/ParkingEnv/env.json",
-    ]
-    base_dir = Path("results", "parking_experiment_1")
+    # SAC hyperparams:
+    env = gym.make("parking-v0")
+    model = HER('MlpPolicy', env, SAC, n_sampled_goal=4,
+        goal_selection_strategy='future', online_sampling=True,
+        verbose=1, buffer_size=int(1e6),
+        learning_rate=1e-3,
+        gamma=0.95, batch_size=256,
+        policy_kwargs=dict(net_arch=[256, 256, 256]), max_episode_length=100
+    )
+    base_dir = Path("results", "stable_baselines_parking_experiment_1")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 200
-    config = {
-        "agent_configs": agent_configs,
-        "env_configs": env_configs,
-        "num_episodes": num_episodes
-    }
-    run_rl_agents_profiling(config, base_dir)
+    save_dir = base_dir / env_path.parts[-2] / env_path.stem / "HER_MlpPolicy"
+    pyins_profile_path = save_dir / "pyins_profile.html"
+
+    # Profiling 
+    pr = Profiler()
+    pr.start()
+
+    model.learn(int(1e5))
+
+    pr.stop()
+    # Return profiling result
+    pyins_result_html = pr.output_html()
+    with pyins_profile_path.open("w") as f:
+            f.write(pyins_result_html)
+    info_path = base_dir / "info.txt"
+    with info_path.open("w") as f:
+        f.write(str(os.uname()))

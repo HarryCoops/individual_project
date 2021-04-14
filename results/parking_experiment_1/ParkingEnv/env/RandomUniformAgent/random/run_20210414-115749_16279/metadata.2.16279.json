@@ -1,0 +1,50 @@
+{
+    "agent": {
+        "__class__": "<class 'rl_agents.agents.simple.random.RandomUniformAgent'>"
+    },
+    "env": {
+        "__class__": "<class 'highway_env.envs.parking_env.ParkingEnvActionRepeat'>",
+        "action": {
+            "type": "ContinuousAction"
+        },
+        "centering_position": [
+            0.5,
+            0.5
+        ],
+        "controlled_vehicles": 1,
+        "duration": 20,
+        "id": "parking-ActionRepeat-v0",
+        "import_module": "highway_env",
+        "manual_control": false,
+        "observation": {
+            "features": [
+                "x",
+                "y",
+                "vx",
+                "vy",
+                "cos_h",
+                "sin_h"
+            ],
+            "normalize": false,
+            "scales": [
+                100,
+                100,
+                5,
+                5,
+                1,
+                1
+            ],
+            "type": "KinematicsGoal"
+        },
+        "offscreen_rendering": false,
+        "other_vehicles_type": "highway_env.vehicle.behavior.IDMVehicle",
+        "policy_frequency": 1,
+        "real_time_rendering": false,
+        "render_agent": true,
+        "scaling": 7,
+        "screen_height": 300,
+        "screen_width": 600,
+        "show_trajectories": true,
+        "simulation_frequency": 15
+    }
+}
