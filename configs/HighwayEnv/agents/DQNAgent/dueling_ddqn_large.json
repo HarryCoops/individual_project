@@ -3,7 +3,7 @@
     "model": {
         "type": "DuelingNetwork",
         "base_module": {
-            "layers": [256, 128]
+            "layers": [512, 256, 128, 128]
         },
         "value": {
             "layers": [128]

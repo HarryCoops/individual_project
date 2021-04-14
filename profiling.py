@@ -88,7 +88,7 @@ def generate_cprofile(agent_config, env_config, num_episodes, directory=None):
     ps.print_stats()
     return result.getvalue(), agent.config, env.config
 
-def run_rl_agnents_profiling(config, base_dir):
+def run_rl_agents_profiling(config, base_dir):
     agent_configs = config["agent_configs"]
     env_configs = config["env_configs"]
     for agent_config, env_config in zip(agent_configs, env_configs):
@@ -133,16 +133,12 @@ def run_rl_agnents_profiling(config, base_dir):
 
 if __name__ == "__main__":
     agent_configs = [
-       "configs/ParkingEnv/OpenLoopAgent/baseline.json",
-       "configs/ParkingEnv/RandomUniformAgent/random.json",
-       "configs/ParkingEnv/random.json"
+       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn_large.json",
     ]
     env_configs = [
-        "configs/ParkingEnv/env.json",
-        "configs/ParkingEnv/env.json",
-        "configs/ParkingEnv/env.json",
+        "configs/HighwayEnv/env.json",
     ]
-    base_dir = Path("results", "parking_experiment_1")
+    base_dir = Path("results", "highway_experiment_large")
     base_dir.mkdir(parents=True, exist_ok=True)
     num_episodes = 200
     config = {
