@@ -10,6 +10,7 @@ from stable_baselines3.common.noise import NormalActionNoise
 
 # Visualisation
 from tqdm import trange
+from rl_agents.agents.common.factory import load_agent, load_environment
 
 # Profiling 
 import io
@@ -134,7 +135,9 @@ def run_profiling(config, base_dir):
 
 if __name__ == "__main__":
     # SAC hyperparams:
-    env = gym.make("parking-v0")
+    env_config = "configs/ParkingEnv/env.json"
+    env_path = Path(env_config)
+    env = load_environment(env_config)
     model = HER('MlpPolicy', env, SAC, n_sampled_goal=4,
         goal_selection_strategy='future', online_sampling=True,
         verbose=1, buffer_size=int(1e6),
@@ -145,13 +148,14 @@ if __name__ == "__main__":
     base_dir = Path("results", "stable_baselines_parking_experiment_1")
     base_dir.mkdir(parents=True, exist_ok=True)
     save_dir = base_dir / env_path.parts[-2] / env_path.stem / "HER_MlpPolicy"
+    save_dir.mkdir(parents=True, exist_ok=True)
     pyins_profile_path = save_dir / "pyins_profile.html"
 
     # Profiling 
     pr = Profiler()
     pr.start()
 
-    model.learn(int(1e5))
+    model.learn(5000)
 
     pr.stop()
     # Return profiling result
