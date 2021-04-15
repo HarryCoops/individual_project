@@ -1,0 +1,15 @@
+{
+    "agent_configs": [
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json"
+    ],
+    "env_configs": [
+        "configs/HighwayEnv/vehicle_number_experiment/env_low_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_med_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_large_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_x_large_vehicle.json"
+    ],
+    "num_episodes": 100
+}
