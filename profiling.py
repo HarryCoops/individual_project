@@ -133,14 +133,20 @@ def run_rl_agents_profiling(config, base_dir):
 
 if __name__ == "__main__":
     agent_configs = [
-       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn_large.json",
+       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+       "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json"
     ]
     env_configs = [
-        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_low_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_med_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_large_vehicle.json",
+        "configs/HighwayEnv/vehicle_number_experiment/env_x_large_vehicle.json",
     ]
-    base_dir = Path("results", "highway_experiment_large")
+    base_dir = Path("results", "highway_vary_vehicle_number")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 200
+    num_episodes = 100
     config = {
         "agent_configs": agent_configs,
         "env_configs": env_configs,
