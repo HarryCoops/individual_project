@@ -1,0 +1,131 @@
+Timer unit: 1e-06 s
+
+Total time: 21.784 s
+File: /home/harry/individual_project/.venv/lib/python3.8/site-packages/highway_env/road/lane.py
+Function: on_lane at line 61
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    61                                               @profile
+    62                                               def on_lane(self, position: np.ndarray, longitudinal: float = None, lateral: float = None, margin: float = 0) \
+    63                                                       -> bool:
+    64                                                   """
+    65                                                   Whether a given world position is on the lane.
+    66                                           
+    67                                                   :param position: a world position [m]
+    68                                                   :param longitudinal: (optional) the corresponding longitudinal lane coordinate, if known [m]
+    69                                                   :param lateral: (optional) the corresponding lateral lane coordinate, if known [m]
+    70                                                   :param margin: (optional) a supplementary margin around the lane width
+    71                                                   :return: is the position on the lane?
+    72                                                   """
+    73   6400593    2810977.0      0.4     12.9          if longitudinal is None or lateral is None:
+    74       143       2164.0     15.1      0.0              longitudinal, lateral = self.local_coordinates(position)
+    75  12801186   15123380.0      1.2     69.4          is_on = np.abs(lateral) <= self.width_at(longitudinal) / 2 + margin and \
+    76   1612177    1774976.0      1.1      8.1              -self.VEHICLE_LENGTH <= longitudinal < self.length + self.VEHICLE_LENGTH
+    77   6400593    2072503.0      0.3      9.5          return is_on
+
+Total time: 50.5161 s
+File: /home/harry/individual_project/.venv/lib/python3.8/site-packages/highway_env/road/lane.py
+Function: local_coordinates at line 165
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   165                                               @profile
+   166                                               def local_coordinates(self, position: np.ndarray) -> Tuple[float, float]:
+   167   7533342    8868116.0      1.2     17.6          delta = position - self.start
+   168   7533342   19597669.0      2.6     38.8          longitudinal = np.dot(delta, self.direction)
+   169   7533342   17895003.0      2.4     35.4          lateral = np.dot(delta, self.direction_lateral)
+   170   7533342    4155317.0      0.6      8.2          return float(longitudinal), float(lateral)
+
+Total time: 126.471 s
+File: /home/harry/individual_project/.venv/lib/python3.8/site-packages/highway_env/road/road.py
+Function: neighbour_vehicles at line 307
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   307                                               @profile
+   308                                               def neighbour_vehicles(self, vehicle: 'kinematics.Vehicle', lane_index: LaneIndex = None) \
+   309                                                       -> Tuple[Optional['kinematics.Vehicle'], Optional['kinematics.Vehicle']]:
+   310                                                   """
+   311                                                   Find the preceding and following vehicles of a given vehicle.
+   312                                           
+   313                                                   :param vehicle: the vehicle whose neighbours must be found
+   314                                                   :param lane_index: the lane on which to look for preceding and following vehicles.
+   315                                                                It doesn't have to be the current vehicle lane but can also be another lane, in which case the
+   316                                                                vehicle is projected on it considering its local coordinates in the lane.
+   317                                                   :return: its preceding vehicle, its following vehicle
+   318                                                   """
+   319    128009      98861.0      0.8      0.1          lane_index = lane_index or vehicle.lane_index
+   320    128009      69383.0      0.5      0.1          if not lane_index:
+   321                                                       return None, None
+   322    128009     209903.0      1.6      0.2          lane = self.network.get_lane(lane_index)
+   323    128009    1598382.0     12.5      1.3          s = self.network.get_lane(lane_index).local_coordinates(vehicle.position)[0]
+   324    128009      66822.0      0.5      0.1          s_front = s_rear = None
+   325    128009      58275.0      0.5      0.0          v_front = v_rear = None
+   326   6656468    3077423.0      0.5      2.4          for v in self.vehicles + self.objects:
+   327   6528459    7057235.0      1.1      5.6              if v is not vehicle and not isinstance(v, Landmark):  # self.network.is_connected_road(v.lane_index,
+   328                                                           # lane_index, same_lane=True):
+   329   6400450   64325130.0     10.1     50.9                  s_v, lat_v = lane.local_coordinates(v.position)
+   330   6400450   44971807.0      7.0     35.6                  if not lane.on_lane(v.position, s_v, lat_v, margin=1):
+   331   4788416    2208539.0      0.5      1.7                      continue
+   332   1612034     931160.0      0.6      0.7                  if s <= s_v and (s_front is None or s_v <= s_front):
+   333    118479      55132.0      0.5      0.0                      s_front = s_v
+   334    118479      53166.0      0.4      0.0                      v_front = v
+   335   1612034     878400.0      0.5      0.7                  if s_v < s and (s_rear is None or s_v > s_rear):
+   336    819550     388489.0      0.5      0.3                      s_rear = s_v
+   337    819550     362024.0      0.4      0.3                      v_rear = v
+   338    128009      61019.0      0.5      0.0          return v_front, v_rear
+
+Total time: 56.8146 s
+File: /home/harry/individual_project/.venv/lib/python3.8/site-packages/highway_env/vehicle/kinematics.py
+Function: check_collision at line 162
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   162                                               @profile
+   163                                               def check_collision(self, other: 'RoadObject', dt: float = 0) -> None:
+   164                                                   """
+   165                                                   Check for collision with another vehicle.
+   166                                           
+   167                                                   :param other: the other vehicle or object
+   168                                                   :param dt: timestep to check for future collisions (at constant velocity)
+   169                                                   """
+   170   2734875    1137982.0      0.4      2.0          if other is self:
+   171                                                       return
+   172                                           
+   173   2734875    2699129.0      1.0      4.8          if isinstance(other, Vehicle):
+   174   2734875    1332046.0      0.5      2.3              if not self.COLLISIONS_ENABLED or not other.COLLISIONS_ENABLED:
+   175                                                           return
+   176   2734875   49365967.0     18.1     86.9              intersecting, will_intersect, transition = self._is_colliding(other, dt)
+   177   2734875    1202200.0      0.4      2.1              if will_intersect:
+   178       141        436.0      3.1      0.0                  self.impact = transition / 2
+   179       141        435.0      3.1      0.0                  other.impact = -transition / 2
+   180   2734875    1076328.0      0.4      1.9              if intersecting:
+   181        83         59.0      0.7      0.0                  self.crashed = other.crashed = True
+   182                                                   elif isinstance(other, Obstacle):
+   183                                                       if not self.COLLISIONS_ENABLED:
+   184                                                           return
+   185                                                       intersecting, will_intersect, transition = self._is_colliding(other, dt)
+   186                                                       if will_intersect:
+   187                                                           self.impact = transition
+   188                                                       if intersecting:
+   189                                                           self.crashed = other.hit = True
+   190                                                   elif isinstance(other, Landmark):
+   191                                                       intersecting, will_intersect, transition = self._is_colliding(other, dt)
+   192                                                       if intersecting:
+   193                                                           other.hit = True
+
+Total time: 41.198 s
+File: /home/harry/individual_project/.venv/lib/python3.8/site-packages/highway_env/vehicle/kinematics.py
+Function: _is_colliding at line 195
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   195                                               @profile
+   196                                               def _is_colliding(self, other, dt):
+   197                                                   # Fast spherical pre-check
+   198   2734875   36880795.0     13.5     89.5          if np.linalg.norm(other.position - self.position) > self.LENGTH + self.speed * dt:
+   199   2732003    3404087.0      1.2      8.3              return False, False, np.zeros(2,)
+   200                                                   # Accurate rectangular check
+   201      2872     913160.0    318.0      2.2          return utils.are_polygons_intersecting(self.polygon(), other.polygon(), self.velocity * dt, other.velocity * dt)
+
