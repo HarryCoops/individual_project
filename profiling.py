@@ -135,20 +135,14 @@ if __name__ == "__main__":
     from rl_agents.trainer import logger
     logger.configure("configs/verbose.json")
     agent_configs = [ 
-        "configs/HighwayEnv/agents/DQNAgent/vary_params/low_params.json",
-        "configs/HighwayEnv/agents/DQNAgent/vary_params/med_params.json",
-        "configs/HighwayEnv/agents/DQNAgent/vary_params/high_params.json",
-        "configs/HighwayEnv/agents/DQNAgent/vary_params/very_high_params.json"
+        "configs/HighwayEnv/agents/DQNAgent/vary_params/super_high_params.json"
     ]
     env_configs = [
         "configs/HighwayEnv/env.json",
-        "configs/HighwayEnv/env.json",
-        "configs/HighwayEnv/env.json",
-        "configs/HighwayEnv/env.json",
     ]
-    base_dir = Path("results", "highway_vary_network_parameters_debug_logging")
+    base_dir = Path("results", "highway_super_high_parameters")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 10
+    num_episodes = 50
     config = {
         "agent_configs": agent_configs,
         "env_configs": env_configs,
