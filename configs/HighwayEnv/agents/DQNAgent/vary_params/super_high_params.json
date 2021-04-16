@@ -1,0 +1,15 @@
+{
+    "base_config": "configs/HighwayEnv/agents/DQNAgent/ddqn.json",
+    "model": {
+        "type": "DuelingNetwork",
+        "base_module": {
+            "layers": [4096, 2048, 1024, 512, 512]
+        },
+        "value": {
+            "layers": [512, 256, 128]
+        },
+        "advantage": {
+            "layers": [512, 256, 128]
+        }
+    }
+}

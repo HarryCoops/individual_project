@@ -1,1 +1,4 @@
 .venv
+.venv-copy
+.DS_Store
+*.tar

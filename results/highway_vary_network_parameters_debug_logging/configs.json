@@ -1,0 +1,15 @@
+{
+    "agent_configs": [
+        "configs/HighwayEnv/agents/DQNAgent/vary_params/low_params.json",
+        "configs/HighwayEnv/agents/DQNAgent/vary_params/med_params.json",
+        "configs/HighwayEnv/agents/DQNAgent/vary_params/high_params.json",
+        "configs/HighwayEnv/agents/DQNAgent/vary_params/very_high_params.json"
+    ],
+    "env_configs": [
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env.json"
+    ],
+    "num_episodes": 10
+}
