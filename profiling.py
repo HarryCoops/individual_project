@@ -142,7 +142,7 @@ if __name__ == "__main__":
     ]
     base_dir = Path("results", "highway_super_high_parameters")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 50
+    num_episodes = 100
     config = {
         "agent_configs": agent_configs,
         "env_configs": env_configs,

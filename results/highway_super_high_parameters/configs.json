@@ -5,5 +5,5 @@
     "env_configs": [
         "configs/HighwayEnv/env.json"
     ],
-    "num_episodes": 50
+    "num_episodes": 100
 }
