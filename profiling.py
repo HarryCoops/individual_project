@@ -133,16 +133,12 @@ def run_rl_agents_profiling(config, base_dir):
 
 if __name__ == "__main__":
     agent_configs = [
-       "configs/HighwayEnv/agents/DQNAgent/vary_params/low_params.json",
-       "configs/HighwayEnv/agents/DQNAgent/vary_params/med_params.json",
        "configs/HighwayEnv/agents/DQNAgent/vary_params/high_params.json",
        "configs/HighwayEnv/agents/DQNAgent/vary_params/very_high_params.json"
     ]
     env_configs = [
-        "configs/HighwayEnv/vehicle_number_experiment/env.json",
-        "configs/HighwayEnv/vehicle_number_experiment/env.json",
-        "configs/HighwayEnv/vehicle_number_experiment/env.json",
-        "configs/HighwayEnv/vehicle_number_experiment/env.json",
+        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/env.json",
     ]
     base_dir = Path("results", "highway_vary_network_parameters")
     base_dir.mkdir(parents=True, exist_ok=True)
