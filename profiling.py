@@ -135,14 +135,28 @@ if __name__ == "__main__":
     from rl_agents.trainer import logger
     logger.configure("configs/verbose.json")
     agent_configs = [ 
-        "configs/HighwayEnv/agents/DQNAgent/vary_params/super_high_params.json"
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
+        "configs/HighwayEnv/agents/DQNAgent/dueling_ddqn.json",
     ]
     env_configs = [
-        "configs/HighwayEnv/env.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_2_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_5_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_7_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_10_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_15_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_20_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_25_agent.json",
+        "configs/HighwayEnv/controlled_vehicles_experiment/env_30_agent.json",
     ]
-    base_dir = Path("results", "highway_super_high_parameters")
+    base_dir = Path("results", "vary_controlled_vehicles")
     base_dir.mkdir(parents=True, exist_ok=True)
-    num_episodes = 100
+    num_episodes = 25
     config = {
         "agent_configs": agent_configs,
         "env_configs": env_configs,
