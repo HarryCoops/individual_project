@@ -1,0 +1,7 @@
+[rl_agents.trainer.evaluation:INFO] Episode 0 score: -3.0 
+[rl_agents.trainer.evaluation:INFO] Saved DQNAgent model to /home/harry/project/project_code/results/highway_line_profiling/IntersectionEnv/env/DQNAgent/baseline/run_20210416-185921_24860/checkpoint-0.tar 
+[rl_agents.trainer.evaluation:INFO] Episode 1 score: 8.0 
+[rl_agents.trainer.evaluation:INFO] Episode 2 score: -1.0 
+[rl_agents.trainer.evaluation:INFO] Episode 3 score: 3.0 
+[rl_agents.trainer.evaluation:INFO] Episode 4 score: -2.0 
+[rl_agents.trainer.evaluation:INFO] Saved DQNAgent model to /home/harry/project/project_code/results/highway_line_profiling/IntersectionEnv/env/DQNAgent/baseline/run_20210416-185921_24860/checkpoint-final.tar 
