@@ -54,12 +54,10 @@ def main(
     config = gen_config(
         scenario=scenario, config_file=config_file, paradigm=paradigm, headless=headless
     )
-
     tune_config = config["run"]["config"]
     tune_config.update(
         {
             "env_config": config["env_config"],
-            "callbacks": SimpleCallbacks,
             "num_workers": num_workers,
             "horizon": horizon,
         }
@@ -68,7 +66,7 @@ def main(
     # TODO(ming): change scenario name (not path)
     experiment_name = EXPERIMENT_NAME.format(
         scenario=scenario.split("/")[-1],
-        n_agent=4,
+        n_agent=len(config["env_config"]["agent_specs"]),
     )
 
     log_dir = Path(log_dir).expanduser().absolute() / RUN_NAME
@@ -85,10 +83,25 @@ def main(
             "name": experiment_name,
             "local_dir": str(log_dir),
             "restore": restore_path,
+            "stop": {"training_iteration": 3}
         }
     )
-    analysis = tune.run(**config["run"])
-
+    import pstats
+    import cProfile
+    pr = cProfile.Profile()
+    pr.enable()
+    try: 
+        analysis = tune.run(**config["run"])
+    except:
+        pass
+    pr.disable()
+    import io
+    result = io.StringIO()
+    ps = pstats.Stats(pr, stream=result)
+    ps.sort_stats("cumulative")
+    ps.print_stats()
+    with open(f"{config['name']}_{experiment_name}_profile.txt", "w") as f:
+        f.write(result.getvalue())
     print(analysis.dataframe().head())
 
 
