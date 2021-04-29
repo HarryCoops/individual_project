@@ -46,3 +46,19 @@ tasks:
     hi-lo:
       train: "scenarios/task2/train_hi-lo*"
       test:  "scenarios/task2/test_hi-lo*"
+  task0-4agents:  # The name of the task.
+    no-traffic:  # The level name.
+      train: "scenarios/task0-4agents/train_no-traffic*"  # The relative path to the training scenarios.
+      test: "scenarios/task0-4agents/test_no-traffic*"  # The relative path to the testing scenarios.
+  task0-3agents:  # The name of the task.
+    no-traffic:  # The level name.
+      train: "scenarios/task0-4agents/train_no-traffic*"  # The relative path to the training scenarios.
+      test:  "scenarios/task0-4agents/test_no-traffic*"  # The relative path to the testing scenarios.
+  task0-2agents:  # The name of the task.
+    no-traffic:  # The level name.
+      train: "scenarios/task0-4agents/train_no-traffic*"  # The relative path to the training scenarios.
+      test:  "scenarios/task0-4agents/test_no-traffic*"  # The relative path to the testing scenarios.
+  task0-1agents:  # The name of the task.
+    no-traffic:  # The level name.
+      train: "scenarios/task0-4agents/train_no-traffic*"  # The relative path to the training scenarios.
+      test:  "scenarios/task0-4agents/test_no-traffic*"  # The relative path to the testing scenarios.

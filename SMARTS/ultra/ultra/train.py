@@ -92,7 +92,6 @@ def train(
         agent_id: agent_spec.build_agent()
         for agent_id, agent_spec in agent_specs.items()
     }
-
     # Create the environment.
     env = gym.make(
         "ultra.env:ultra-v0",

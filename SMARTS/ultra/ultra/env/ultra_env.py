@@ -59,7 +59,7 @@ class UltraEnv(HiWayEnv):
             _scenarios = glob.glob(f"{self.scenarios['test']}")
 
         self.ultra_scores = BaselineAdapter.reward_adapter
-
+        
         super().__init__(
             scenarios=_scenarios,
             agent_specs=agent_specs,
