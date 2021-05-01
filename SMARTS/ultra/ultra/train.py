@@ -23,6 +23,9 @@ import json
 import os
 import sys
 
+from pyinstrument import Profiler
+import pstats
+
 from ultra.utils.ray import default_ray_kwargs
 
 # Set environment to better support Ray
@@ -45,7 +48,7 @@ num_gpus = 1 if torch.cuda.is_available() else 0
 
 
 # @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
-@ray.remote(num_gpus=num_gpus / 2)
+#@ray.remote(num_gpus=num_gpus / 2)
 def train(
     scenario_info,
     num_episodes,
@@ -94,6 +97,15 @@ def train(
     }
     # Create the environment.
     env = gym.make(
+        "smarts.env:hiway-v0",
+        scenarios=scenario_info,
+        agent_specs=agent_specs,
+        sim_name=None,
+        headless=headless,
+        seed=seed,
+    )
+    '''
+    env = gym.make(
         "ultra.env:ultra-v0",
         agent_specs=agent_specs,
         scenario_info=scenario_info,
@@ -101,20 +113,21 @@ def train(
         timestep_sec=timestep_sec,
         seed=seed,
     )
-
+    '''
     # Define an 'etag' for this experiment's data directory based off policy_classes.
     # E.g. From a ["ultra.baselines.dqn:dqn-v0", "ultra.baselines.ppo:ppo-v0"]
     # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
     etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
-
-    for episode in episodes(num_episodes, etag=etag, log_dir=log_dir):
+    pr = Profiler()
+    pr.start()
+    for episode in episodes(num_episodes, etag=etag, log_dir=log_dir, write_table=True):
         # Reset the environment and retrieve the initial observations.
         observations = env.reset()
         dones = {"__all__": False}
         infos = None
         episode.reset()
         experiment_dir = episode.experiment_dir
-
+        print(experiment_dir)
         # Save relevant agent metadata.
         if not os.path.exists(f"{experiment_dir}/agent_metadata.pkl"):
             if not os.path.exists(experiment_dir):
@@ -189,7 +202,9 @@ def train(
 
         if finished:
             break
-
+    pr.stop()
+    with open(f"{experiment_dir}/profile.html", "w") as f:
+        f.write(pr.output_html())
     env.close()
 
 
@@ -273,24 +288,19 @@ if __name__ == "__main__":
 
     # Obtain the policy class IDs from the arguments.
     policy_ids = args.policy_ids.split(",") if args.policy_ids else None
-
-    ray.init()
-    ray.wait(
-        [
-            train.remote(
-                scenario_info=(args.task, args.level),
-                num_episodes=int(args.episodes),
-                max_episode_steps=int(args.max_episode_steps),
-                eval_info={
-                    "eval_rate": float(args.eval_rate),
-                    "eval_episodes": int(args.eval_episodes),
-                },
-                timestep_sec=float(args.timestep),
-                headless=args.headless,
-                policy_classes=policy_classes,
-                seed=args.seed,
-                log_dir=args.log_dir,
-                policy_ids=policy_ids,
-            )
-        ]
+    
+    train(
+        scenario_info=args.task,
+        num_episodes=int(args.episodes),
+        max_episode_steps=int(args.max_episode_steps),
+        eval_info={
+            "eval_rate": float(args.eval_rate),
+            "eval_episodes": int(args.eval_episodes),
+        },
+        timestep_sec=float(args.timestep),
+        headless=args.headless,
+        policy_classes=policy_classes,
+        seed=args.seed,
+        log_dir=args.log_dir,
+        policy_ids=policy_ids,
     )

@@ -22,6 +22,8 @@
 import datetime
 import math
 import os
+import csv
+import sys
 from pathlib import Path
 
 import shutil
@@ -286,8 +288,15 @@ class Episode:
                     pass
 
 
-def episodes(n, etag=None, log_dir=None):
+def episodes(n, etag=None, log_dir=None, write_table=False):
     col_width = 18
+    running_stats = {
+            "episode": [],
+            "sim/wall": [],
+            "total steps": [],
+            "steps/sec": [],
+            "score": []
+    }
     with tp.TableContext(
         [
             f"Episode",
@@ -339,9 +348,25 @@ def episodes(n, etag=None, log_dir=None):
                     f"{e.steps_per_second:.2f}",
                     ", ".join(agent_rewards_strings),
                 )
+                running_stats["episode"].append(e.index)
+                running_stats["sim/wall"].append(e.sim2wall_ratio)
+                running_stats["total steps"].append(e.steps)
+                running_stats["steps/sec"].append(e.steps_per_second)
+                running_stats["score"].append(", ".join(agent_rewards_strings))
                 table(row)
             else:
                 table(("", "", "", "", ""))
+    if write_table:
+        n = len(running_stats["episode"])
+        running_stats["episode"].append("MEAN")
+        running_stats["sim/wall"].append(sum(running_stats["sim/wall"])/n)
+        running_stats["total steps"].append(sum(running_stats["total steps"])/n)
+        running_stats["steps/sec"].append(sum(running_stats["steps/sec"])/n)
+        running_stats["score"].append("n/a")
+        with open(Path(log_dir) / experiment_name / "stats.csv", "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(running_stats.keys())
+            writer.writerows(zip(*running_stats.values()))
 
 
 class Callbacks(DefaultCallbacks):
