@@ -62,7 +62,7 @@ class StatePreprocessor:
         ego_heading,
         ego_waypoints,
     ):
-        if social_vehicle_config["encoder"]["use_leading_vehicles"]:
+        if False:#social_vehicle_config["encoder"]["use_leading_vehicles"]:
             social_vehicles = get_social_vehicles_leading(
                 ego_vehicle_pos=ego_position,
                 ego_vehicle_heading=ego_heading,

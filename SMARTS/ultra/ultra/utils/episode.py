@@ -68,6 +68,7 @@ class LogInfo:
         }
 
     def add(self, infos, rewards):
+        return
         self.data["env_score"] += int(infos["logs"]["env_score"])
         self.data["speed"] += infos["logs"]["speed"]
         self.data["max_speed_violation"] += (

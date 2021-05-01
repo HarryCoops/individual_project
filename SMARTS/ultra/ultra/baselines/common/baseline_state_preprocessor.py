@@ -58,13 +58,13 @@ class BaselineStatePreprocessor(StatePreprocessor):
         return {
             "low_dim_states": {
                 "speed": 1,
-                "distance_from_center": 1,
+                #"distance_from_center": 1,
                 "steering": 1,
-                "angle_error": 1,
-                "relative_goal_position": 2,
+                #"angle_error": 1,
+                #"relative_goal_position": 2,
                 # "action": int(action_size),  # 2
-                "waypoints_lookahead": 2 * int(observation_waypoints_lookahead),
-                "road_speed": 1,
+                #"waypoints_lookahead": 2 * int(observation_waypoints_lookahead),
+                #"road_speed": 1,
             },
             "social_vehicles": int(social_vehicle_config["num_social_features"])
             if int(social_vehicle_config["social_capacity"]) > 0
@@ -85,6 +85,7 @@ class BaselineStatePreprocessor(StatePreprocessor):
         state = self._adapt_observation_for_baseline(state)
 
         # Obtain the next waypoints.
+        '''
         _, lookahead_waypoints = self.extract_closest_waypoint(
             ego_goal_path=state["goal_path"],
             ego_position=state["ego_position"],
@@ -92,7 +93,7 @@ class BaselineStatePreprocessor(StatePreprocessor):
             num_lookahead=observation_num_lookahead,
         )
         state["waypoints_lookahead"] = np.hstack(lookahead_waypoints)
-
+        '''
         # Normalize states and concatenate.
         normalized = [
             self._normalize(key, state[key])
@@ -115,7 +116,7 @@ class BaselineStatePreprocessor(StatePreprocessor):
                 social_vehicle_config=social_vehicle_config,
                 ego_position=state["ego_position"],
                 ego_heading=state["heading"],
-                ego_waypoints=state["waypoint_paths"],
+                ego_waypoints=None#state["waypoint_paths"],
             )
             if social_capacity > 0
             else []
@@ -143,11 +144,12 @@ class BaselineStatePreprocessor(StatePreprocessor):
         ego_speed = self.extract_ego_speed(state)
         ego_steering = self.extract_ego_steering(state)
         ego_start = self.extract_ego_start(state)
-        ego_goal = self.extract_ego_goal(state)
-        ego_waypoints = self.extract_ego_waypoints(state)
+        #ego_goal = self.extract_ego_goal(state)
+        #ego_waypoints = self.extract_ego_waypoints(state)
         social_vehicle_states = self.extract_social_vehicles(state)
 
         # Identify the path the ego is following.
+        '''
         ego_goal_path = self.extract_ego_goal_path(
             ego_goal=ego_goal,
             ego_waypoints=ego_waypoints,
@@ -160,34 +162,39 @@ class BaselineStatePreprocessor(StatePreprocessor):
             ego_position=ego_position,
             ego_heading=ego_heading,
         )
+        '''
 
         # Calculate the ego's distance from the center of the lane.
+        '''
         signed_distance_from_center = ego_closest_waypoint.signed_lateral_error(
             ego_position
         )
-        lane_width = ego_closest_waypoint.lane_width * 0.5
-        ego_distance_from_center = signed_distance_from_center / lane_width
+        '''
+        #lane_width = ego_closest_waypoint.lane_width * 0.5
+        #ego_distance_from_center = signed_distance_from_center / lane_width
 
         # Calculate the ego's relative, rotated position from the goal.
+        '''
         ego_relative_rotated_goal_position = rotate2d_vector(
             np.asarray(ego_goal.position[0:2]) - np.asarray(ego_position[0:2]),
             -ego_heading,
         )
+        '''
 
         basic_state = dict(
             speed=ego_speed,
-            relative_goal_position=ego_relative_rotated_goal_position,
-            distance_from_center=ego_distance_from_center,
+            #relative_goal_position=ego_relative_rotated_goal_position,
+            #distance_from_center=ego_distance_from_center,
             steering=ego_steering,
-            angle_error=ego_closest_waypoint.relative_heading(ego_heading),
+            #angle_error=ego_closest_waypoint.relative_heading(ego_heading),
             social_vehicles=social_vehicle_states,
-            road_speed=ego_closest_waypoint.speed_limit,
+            #road_speed=ego_closest_waypoint.speed_limit,
             start=ego_start.position,
-            goal=ego_goal.position,
+            #goal=ego_goal.position,
             heading=ego_heading,
-            goal_path=ego_goal_path,
+            #goal_path=ego_goal_path,
             ego_position=ego_position,
-            waypoint_paths=ego_waypoints,
+            #waypoint_paths=ego_waypoints,
             events=state.events,
         )
         return basic_state

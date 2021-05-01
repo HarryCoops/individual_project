@@ -50,7 +50,8 @@ num_gpus = 1 if torch.cuda.is_available() else 0
 # @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
 #@ray.remote(num_gpus=num_gpus / 2)
 def train(
-    scenario_info,
+    scenario,
+    n_agents,
     num_episodes,
     policy_classes,
     max_episode_steps,
@@ -68,22 +69,25 @@ def train(
     # Make agent_ids in the form of 000, 001, ..., 010, 011, ..., 999, 1000, ...;
     # or use the provided policy_ids if available.
     agent_ids = (
-        ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(len(policy_classes))]
+        ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
         if not policy_ids
         else policy_ids
     )
     # Ensure there is an ID for each policy, and a policy for each ID.
+    '''
     assert len(agent_ids) == len(policy_classes), (
         "The number of agent IDs provided ({}) must be equal to "
         "the number of policy classes provided ({}).".format(
             len(agent_ids), len(policy_classes)
         )
     )
+    '''
+    policy_class = policy_classes[0]
 
     # Assign the policy classes to their associated ID.
     agent_classes = {
         agent_id: policy_class
-        for agent_id, policy_class in zip(agent_ids, policy_classes)
+        for agent_id in agent_ids
     }
     # Create the agent specifications matched with their associated ID.
     agent_specs = {
@@ -98,7 +102,7 @@ def train(
     # Create the environment.
     env = gym.make(
         "smarts.env:hiway-v0",
-        scenarios=scenario_info,
+        scenarios=[scenario,],
         agent_specs=agent_specs,
         sim_name=None,
         headless=headless,
@@ -150,6 +154,7 @@ def train(
                 break
 
             # Perform the evaluation check.
+            '''
             evaluation_check(
                 agents=agents,
                 agent_ids=agent_ids,
@@ -160,6 +165,7 @@ def train(
                 **eval_info,
                 **env.info,
             )
+            '''
 
             # Request and perform actions on each agent that received an observation.
             actions = {
@@ -211,13 +217,13 @@ def train(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("intersection-training")
     parser.add_argument(
-        "--task", help="Tasks available : [0, 1, 2]", type=str, default="1"
+        "--scenario", help="Scenario to run", type=str, default="scenarios/loop"
     )
     parser.add_argument(
-        "--level",
-        help="Levels available : [easy, medium, hard, no-traffic]",
-        type=str,
-        default="easy",
+        "--n-agents",
+        help="Number of ego agents to train",
+        type=int,
+        default=10
     )
     parser.add_argument(
         "--policy",
@@ -290,7 +296,8 @@ if __name__ == "__main__":
     policy_ids = args.policy_ids.split(",") if args.policy_ids else None
     
     train(
-        scenario_info=args.task,
+        scenario=args.scenario,
+        n_agents=args.n_agents,
         num_episodes=int(args.episodes),
         max_episode_steps=int(args.max_episode_steps),
         eval_info={

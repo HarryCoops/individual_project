@@ -287,7 +287,8 @@ class DQNPolicy(Agent):
 
     def step(self, state, action, reward, next_state, done, info, others=None):
         # dont treat timeout as done equal to True
-        max_steps_reached = info["logs"]["events"].reached_max_episode_steps
+        #max_steps_reached = info["logs"]["events"].reached_max_episode_steps
+        max_steps_reached = False
         if max_steps_reached:
             done = False
         if self.action_space_type == "continuous":

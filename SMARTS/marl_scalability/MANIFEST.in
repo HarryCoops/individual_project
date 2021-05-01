@@ -1,0 +1,6 @@
+include sac/checkpoint/checkpoint
+include marl_scalability/agent_pool.json
+include config.yaml
+include marl_scalability/scenarios/task1/config.yaml
+include marl_scalability/scenarios/task2/config.yaml
+recursive-include marl_scalability/scenarios/pool
