@@ -1,5 +1,0 @@
-[rl_agents.trainer.evaluation:INFO] Episode 0 score: 21.7 
-[rl_agents.trainer.evaluation:INFO] Episode 1 score: 2.0 
-[rl_agents.trainer.evaluation:INFO] Saved DQNAgent model to /home/harry/individual_project/out/HighwayEnv/DQNAgent/run_20210410-164532_916013/checkpoint-final.tar 
-[rl_agents.agents.deep_q_network.pytorch:DEBUG] Number of trainable parameters: 34373 
-[rl_agents.agents.common.utils:INFO] Choosing GPU device: 3, memory used: 8 

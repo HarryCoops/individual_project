@@ -1,0 +1,28 @@
+WARNING:tornado.access:404 GET /favicon.ico (172.17.0.1) 0.81ms
+WARNING:tornado.access:404 GET /favicon.ico (172.17.0.1) 0.81ms
+Traceback (most recent call last):
+  File "/usr/local/bin/scl", line 8, in <module>
+    sys.exit(scl())
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 829, in __call__
+    return self.main(*args, **kwargs)
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 782, in main
+    rv = self.invoke(ctx)
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 1259, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 1259, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 1066, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/local/lib/python3.7/dist-packages/click/core.py", line 610, in invoke
+    return callback(*args, **kwargs)
+  File "/src/cli/envision.py", line 50, in start_server
+    run(scenario_dirs=scenarios, max_capacity_mb=max_capacity, port=port)
+  File "/src/envision/server.py", line 424, in run
+    app.listen(port)
+  File "/usr/local/lib/python3.7/dist-packages/tornado/web.py", line 2109, in listen
+    server.listen(port, address)
+  File "/usr/local/lib/python3.7/dist-packages/tornado/tcpserver.py", line 151, in listen
+    sockets = bind_sockets(port, address=address)
+  File "/usr/local/lib/python3.7/dist-packages/tornado/netutil.py", line 161, in bind_sockets
+    sock.bind(sockaddr)
+OSError: [Errno 98] Address already in use

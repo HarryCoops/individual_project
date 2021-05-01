@@ -1,9 +1,0 @@
-{
-    "agent_configs": [
-        "configs/HighwayEnv/agents/DQNAgent/dqn.json"
-    ],
-    "env_configs": [
-        "configs/HighwayEnv/env_multi_agent.json"
-    ],
-    "num_episodes": 3
-}

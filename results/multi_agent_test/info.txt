@@ -1,1 +1,0 @@
-posix.uname_result(sysname='Linux', nodename='harry-desktop', release='5.4.0-72-generic', version='#80~18.04.1-Ubuntu SMP Mon Apr 12 23:26:25 UTC 2021', machine='x86_64')
