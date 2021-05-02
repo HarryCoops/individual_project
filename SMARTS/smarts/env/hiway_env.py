@@ -172,7 +172,6 @@ class HiWayEnv(gym.Env):
             observation = observations[agent_id]
             reward = rewards[agent_id]
             info = infos[agent_id]
-
             rewards[agent_id] = agent_spec.reward_adapter(observation, reward)
             observations[agent_id] = agent_spec.observation_adapter(observation)
             infos[agent_id] = agent_spec.info_adapter(observation, reward, info)

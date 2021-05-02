@@ -167,7 +167,10 @@ class BaselineAdapter:
         # Distance to goal
         ego_2d_position = ego_observation.position[0:2]
         #goal_dist = distance.euclidean(ego_2d_position, goal.position)
-
+        ego_position = ego_observation.position
+        # This is awful  
+        closest_wp = [min(wps, key=lambda wp: wp.dist_to(ego_position)) for wps in observation.waypoint_paths]
+        closest_wp = min(closest_wp, key=lambda wp: wp.dist_to(ego_position))
         '''
         closest_wp, _ = get_closest_waypoint(
             num_lookahead=num_lookahead,
@@ -175,20 +178,19 @@ class BaselineAdapter:
             ego_position=ego_observation.position,
             ego_heading=ego_observation.heading,
         )
-    
+        '''
         angle_error = closest_wp.relative_heading(
             ego_observation.heading
         )  # relative heading radians [-pi, pi]
-        '''
+        
         # Distance from center
-        '''
+        
         signed_dist_from_center = closest_wp.signed_lateral_error(
             observation.ego_vehicle_state.position
         )
         lane_width = closest_wp.lane_width * 0.5
         ego_dist_center = signed_dist_from_center / lane_width
-        '''
-
+        
         # number of violations
         (ego_num_violations, social_num_violations,) = ego_social_safety(
             observation,
@@ -199,11 +201,11 @@ class BaselineAdapter:
             ignore_vehicle_behind=True,
         )
 
-        #speed_fraction = max(0, ego_observation.speed / closest_wp.speed_limit)
-        #ego_step_reward = 0.02 * min(speed_fraction, 1) * np.cos(angle_error)
-        #ego_speed_reward = min(
-        #    0, (closest_wp.speed_limit - ego_observation.speed) * 0.01
-        #)  # m/s
+        speed_fraction = max(0, ego_observation.speed / closest_wp.speed_limit)
+        ego_step_reward = 0.02 * min(speed_fraction, 1) * np.cos(angle_error)
+        ego_speed_reward = min(
+            0, (closest_wp.speed_limit - ego_observation.speed) * 0.01
+        )  # m/s
         ego_collision = len(ego_events.collisions) > 0
         ego_collision_reward = -1.0 if ego_collision else 0.0
         ego_off_road_reward = -1.0 if ego_events.off_road else 0.0
@@ -211,8 +213,8 @@ class BaselineAdapter:
         ego_wrong_way = -0.02 if ego_events.wrong_way else 0.0
         ego_goal_reward = 0.0
         ego_time_out = 0.0
-        #ego_dist_center_reward = -0.002 * min(1, abs(ego_dist_center))
-        #ego_angle_error_reward = -0.005 * max(0, np.cos(angle_error))
+        ego_dist_center_reward = -0.002 * min(1, abs(ego_dist_center))
+        ego_angle_error_reward = -0.005 * max(0, np.cos(angle_error))
         ego_reached_goal = 1.0 if ego_events.reached_goal else 0.0
         ego_safety_reward = -0.02 if ego_num_violations > 0 else 0
         social_safety_reward = -0.02 if social_num_violations > 0 else 0
@@ -221,22 +223,22 @@ class BaselineAdapter:
         #ego_angular_jerk = -0.0001 * angular_jerk * math.cos(angle_error)
         env_reward /= 100
         # DG: Different speed reward
-        #ego_speed_reward = -0.1 if speed_fraction >= 1 else 0.0
-        #ego_speed_reward += -0.01 if speed_fraction < 0.01 else 0.0
+        ego_speed_reward = -0.1 if speed_fraction >= 1 else 0.0
+        ego_speed_reward += -0.01 if speed_fraction < 0.01 else 0.0
 
         rewards = sum(
             [
-                #ego_goal_reward,
+                ego_goal_reward,
                 ego_collision_reward,
                 ego_off_road_reward,
                 ego_off_route_reward,
                 ego_wrong_way,
-                #ego_speed_reward,
+                ego_speed_reward,
                 # ego_time_out,
-                #ego_dist_center_reward,
-                #ego_angle_error_reward,
+                ego_dist_center_reward,
+                ego_angle_error_reward,
                 ego_reached_goal,
-                #ego_step_reward,
+                ego_step_reward,
                 env_reward,
                 # ego_linear_jerk,
                 # ego_angular_jerk,

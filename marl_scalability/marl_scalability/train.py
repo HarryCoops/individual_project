@@ -99,6 +99,7 @@ def train(
         agent_id: agent_spec.build_agent()
         for agent_id, agent_spec in agent_specs.items()
     }
+    print(agent_specs)
     # Create the environment.
     env = gym.make(
         "smarts.env:hiway-v0",
@@ -131,7 +132,6 @@ def train(
         infos = None
         episode.reset()
         experiment_dir = episode.experiment_dir
-        print(experiment_dir)
         # Save relevant agent metadata.
         if not os.path.exists(f"{experiment_dir}/agent_metadata.pkl"):
             if not os.path.exists(experiment_dir):
@@ -205,7 +205,7 @@ def train(
         # Normalize the data and record this episode on tensorboard.
         episode.record_episode()
         episode.record_tensorboard()
-
+        
         if finished:
             break
     pr.stop()

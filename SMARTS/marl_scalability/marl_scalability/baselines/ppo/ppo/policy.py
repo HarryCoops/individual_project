@@ -176,6 +176,8 @@ class PPOPolicy(Agent):
         max_steps_reached = info["logs"]["events"].reached_max_episode_steps
         if max_steps_reached:
             done = False
+        if self.step_count > 1000:
+            done = False
         action = to_2d_action(action)
 
         # pass social_vehicle_rep through the network
