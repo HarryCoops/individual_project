@@ -171,14 +171,8 @@ class BaselineAdapter:
         # This is awful  
         closest_wp = [min(wps, key=lambda wp: wp.dist_to(ego_position)) for wps in observation.waypoint_paths]
         closest_wp = min(closest_wp, key=lambda wp: wp.dist_to(ego_position))
-        '''
-        closest_wp, _ = get_closest_waypoint(
-            num_lookahead=num_lookahead,
-            goal_path=path,
-            ego_position=ego_observation.position,
-            ego_heading=ego_observation.heading,
-        )
-        '''
+        
+
         angle_error = closest_wp.relative_heading(
             ego_observation.heading
         )  # relative heading radians [-pi, pi]
@@ -225,7 +219,7 @@ class BaselineAdapter:
         # DG: Different speed reward
         ego_speed_reward = -0.1 if speed_fraction >= 1 else 0.0
         ego_speed_reward += -0.01 if speed_fraction < 0.01 else 0.0
-
+        
         rewards = sum(
             [
                 ego_goal_reward,

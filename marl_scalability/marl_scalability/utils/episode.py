@@ -49,7 +49,6 @@ class LogInfo:
             "env_score": 0,
             "episode_reward": 0,
             "dist_center": 0,
-            "goal_dist": 0,
             "speed": 0,
             "max_speed_violation": 0,
             "ego_num_violations": 0,
@@ -62,13 +61,12 @@ class LogInfo:
             "collision": 0,
             "off_road": 0,
             "off_route": 0,
-            "reached_goal": 0,
             "timed_out": 0,
             "episode_length": 1,
         }
 
     def add(self, infos, rewards):
-        return
+        
         self.data["env_score"] += int(infos["logs"]["env_score"])
         self.data["speed"] += infos["logs"]["speed"]
         self.data["max_speed_violation"] += (
@@ -79,7 +77,6 @@ class LogInfo:
         self.data["social_num_violations"] += int(
             infos["logs"]["social_num_violations"] > 0
         )
-        self.data["goal_dist"] = infos["logs"]["goal_dist"]
         self.data["ego_linear_jerk"] += infos["logs"]["linear_jerk"]
         self.data["ego_angular_jerk"] += infos["logs"]["angular_jerk"]
         self.data["episode_reward"] += rewards
@@ -98,7 +95,6 @@ class LogInfo:
         )
         self.data["off_road"] = int(events.off_road)
         self.data["off_route"] = int(events.off_route)
-        self.data["reached_goal"] = int(events.reached_goal)
         self.data["timed_out"] = int(events.reached_max_episode_steps)
         #
 
@@ -289,7 +285,7 @@ class Episode:
                     pass
 
 
-def episodes(n, etag=None, log_dir=None, write_table=False):
+def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None):
     col_width = 18
     running_stats = {
             "episode": [],
@@ -310,7 +306,6 @@ def episodes(n, etag=None, log_dir=None, write_table=False):
         style="round",
     ) as table:
         tb_writer = None
-        experiment_name = None
         last_eval_iterations = defaultdict(lambda: None)
         eval_count = 0
         all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: [])))

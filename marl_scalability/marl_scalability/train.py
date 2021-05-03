@@ -22,9 +22,7 @@
 import json
 import os
 import sys
-
-from pyinstrument import Profiler
-import pstats
+from pathlib import Path
 
 from marl_scalability.utils.ray import default_ray_kwargs
 
@@ -46,45 +44,30 @@ from marl_scalability.utils.episode import episodes
 
 num_gpus = 1 if torch.cuda.is_available() else 0
 
-
+from datetime import datetime 
 # @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
 #@ray.remote(num_gpus=num_gpus / 2)
+ 
 def train(
     scenario,
     n_agents,
     num_episodes,
-    policy_classes,
     max_episode_steps,
     eval_info,
     timestep_sec,
     headless,
+    policy_class,
     seed,
     log_dir,
-    policy_ids=None,
+    experiment_name
 ):
     torch.set_num_threads(1)
     total_step = 0
     finished = False
-
     # Make agent_ids in the form of 000, 001, ..., 010, 011, ..., 999, 1000, ...;
-    # or use the provided policy_ids if available.
-    agent_ids = (
-        ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
-        if not policy_ids
-        else policy_ids
-    )
-    # Ensure there is an ID for each policy, and a policy for each ID.
-    '''
-    assert len(agent_ids) == len(policy_classes), (
-        "The number of agent IDs provided ({}) must be equal to "
-        "the number of policy classes provided ({}).".format(
-            len(agent_ids), len(policy_classes)
-        )
-    )
-    '''
-    policy_class = policy_classes[0]
+    agent_ids = ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
 
-    # Assign the policy classes to their associated ID.
+    # Assign the agent classes
     agent_classes = {
         agent_id: policy_class
         for agent_id in agent_ids
@@ -99,33 +82,22 @@ def train(
         agent_id: agent_spec.build_agent()
         for agent_id, agent_spec in agent_specs.items()
     }
-    print(agent_specs)
+
     # Create the environment.
     env = gym.make(
-        "smarts.env:hiway-v0",
+        "marl_scalability.env:scalability-v0",
+        agent_specs=agent_specs,
         scenarios=[scenario,],
-        agent_specs=agent_specs,
-        sim_name=None,
         headless=headless,
+        timestep_sec=0.1,
         seed=seed,
     )
-    '''
-    env = gym.make(
-        "marl_scalability.env:marl_scalability-v0",
-        agent_specs=agent_specs,
-        scenario_info=scenario_info,
-        headless=headless,
-        timestep_sec=timestep_sec,
-        seed=seed,
-    )
-    '''
+
     # Define an 'etag' for this experiment's data directory based off policy_classes.
     # E.g. From a ["marl_scalability.baselines.dqn:dqn-v0", "marl_scalability.baselines.ppo:ppo-v0"]
     # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
-    etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
-    pr = Profiler()
-    pr.start()
-    for episode in episodes(num_episodes, etag=etag, log_dir=log_dir, write_table=True):
+    #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
+    for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
         # Reset the environment and retrieve the initial observations.
         observations = env.reset()
         dones = {"__all__": False}
@@ -173,7 +145,6 @@ def train(
                 for agent_id, observation in observations.items()
             }
             next_observations, rewards, dones, infos = env.step(actions)
-
             # Active agents are those that receive observations in this step and the next
             # step. Step each active agent (obtaining their network loss if applicable).
             active_agent_ids = observations.keys() & next_observations.keys()
@@ -208,9 +179,6 @@ def train(
         
         if finished:
             break
-    pr.stop()
-    with open(f"{experiment_dir}/profile.html", "w") as f:
-        f.write(pr.output_html())
     env.close()
 
 
@@ -244,7 +212,18 @@ if __name__ == "__main__":
         "--timestep", help="Environment timestep (sec)", type=float, default=0.1
     )
     parser.add_argument(
-        "--headless", help="Run without envision", type=bool, default=False
+        "--headless", help="Run without envision", action="store_true", default=False
+    )
+    parser.add_argument(
+        "--memprof", help="Run experiment with a memory profiler", 
+        action="store_true", 
+        default=False
+    )
+    parser.add_argument(
+        "--profiler", 
+        help="Run experiment with a specified exeuction profiler",
+        type=str, 
+        default=""
     )
     parser.add_argument(
         "--eval-episodes", help="Number of evaluation episodes", type=int, default=200
@@ -267,47 +246,78 @@ if __name__ == "__main__":
         default="logs",
         type=str,
     )
-    parser.add_argument(
-        "--policy-ids",
-        help="Name of each specified policy",
-        default=None,
-        type=str,
-    )
 
     base_dir = os.path.dirname(__file__)
     pool_path = os.path.join(base_dir, "agent_pool.json")
     args = parser.parse_args()
 
+    log_dir = Path(args.log_dir)
+    log_dir.mkdir(exist_ok=True)
+
+    string_date = datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+    experiment_name = f"exp_{args.policy}_{args.n_agents}_{args.episodes}_{string_date}"
+
     # Obtain the policy class strings for each specified policy.
-    policy_classes = []
+    policy_class = "sac"
     with open(pool_path, "r") as f:
         data = json.load(f)
-        for policy in args.policy.split(","):
-            if policy in data["agents"].keys():
-                policy_classes.append(
-                    data["agents"][policy]["path"]
-                    + ":"
-                    + data["agents"][policy]["locator"]
-                )
-            else:
-                raise ImportError("Invalid policy name. Please try again")
+        if args.policy in data["agents"].keys():
+            policy_class = (data["agents"][args.policy]["path"] +
+             ":" + data["agents"][args.policy]["locator"])
+        else:
+            raise ImportError("Invalid policy name. Please try again")
 
-    # Obtain the policy class IDs from the arguments.
-    policy_ids = args.policy_ids.split(",") if args.policy_ids else None
     
-    train(
-        scenario=args.scenario,
-        n_agents=args.n_agents,
-        num_episodes=int(args.episodes),
-        max_episode_steps=int(args.max_episode_steps),
-        eval_info={
+    train_args = {
+        "scenario": args.scenario,
+        "n_agents": args.n_agents,
+        "num_episodes": int(args.episodes),
+        "max_episode_steps": int(args.max_episode_steps),
+        "eval_info": {
             "eval_rate": float(args.eval_rate),
             "eval_episodes": int(args.eval_episodes),
         },
-        timestep_sec=float(args.timestep),
-        headless=args.headless,
-        policy_classes=policy_classes,
-        seed=args.seed,
-        log_dir=args.log_dir,
-        policy_ids=policy_ids,
-    )
+        "timestep_sec": float(args.timestep),
+        "headless": args.headless,
+        "policy_class": policy_class,
+        "seed": args.seed,
+        "log_dir": args.log_dir,
+        "experiment_name": experiment_name
+    }
+    if args.profiler == "pyinstrument":
+        from pyinstrument import Profiler
+        pr = Profiler()
+        pr.start()
+    elif args.profiler == "cProfile":
+        import cProfile 
+        pr = cProfile.Profile()
+        pr.enable()
+    
+    if args.memprof:
+        from memory_profiler import memory_usage
+        mem_usage = memory_usage((train, train_args.values(), {}),1)
+        import pandas as pd 
+        mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage)})
+        mem_usage.to_csv(log_dir / experiment_name / "mem_usage.csv")
+    else:
+        train(*train_args.values())
+
+    if args.profiler == "pyinstrument":
+        pr.stop()
+        with open(log_dir / experiment_name / "profile.html", "w") as f:
+            f.write(pr.output_html())
+    elif args.profiler == "cProfile":
+        import pstats
+        import io
+        result = io.StringIO()
+        ps = pstats.Stats(pr, stream=result)
+        ps.sort_stats("cumulative")
+        ps.print_stats()
+        result = result.getvalue()
+        result = "ncalls" + result.split("ncalls")[-1]
+        result = "\n".join([",".join(line.rstrip().split(None, 5)) for line in result.split("\n")])
+        with open(log_dir / experiment_name / "cprofile.csv", "w") as f:
+            f.write(result)
+
+    with open(log_dir / experiment_name / "train_args.json", "w") as f:
+        f.write(json.dumps(train_args))
