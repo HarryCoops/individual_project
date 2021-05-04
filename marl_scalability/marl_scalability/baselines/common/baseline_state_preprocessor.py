@@ -148,9 +148,8 @@ class BaselineStatePreprocessor(StatePreprocessor):
         ego_waypoints = self.extract_ego_waypoints(state)
         social_vehicle_states = self.extract_social_vehicles(state)
 
-        ego_closest_waypoint = min(
-            ego_waypoints, key=lambda wp: wp.dist_to(ego_position)
-        )
+        ego_closest_waypoint = [min(wps, key=lambda wp: wp.dist_to(ego_position)) for wps in ego_waypoints]
+        ego_closest_waypoint = min(ego_closest_waypoint, key=lambda wp: wp.dist_to(ego_position))
 
         # Identify the path the ego is following.
         '''
