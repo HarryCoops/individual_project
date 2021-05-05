@@ -186,6 +186,7 @@ class BaselineAdapter:
         ego_dist_center = signed_dist_from_center / lane_width
         
         # number of violations
+        """
         (ego_num_violations, social_num_violations,) = ego_social_safety(
             observation,
             d_min_ego=1.0,
@@ -194,6 +195,7 @@ class BaselineAdapter:
             t_c_social=1.0,
             ignore_vehicle_behind=True,
         )
+        """
 
         speed_fraction = max(0, ego_observation.speed / closest_wp.speed_limit)
         ego_step_reward = 0.02 * min(speed_fraction, 1) * np.cos(angle_error)
@@ -210,8 +212,8 @@ class BaselineAdapter:
         ego_dist_center_reward = -0.002 * min(1, abs(ego_dist_center))
         ego_angle_error_reward = -0.005 * max(0, np.cos(angle_error))
         ego_reached_goal = 1.0 if ego_events.reached_goal else 0.0
-        ego_safety_reward = -0.02 if ego_num_violations > 0 else 0
-        social_safety_reward = -0.02 if social_num_violations > 0 else 0
+        #ego_safety_reward = -0.02 if ego_num_violations > 0 else 0
+        #social_safety_reward = -0.02 if social_num_violations > 0 else 0
         ego_lat_speed = 0.0  # -0.1 * abs(long_lat_speed[1])
         #ego_linear_jerk = -0.0001 * linear_jerk
         #ego_angular_jerk = -0.0001 * angular_jerk * math.cos(angle_error)

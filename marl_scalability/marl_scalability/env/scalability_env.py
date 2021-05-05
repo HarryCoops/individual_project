@@ -81,6 +81,7 @@ class ScalabilityEnv(HiWayEnv):
         )  # relative heading radians [-pi, pi]
 
         # number of violations
+        """
         (ego_num_violations, social_num_violations,) = ego_social_safety(
             observation,
             d_min_ego=1.0,
@@ -89,7 +90,8 @@ class ScalabilityEnv(HiWayEnv):
             t_c_social=1.0,
             ignore_vehicle_behind=True,
         )
-
+        """
+        # This is kind of not efficient because the reward adapter is called again
         info = dict(
             position=ego_state.position,
             speed=ego_state.speed,
@@ -99,8 +101,8 @@ class ScalabilityEnv(HiWayEnv):
             start=start,
             closest_wp=closest_wp,
             events=observation.events,
-            ego_num_violations=ego_num_violations,
-            social_num_violations=social_num_violations,
+            #ego_num_violations=ego_num_violations,
+            #social_num_violations=social_num_violations,
             linear_jerk=np.linalg.norm(ego_state.linear_jerk),
             angular_jerk=np.linalg.norm(ego_state.angular_jerk),
             env_score=self.marl_scalability_scores(observation, highwayenv_score),
