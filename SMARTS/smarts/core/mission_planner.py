@@ -78,7 +78,6 @@ class MissionPlanner:
         offset = random.random() * (
             max_range_along_lane - min_range_along_lane
         ) + min_range_along_lane
-        print(offset)
         offset *= n_lane.getLength()
         coord = self._road_network.world_coord_from_offset(n_lane, offset)
         nearest_wp = self._waypoints.closest_waypoint_on_lane_to_point(
