@@ -64,7 +64,7 @@ class MissionPlanner:
         self._first_uturn = True
 
     def random_endless_mission(
-        self, min_range_along_lane=0.3, max_range_along_lane=0.9
+        self, min_range_along_lane=0.05, max_range_along_lane=0.95
     ) -> Mission:
         assert min_range_along_lane > 0  # Need to start further than beginning of lane
         assert max_range_along_lane < 1  # Cannot start past end of lane
@@ -75,9 +75,10 @@ class MissionPlanner:
 
         # XXX: The ends of the edge are not as useful as starting mission locations.
         #      Sumo complains if we get too close to 0 or `lane_length`.
-        offset = random.random() * min_range_along_lane + (
+        offset = random.random() * (
             max_range_along_lane - min_range_along_lane
-        )
+        ) + min_range_along_lane
+        print(offset)
         offset *= n_lane.getLength()
         coord = self._road_network.world_coord_from_offset(n_lane, offset)
         nearest_wp = self._waypoints.closest_waypoint_on_lane_to_point(
