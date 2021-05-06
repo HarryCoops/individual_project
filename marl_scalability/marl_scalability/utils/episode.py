@@ -51,8 +51,8 @@ class LogInfo:
             "dist_center": 0,
             "speed": 0,
             "max_speed_violation": 0,
-            "ego_num_violations": 0,
-            "social_num_violations": 0,
+            #"ego_num_violations": 0,
+            #"social_num_violations": 0,
             "ego_linear_jerk": 0.0,
             "ego_angular_jerk": 0.0,
             "final_pos": [0, 0],
@@ -73,10 +73,10 @@ class LogInfo:
             1 if infos["logs"]["speed"] > infos["logs"]["closest_wp"].speed_limit else 0
         )
         self.data["dist_center"] += infos["logs"]["dist_center"]
-        self.data["ego_num_violations"] += int(infos["logs"]["ego_num_violations"] > 0)
-        self.data["social_num_violations"] += int(
-            infos["logs"]["social_num_violations"] > 0
-        )
+        #self.data["ego_num_violations"] += int(infos["logs"]["ego_num_violations"] > 0)
+        #self.data["social_num_violations"] += int(
+        #    infos["logs"]["social_num_violations"] > 0
+        #)
         self.data["ego_linear_jerk"] += infos["logs"]["linear_jerk"]
         self.data["ego_angular_jerk"] += infos["logs"]["angular_jerk"]
         self.data["episode_reward"] += rewards
@@ -108,8 +108,8 @@ class LogInfo:
         self.data["speed"] /= steps
         self.data["ego_linear_jerk"] /= steps
         self.data["ego_angular_jerk"] /= steps
-        self.data["ego_num_violations"] /= steps
-        self.data["social_num_violations"] /= steps
+        #self.data["ego_num_violations"] /= steps
+        #self.data["social_num_violations"] /= steps
         self.data["max_speed_violation"] /= steps
 
 
