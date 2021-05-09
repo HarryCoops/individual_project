@@ -53,6 +53,12 @@ register(
     ),
 )
 register(
+    locator="dqn_discrete-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, policy_class=DQNPolicy, **kwargs
+    ),
+)
+register(
     locator="bdqn-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, policy_class=BehavioralDQNPolicy, **kwargs

@@ -18,6 +18,12 @@
             "name" : "dqn",
             "locator" : "dqn-v0"
         },
+        "dqn_discrete" : {
+            "path" : "marl_scalability.baselines.dqn_discrete",
+            "class" : "DiscreteDQNPolicy",
+            "name" : "dqn_discrete",
+            "locator" : "dqn_discrete-v0"
+        },
         "bdqn" : {
             "path" : "marl_scalability.baselines.bdqn",
             "class" : "BehavioralDQNPolicy",

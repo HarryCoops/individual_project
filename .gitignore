@@ -1,3 +1,5 @@
+*.pyc
+xdummy.log*
 .venv
 .venv-copy
 .DS_Store
