@@ -219,8 +219,8 @@ class BaselineAdapter:
         #ego_angular_jerk = -0.0001 * angular_jerk * math.cos(angle_error)
         env_reward /= 100
         # DG: Different speed reward
-        ego_speed_reward = -0.1 if speed_fraction >= 1 else 0.0
-        ego_speed_reward += -0.01 if speed_fraction < 0.01 else 0.0
+        #ego_speed_reward = -0.1 if speed_fraction >= 1 else 0.0
+        #ego_speed_reward += -0.01 if speed_fraction < 0.01 else 0.0
         
         rewards = sum(
             [

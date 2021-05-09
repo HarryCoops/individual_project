@@ -1,6 +1,6 @@
 docker run -it \
 	-v $PWD/SMARTS:/src \
 	-v $PWD/marl_scalability:/marl \
+	-v $PWD/SMARTS:/src \
 	--runtime nvidia \
-	-p 8081:8081 \
 	marl_scalability

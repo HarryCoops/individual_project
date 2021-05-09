@@ -1,0 +1,1 @@
+{"scenario": "scenarios/loop_4_lane", "n_agents": 30, "num_episodes": 100, "max_episode_steps": 5000, "eval_info": {"eval_rate": 10000.0, "eval_episodes": 200}, "timestep_sec": 0.1, "headless": true, "policy_class": "marl_scalability.baselines.dqn:dqn-v0", "seed": 2, "log_dir": "rerun_with_spread_vehicles_and_for_longer", "experiment_name": "exp_dqn_30_100_2021:05:08:02:13:05"}
