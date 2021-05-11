@@ -22,6 +22,7 @@
 import json
 import os
 import sys
+import csv
 from pathlib import Path
 
 from marl_scalability.utils.ray import default_ray_kwargs
@@ -37,6 +38,7 @@ import gym
 import psutil
 import ray
 import torch
+import logging
 
 from smarts.zoo.registry import make
 from marl_scalability.evaluate import evaluation_check
@@ -47,140 +49,153 @@ num_gpus = 1 if torch.cuda.is_available() else 0
 from datetime import datetime 
 # @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
 #@ray.remote(num_gpus=num_gpus / 2)
- 
-def train(
-    scenario,
-    n_agents,
-    num_episodes,
-    max_episode_steps,
-    eval_info,
-    timestep_sec,
-    headless,
-    policy_class,
-    seed,
-    log_dir,
-    experiment_name
-):
-    torch.set_num_threads(1)
-    total_step = 0
-    finished = False
-    # Make agent_ids in the form of 000, 001, ..., 010, 011, ..., 999, 1000, ...;
-    agent_ids = ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
 
-    # Assign the agent classes
-    agent_classes = {
-        agent_id: policy_class
-        for agent_id in agent_ids
-    }
-    # Create the agent specifications matched with their associated ID.
-    agent_specs = {
-        agent_id: make(locator=policy_class, max_episode_steps=max_episode_steps)
-        for agent_id, policy_class in agent_classes.items()
-    }
-    # Create the agents matched with their associated ID.
-    agents = {
-        agent_id: agent_spec.build_agent()
-        for agent_id, agent_spec in agent_specs.items()
-    }
+from memory_profiler import profile
+def outer_train(f, *args, **kwargs):
+    @profile(stream=f)
+    def train(
+        scenario,
+        n_agents,
+        num_episodes,
+        max_episode_steps,
+        eval_info,
+        timestep_sec,
+        headless,
+        policy_class,
+        seed,
+        log_dir,
+        experiment_name,
+        record_vehicle_lifespan
+    ):
+        torch.set_num_threads(1)
+        total_step = 0
+        finished = False
+        # Make agent_ids in the form of 000, 001, ..., 010, 011, ..., 999, 1000, ...;
+        agent_ids = ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
 
-    # Create the environment.
-    env = gym.make(
-        "marl_scalability.env:scalability-v0",
-        agent_specs=agent_specs,
-        scenarios=[scenario,],
-        headless=headless,
-        timestep_sec=0.1,
-        seed=seed,
-    )
+        # Assign the agent classes
+        agent_classes = {
+            agent_id: policy_class
+            for agent_id in agent_ids
+        }
+        # Create the agent specifications matched with their associated ID.
+        agent_specs = {
+            agent_id: make(locator=policy_class, max_episode_steps=max_episode_steps)
+            for agent_id, policy_class in agent_classes.items()
+        }
+        # Create the agents matched with their associated ID.
+        agents = {
+            agent_id: agent_spec.build_agent()
+            for agent_id, agent_spec in agent_specs.items()
+        }
 
-    # Define an 'etag' for this experiment's data directory based off policy_classes.
-    # E.g. From a ["marl_scalability.baselines.dqn:dqn-v0", "marl_scalability.baselines.ppo:ppo-v0"]
-    # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
-    #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
-    for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
-        # Reset the environment and retrieve the initial observations.
-        observations = env.reset()
-        dones = {"__all__": False}
-        infos = None
-        episode.reset()
-        experiment_dir = episode.experiment_dir
-        # Save relevant agent metadata.
-        if not os.path.exists(f"{experiment_dir}/agent_metadata.pkl"):
-            if not os.path.exists(experiment_dir):
-                os.makedirs(experiment_dir)
-            with open(f"{experiment_dir}/agent_metadata.pkl", "wb") as metadata_file:
-                dill.dump(
-                    {
-                        "agent_ids": agent_ids,
-                        "agent_classes": agent_classes,
-                        "agent_specs": agent_specs,
-                    },
-                    metadata_file,
-                    pickle.HIGHEST_PROTOCOL,
+        # Create the environment.
+        env = gym.make(
+            "marl_scalability.env:scalability-v0",
+            agent_specs=agent_specs,
+            scenarios=[scenario,],
+            headless=headless,
+            timestep_sec=0.1,
+            seed=seed,
+        )
+
+        # Define an 'etag' for this experiment's data directory based off policy_classes.
+        # E.g. From a ["marl_scalability.baselines.dqn:dqn-v0", "marl_scalability.baselines.ppo:ppo-v0"]
+        # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
+        #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
+        surviving_vehicles_total = []
+        for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
+            # Reset the environment and retrieve the initial observations.
+            surviving_vehicles = []
+            observations = env.reset()
+            dones = {"__all__": False}
+            infos = None
+            episode.reset()
+            experiment_dir = episode.experiment_dir
+            # Save relevant agent metadata.
+            if not os.path.exists(f"{experiment_dir}/agent_metadata.pkl"):
+                if not os.path.exists(experiment_dir):
+                    os.makedirs(experiment_dir)
+                with open(f"{experiment_dir}/agent_metadata.pkl", "wb") as metadata_file:
+                    dill.dump(
+                        {
+                            "agent_ids": agent_ids,
+                            "agent_classes": agent_classes,
+                            "agent_specs": agent_specs,
+                        },
+                        metadata_file,
+                        pickle.HIGHEST_PROTOCOL,
+                    )
+
+            while not dones["__all__"]:
+                # Break if any of the agent's step counts is 1000000 or greater.
+                if any([episode.get_itr(agent_id) >= 1000000 for agent_id in agents]):
+                    finished = True
+                    break
+
+                # Perform the evaluation check.
+                '''
+                evaluation_check(
+                    agents=agents,
+                    agent_ids=agent_ids,
+                    policy_classes=agent_classes,
+                    episode=episode,
+                    log_dir=log_dir,
+                    max_episode_steps=max_episode_steps,
+                    **eval_info,
+                    **env.info,
+                )
+                '''
+
+                # Request and perform actions on each agent that received an observation.
+                actions = {
+                    agent_id: agents[agent_id].act(observation, explore=True)
+                    for agent_id, observation in observations.items()
+                }
+                next_observations, rewards, dones, infos = env.step(actions)
+                # Active agents are those that receive observations in this step and the next
+                # step. Step each active agent (obtaining their network loss if applicable).
+                active_agent_ids = observations.keys() & next_observations.keys()
+                print(len(active_agent_ids))
+                surviving_vehicles.append(len(active_agent_ids))
+                loss_outputs = {
+                    agent_id: agents[agent_id].step(
+                        state=observations[agent_id],
+                        action=actions[agent_id],
+                        reward=rewards[agent_id],
+                        next_state=next_observations[agent_id],
+                        done=dones[agent_id],
+                        info=infos[agent_id],
+                    )
+                    for agent_id in active_agent_ids
+                }
+
+                # Record the data from this episode.
+                episode.record_step(
+                    agent_ids_to_record=active_agent_ids,
+                    infos=infos,
+                    rewards=rewards,
+                    total_step=total_step,
+                    loss_outputs=loss_outputs,
                 )
 
-        while not dones["__all__"]:
-            # Break if any of the agent's step counts is 1000000 or greater.
-            if any([episode.get_itr(agent_id) >= 1000000 for agent_id in agents]):
-                finished = True
+                # Update variables for the next step.
+                total_step += 1
+                observations = next_observations
+
+            # Normalize the data and record this episode on tensorboard.
+            episode.record_episode()
+            episode.record_tensorboard()
+            surviving_vehicles += [0,] * (max_episode_steps - len(surviving_vehicles))
+            surviving_vehicles_total.append(surviving_vehicles)
+            if finished:
                 break
-
-            # Perform the evaluation check.
-            '''
-            evaluation_check(
-                agents=agents,
-                agent_ids=agent_ids,
-                policy_classes=agent_classes,
-                episode=episode,
-                log_dir=log_dir,
-                max_episode_steps=max_episode_steps,
-                **eval_info,
-                **env.info,
-            )
-            '''
-
-            # Request and perform actions on each agent that received an observation.
-            actions = {
-                agent_id: agents[agent_id].act(observation, explore=True)
-                for agent_id, observation in observations.items()
-            }
-            next_observations, rewards, dones, infos = env.step(actions)
-            # Active agents are those that receive observations in this step and the next
-            # step. Step each active agent (obtaining their network loss if applicable).
-            active_agent_ids = observations.keys() & next_observations.keys()
-            loss_outputs = {
-                agent_id: agents[agent_id].step(
-                    state=observations[agent_id],
-                    action=actions[agent_id],
-                    reward=rewards[agent_id],
-                    next_state=next_observations[agent_id],
-                    done=dones[agent_id],
-                    info=infos[agent_id],
-                )
-                for agent_id in active_agent_ids
-            }
-
-            # Record the data from this episode.
-            episode.record_step(
-                agent_ids_to_record=active_agent_ids,
-                infos=infos,
-                rewards=rewards,
-                total_step=total_step,
-                loss_outputs=loss_outputs,
-            )
-
-            # Update variables for the next step.
-            total_step += 1
-            observations = next_observations
-
-        # Normalize the data and record this episode on tensorboard.
-        episode.record_episode()
-        episode.record_tensorboard()
-        
-        if finished:
-            break
-    env.close()
-
+        if record_vehicle_lifespan:
+            with open(Path(log_dir) / experiment_name / "surviving_vehicle_data.csv", "w") as f:
+                writer = csv.writer(f)
+                writer.writerows(surviving_vehicles_total)
+        env.close()
+    train(*args, **kwargs)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("intersection-training")
@@ -235,6 +250,12 @@ if __name__ == "__main__":
         default=10000,
     )
     parser.add_argument(
+        "--record-vehicle-lifespan", 
+        help="Record the number of vehicles surviving at each timestep",
+        action="store_true",
+        default=False
+    )
+    parser.add_argument(
         "--seed",
         help="Environment seed",
         default=2,
@@ -256,7 +277,8 @@ if __name__ == "__main__":
 
     string_date = datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
     experiment_name = f"exp_{args.policy}_{args.n_agents}_{args.episodes}_{string_date}"
-
+    experiment_dir = log_dir / experiment_name
+    experiment_dir.mkdir(exist_ok=True)
     # Obtain the policy class strings for each specified policy.
     policy_class = "sac"
     with open(pool_path, "r") as f:
@@ -282,8 +304,10 @@ if __name__ == "__main__":
         "policy_class": policy_class,
         "seed": args.seed,
         "log_dir": args.log_dir,
-        "experiment_name": experiment_name
+        "experiment_name": experiment_name,
+        "record_vehicle_lifespan": args.record_vehicle_lifespan
     }
+
     if args.profiler == "pyinstrument":
         from pyinstrument import Profiler
         pr = Profiler()
@@ -292,7 +316,7 @@ if __name__ == "__main__":
         import cProfile 
         pr = cProfile.Profile()
         pr.enable()
-    
+    f = open(log_dir / experiment_name / "mem_profile.txt", "w")
     if args.memprof:
         from memory_profiler import memory_usage
         mem_usage = memory_usage((train, train_args.values(), {}),1)
@@ -300,7 +324,7 @@ if __name__ == "__main__":
         mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage)})
         mem_usage.to_csv(log_dir / experiment_name / "mem_usage.csv")
     else:
-        train(*train_args.values())
+        outer_train(f, *train_args.values())
 
     if args.profiler == "pyinstrument":
         pr.stop()
@@ -321,3 +345,4 @@ if __name__ == "__main__":
 
     with open(log_dir / experiment_name / "train_args.json", "w") as f:
         f.write(json.dumps(train_args))
+    f.close()
