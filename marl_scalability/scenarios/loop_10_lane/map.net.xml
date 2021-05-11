@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Tue 11 May 19:36:33 2021 by Eclipse SUMO netedit Version 1.8.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <output>
+        <output-file value="/Users/harrycooper/diss/individual_project/marl_scalability/scenarios/loop_10_lane/map.net.xml"/>
+    </output>
+
+    <processing>
+        <offset.disable-normalization value="true"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+    <report>
+        <aggregate-warnings value="5"/>
+    </report>
+
+</configuration>
+-->
+
+<net version="1.6" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="14.69,-55.71,156.02,82.87" origBoundary="10000000000.00,10000000000.00,-10000000000.00,-10000000000.00" projParameter="!"/>
+
+    <edge id=":gneJ10_0" function="internal">
+        <lane id=":gneJ10_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="-0.67,54.71 -0.86,54.37"/>
+        <lane id=":gneJ10_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="1.99,52.94 1.81,52.62"/>
+        <lane id=":gneJ10_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="4.66,51.16 4.49,50.86"/>
+        <lane id=":gneJ10_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="7.32,49.39 7.16,49.11"/>
+        <lane id=":gneJ10_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="9.99,47.62 9.94,47.54 9.91,47.49 9.89,47.43 9.84,47.35"/>
+        <lane id=":gneJ10_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="12.65,45.85 12.61,45.78 12.58,45.72 12.56,45.67 12.52,45.60"/>
+        <lane id=":gneJ10_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="15.32,44.08 15.28,44.01 15.25,43.96 15.23,43.91 15.19,43.84"/>
+        <lane id=":gneJ10_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="17.98,42.31 17.95,42.25 17.92,42.20 17.90,42.15 17.87,42.08"/>
+        <lane id=":gneJ10_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="20.65,40.54 20.61,40.48 20.60,40.43 20.58,40.39 20.54,40.33"/>
+        <lane id=":gneJ10_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.30" shape="23.31,38.77 23.28,38.71 23.27,38.67 23.25,38.63 23.22,38.57"/>
+    </edge>
+    <edge id=":gneJ11_0" function="internal">
+        <lane id=":gneJ11_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="2.14,-31.69 2.44,-32.05 2.63,-32.31 2.81,-32.58 3.13,-32.92"/>
+        <lane id=":gneJ11_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="4.44,-29.47 4.73,-29.81 4.90,-30.06 5.07,-30.31 5.37,-30.64"/>
+        <lane id=":gneJ11_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="6.75,-27.25 7.02,-27.57 7.17,-27.81 7.33,-28.04 7.60,-28.35"/>
+        <lane id=":gneJ11_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="9.05,-25.03 9.30,-25.33 9.44,-25.55 9.59,-25.78 9.84,-26.06"/>
+        <lane id=":gneJ11_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="11.36,-22.81 11.59,-23.09 11.72,-23.30 11.85,-23.51 12.08,-23.78"/>
+        <lane id=":gneJ11_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="13.67,-20.60 13.87,-20.85 13.99,-21.05 14.11,-21.24 14.32,-21.49"/>
+        <lane id=":gneJ11_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="15.97,-18.38 16.16,-18.61 16.26,-18.79 16.36,-18.98 16.56,-19.20"/>
+        <lane id=":gneJ11_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="18.28,-16.16 18.45,-16.37 18.53,-16.54 18.62,-16.71 18.80,-16.92"/>
+        <lane id=":gneJ11_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="20.58,-13.94 20.73,-14.13 20.81,-14.29 20.88,-14.44 21.04,-14.63"/>
+        <lane id=":gneJ11_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.16" shape="22.89,-11.72 23.02,-11.89 23.08,-12.03 23.14,-12.18 23.28,-12.34"/>
+    </edge>
+    <edge id=":gneJ12_0" function="internal">
+        <lane id=":gneJ12_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="29.43,-58.67 29.68,-58.93"/>
+        <lane id=":gneJ12_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="31.66,-56.38 31.95,-56.67"/>
+        <lane id=":gneJ12_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="33.90,-54.10 34.23,-54.42"/>
+        <lane id=":gneJ12_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="36.14,-51.81 36.50,-52.16"/>
+        <lane id=":gneJ12_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="38.38,-49.52 38.77,-49.91"/>
+        <lane id=":gneJ12_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="40.62,-47.24 41.04,-47.66"/>
+        <lane id=":gneJ12_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="42.86,-44.95 43.31,-45.40"/>
+        <lane id=":gneJ12_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="45.10,-42.67 45.58,-43.15"/>
+        <lane id=":gneJ12_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="47.34,-40.38 47.86,-40.90"/>
+        <lane id=":gneJ12_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.57" shape="49.57,-38.09 50.13,-38.64"/>
+    </edge>
+    <edge id=":gneJ13_0" function="internal">
+        <lane id=":gneJ13_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="141.04,-58.59 141.76,-57.79"/>
+        <lane id=":gneJ13_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="138.68,-56.43 139.35,-55.68"/>
+        <lane id=":gneJ13_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="136.32,-54.27 136.94,-53.57"/>
+        <lane id=":gneJ13_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="133.95,-52.12 134.54,-51.46"/>
+        <lane id=":gneJ13_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="131.59,-49.96 132.13,-49.35"/>
+        <lane id=":gneJ13_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="129.23,-47.80 129.73,-47.24"/>
+        <lane id=":gneJ13_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="126.86,-45.64 127.32,-45.13"/>
+        <lane id=":gneJ13_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="124.50,-43.49 124.91,-43.02"/>
+        <lane id=":gneJ13_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="122.14,-41.33 122.51,-40.91"/>
+        <lane id=":gneJ13_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.78" shape="119.77,-39.17 120.10,-38.80"/>
+    </edge>
+    <edge id=":gneJ14_0" function="internal">
+        <lane id=":gneJ14_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="165.08,-30.50 166.69,-28.76"/>
+        <lane id=":gneJ14_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="162.63,-28.44 164.15,-26.81"/>
+        <lane id=":gneJ14_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="160.18,-26.38 161.61,-24.87"/>
+        <lane id=":gneJ14_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="157.73,-24.32 159.07,-22.92"/>
+        <lane id=":gneJ14_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="155.27,-22.27 156.53,-20.98"/>
+        <lane id=":gneJ14_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="152.82,-20.21 153.99,-19.04"/>
+        <lane id=":gneJ14_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="150.37,-18.15 150.68,-17.83 150.92,-17.63 151.15,-17.43 151.44,-17.09"/>
+        <lane id=":gneJ14_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="147.92,-16.09 148.20,-15.80 148.42,-15.63 148.64,-15.45 148.90,-15.15"/>
+        <lane id=":gneJ14_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="145.47,-14.04 145.72,-13.78 145.92,-13.63 146.12,-13.47 146.36,-13.20"/>
+        <lane id=":gneJ14_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="143.02,-11.98 143.24,-11.75 143.43,-11.62 143.60,-11.49 143.82,-11.26"/>
+    </edge>
+    <edge id=":gneJ15_0" function="internal">
+        <lane id=":gneJ15_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="163.82,64.91 163.73,64.98"/>
+        <lane id=":gneJ15_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="161.97,62.29 161.71,62.50"/>
+        <lane id=":gneJ15_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="160.10,59.65 159.69,60.02"/>
+        <lane id=":gneJ15_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="158.24,57.01 157.66,57.54"/>
+        <lane id=":gneJ15_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="156.37,54.37 155.64,55.06"/>
+        <lane id=":gneJ15_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="154.51,51.73 153.62,52.58"/>
+        <lane id=":gneJ15_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="152.64,49.09 151.59,50.10"/>
+        <lane id=":gneJ15_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="150.78,46.45 149.57,47.62"/>
+        <lane id=":gneJ15_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="148.91,43.81 147.55,45.14"/>
+        <lane id=":gneJ15_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.12" shape="147.04,41.17 145.52,42.66"/>
+    </edge>
+    <edge id=":gneJ8_0" function="internal">
+        <lane id=":gneJ8_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="128.13,93.93 127.90,94.08"/>
+        <lane id=":gneJ8_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="126.18,91.40 125.93,91.56"/>
+        <lane id=":gneJ8_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="124.22,88.87 123.96,89.04"/>
+        <lane id=":gneJ8_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="122.26,86.33 121.99,86.52"/>
+        <lane id=":gneJ8_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="120.30,83.80 120.02,84.00"/>
+        <lane id=":gneJ8_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="118.35,81.27 118.04,81.48"/>
+        <lane id=":gneJ8_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="116.39,78.74 116.07,78.96"/>
+        <lane id=":gneJ8_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="114.43,76.21 114.10,76.44"/>
+        <lane id=":gneJ8_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="112.48,73.68 112.13,73.92"/>
+        <lane id=":gneJ8_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="0.36" shape="110.52,71.14 110.15,71.40"/>
+    </edge>
+    <edge id=":gneJ9_0" function="internal">
+        <lane id=":gneJ9_0_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="30.24,96.10 29.46,95.51 28.96,95.08 28.48,94.61 27.79,93.92"/>
+        <lane id=":gneJ9_0_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="32.22,93.59 31.53,93.06 31.08,92.67 30.65,92.26 30.03,91.64"/>
+        <lane id=":gneJ9_0_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="34.21,91.08 33.60,90.61 33.20,90.27 32.82,89.90 32.27,89.36"/>
+        <lane id=":gneJ9_0_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="36.20,88.57 35.67,88.17 35.32,87.87 34.99,87.55 34.52,87.08"/>
+        <lane id=":gneJ9_0_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="38.18,86.06 37.73,85.72 37.44,85.46 37.16,85.19 36.76,84.80"/>
+        <lane id=":gneJ9_0_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="40.17,83.55 39.80,83.27 39.56,83.06 39.33,82.84 39.01,82.51"/>
+        <lane id=":gneJ9_0_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="42.15,81.04 41.87,80.82 41.68,80.66 41.50,80.49 41.25,80.23"/>
+        <lane id=":gneJ9_0_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="44.14,78.52 43.93,78.37 43.80,78.26 43.68,78.13 43.49,77.95"/>
+        <lane id=":gneJ9_0_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="46.12,76.01 46.00,75.92 45.92,75.85 45.85,75.78 45.74,75.67"/>
+        <lane id=":gneJ9_0_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="1.73" shape="48.11,73.50 48.07,73.47 48.04,73.45 48.02,73.42 47.98,73.39"/>
+    </edge>
+
+    <edge id="gneE10" from="gneJ10" to="gneJ11" priority="11" type="highway.secondary" shape="24.84,38.13 22.74,34.93 21.26,32.45 19.94,30.01 18.76,27.60 17.73,25.23 16.85,22.90 16.12,20.60 15.54,18.33 15.11,16.11 14.83,13.91 14.69,11.76 14.71,9.64 14.87,7.56 15.18,5.51 15.65,3.50 16.26,1.52 17.02,-0.42 17.93,-2.32 18.98,-4.19 20.19,-6.02 21.55,-7.82 23.05,-9.58 24.70,-11.30">
+        <lane id="gneE10_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="-0.86,54.37 -3.03,51.07 -5.17,47.48 -7.09,43.93 -8.85,40.35 -10.45,36.67 -11.88,32.88 -13.12,28.97 -14.14,24.99 -14.92,20.92 -15.44,16.82 -15.72,12.61 -15.68,8.33 -15.35,4.12 -14.70,-0.23 -13.71,-4.45 -12.46,-8.51 -10.88,-12.55 -9.06,-16.34 -6.99,-20.04 -4.64,-23.58 -2.17,-26.86 0.51,-30.00 2.14,-31.69"/>
+        <lane id="gneE10_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="1.81,52.62 -0.32,49.37 -2.39,45.90 -4.25,42.47 -5.94,39.01 -7.48,35.46 -8.85,31.83 -10.04,28.09 -11.01,24.29 -11.76,20.42 -12.26,16.51 -12.52,12.52 -12.48,8.47 -12.17,4.48 -11.55,0.37 -10.62,-3.61 -9.44,-7.46 -7.94,-11.27 -6.22,-14.87 -4.25,-18.37 -2.03,-21.73 0.33,-24.85 2.88,-27.85 4.44,-29.47"/>
+        <lane id="gneE10_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="4.49,50.86 2.39,47.67 0.39,44.31 -1.40,41.00 -3.03,37.67 -4.51,34.26 -5.83,30.78 -6.96,27.21 -7.89,23.59 -8.60,19.91 -9.07,16.21 -9.32,12.43 -9.28,8.61 -8.99,4.84 -8.41,0.98 -7.53,-2.77 -6.41,-6.40 -5.01,-9.99 -3.38,-13.39 -1.52,-16.70 0.59,-19.89 2.83,-22.85 5.25,-25.70 6.75,-27.25"/>
+        <lane id="gneE10_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="7.16,49.11 5.11,45.97 3.17,42.73 1.44,39.54 -0.13,36.32 -1.55,33.05 -2.81,29.73 -3.89,26.33 -4.76,22.89 -5.44,19.40 -5.88,15.90 -6.12,12.34 -6.08,8.74 -5.81,5.20 -5.26,1.58 -4.44,-1.94 -3.39,-5.35 -2.07,-8.72 -0.54,-11.91 1.21,-15.03 3.20,-18.04 5.32,-20.85 7.63,-23.55 9.05,-25.03"/>
+        <lane id="gneE10_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="9.84,47.35 7.82,44.27 5.96,41.15 4.29,38.07 2.78,34.98 1.42,31.85 0.22,28.68 -0.81,25.44 -1.64,22.19 -2.28,18.90 -2.70,15.59 -2.92,12.25 -2.88,8.88 -2.63,5.57 -2.12,2.19 -1.35,-1.10 -0.37,-4.29 0.87,-7.44 2.30,-10.44 3.95,-13.36 5.81,-16.19 7.82,-18.84 10.00,-21.40 11.36,-22.81"/>
+        <lane id="gneE10_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="12.52,45.60 10.53,42.57 8.74,39.57 7.14,36.60 5.68,33.64 4.38,30.65 3.24,27.63 2.27,24.56 1.48,21.48 0.88,18.39 0.49,15.29 0.29,12.16 0.32,9.02 0.55,5.93 1.03,2.79 1.74,-0.26 2.66,-3.23 3.80,-6.16 5.14,-8.96 6.68,-11.70 8.43,-14.34 10.32,-16.84 12.37,-19.25 13.67,-20.60"/>
+        <lane id="gneE10_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="15.19,43.84 13.25,40.87 11.52,37.99 9.98,35.14 8.59,32.30 7.35,29.44 6.27,26.58 5.35,23.68 4.61,20.78 4.05,17.88 3.68,14.98 3.49,12.07 3.51,9.16 3.73,6.29 4.17,3.39 4.83,0.57 5.68,-2.18 6.74,-4.89 7.99,-7.49 9.41,-10.03 11.04,-12.49 12.81,-14.83 14.75,-17.10 15.97,-18.38"/>
+        <lane id="gneE10_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="17.87,42.08 15.96,39.18 14.30,36.40 12.83,33.67 11.50,30.96 10.32,28.24 9.29,25.53 8.43,22.80 7.73,20.08 7.21,17.38 6.86,14.68 6.69,11.98 6.71,9.30 6.92,6.65 7.32,4.00 7.92,1.41 8.70,-1.12 9.68,-3.61 10.83,-6.01 12.15,-8.36 13.66,-10.64 15.31,-12.83 17.12,-14.95 18.28,-16.16"/>
+        <lane id="gneE10_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="20.54,40.33 18.67,37.48 17.09,34.82 15.67,32.21 14.40,29.61 13.28,27.04 12.31,24.48 11.50,21.92 10.85,19.38 10.37,16.87 10.05,14.37 9.89,11.89 9.91,9.43 10.10,7.02 10.46,4.60 11.01,2.25 11.73,-0.06 12.61,-2.33 13.67,-4.53 14.88,-6.69 16.27,-8.79 17.81,-10.83 19.49,-12.80 20.58,-13.94"/>
+        <lane id="gneE10_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="74.62" shape="23.22,38.57 21.38,35.78 19.87,33.24 18.52,30.74 17.31,28.27 16.25,25.83 15.34,23.43 14.58,21.04 13.98,18.68 13.53,16.36 13.24,14.06 13.09,11.80 13.11,9.57 13.28,7.38 13.61,5.21 14.10,3.08 14.75,0.99 15.55,-1.06 16.51,-3.06 17.61,-5.02 18.88,-6.94 20.30,-8.82 21.86,-10.65 22.89,-11.72"/>
+    </edge>
+    <edge id="gneE11" from="gneJ11" to="gneJ12" priority="11" type="highway.secondary" shape="23.71,-10.53 50.98,-37.23">
+        <lane id="gneE11_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="3.13,-32.92 29.43,-58.67"/>
+        <lane id="gneE11_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="5.37,-30.64 31.66,-56.38"/>
+        <lane id="gneE11_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="7.60,-28.35 33.90,-54.10"/>
+        <lane id="gneE11_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="9.84,-26.06 36.14,-51.81"/>
+        <lane id="gneE11_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="12.08,-23.78 38.38,-49.52"/>
+        <lane id="gneE11_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="14.32,-21.49 40.62,-47.24"/>
+        <lane id="gneE11_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="16.56,-19.20 42.86,-44.95"/>
+        <lane id="gneE11_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="18.80,-16.92 45.10,-42.67"/>
+        <lane id="gneE11_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="21.04,-14.63 47.34,-40.38"/>
+        <lane id="gneE11_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="36.80" shape="23.28,-12.34 49.57,-38.09"/>
+    </edge>
+    <edge id="gneE12" from="gneJ12" to="gneJ13" priority="11" type="highway.secondary" shape="50.98,-37.23 53.62,-39.89 55.59,-41.52 57.88,-43.46 60.16,-45.25 62.42,-46.90 64.67,-48.41 66.90,-49.78 69.13,-51.00 71.34,-52.09 73.54,-53.03 75.73,-53.83 77.90,-54.49 80.06,-55.01 82.21,-55.38 84.35,-55.62 86.47,-55.71 88.58,-55.66 90.68,-55.47 92.77,-55.14 94.84,-54.66 96.90,-54.05 98.95,-53.29 100.99,-52.39 103.01,-51.35 105.02,-50.17 107.02,-48.84 109.01,-47.38 110.98,-45.77 112.94,-44.02 114.89,-42.13 116.52,-40.36 118.75,-37.92">
+        <lane id="gneE12_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="29.68,-58.93 33.09,-62.36 36.06,-64.82 38.66,-67.02 41.80,-69.48 44.98,-71.81 48.24,-73.99 51.64,-76.08 55.10,-77.98 58.63,-79.72 62.34,-81.31 66.08,-82.67 69.91,-83.84 73.92,-84.80 77.93,-85.49 82.01,-85.95 86.19,-86.13 90.31,-86.03 94.42,-85.66 98.58,-85.00 102.60,-84.07 106.51,-82.91 110.38,-81.47 114.09,-79.84 117.67,-77.99 121.14,-75.96 124.44,-73.77 127.63,-71.42 130.73,-68.89 133.65,-66.28 136.67,-63.36 138.93,-60.90 141.04,-58.59"/>
+        <lane id="gneE12_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="31.95,-56.67 35.25,-59.99 38.12,-62.37 40.68,-64.54 43.73,-66.93 46.82,-69.19 49.97,-71.30 53.24,-73.31 56.58,-75.14 59.97,-76.81 63.52,-78.33 67.10,-79.64 70.75,-80.75 74.56,-81.66 78.38,-82.32 82.25,-82.76 86.22,-82.92 90.13,-82.83 94.03,-82.48 97.97,-81.86 101.78,-80.97 105.50,-79.87 109.18,-78.51 112.72,-76.95 116.13,-75.19 119.45,-73.24 122.60,-71.14 125.67,-68.89 128.65,-66.46 131.47,-63.94 134.38,-61.12 136.58,-58.73 138.68,-56.43"/>
+        <lane id="gneE12_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="34.23,-54.42 37.41,-57.63 40.17,-59.91 42.71,-62.06 45.67,-64.38 48.65,-66.56 51.70,-68.61 54.85,-70.55 58.06,-72.30 61.31,-73.90 64.70,-75.35 68.11,-76.60 71.59,-77.66 75.21,-78.53 78.83,-79.15 82.50,-79.56 86.25,-79.72 89.95,-79.63 93.64,-79.30 97.36,-78.71 100.96,-77.88 104.49,-76.83 107.97,-75.54 111.34,-74.06 114.59,-72.38 117.75,-70.53 120.77,-68.52 123.71,-66.36 126.57,-64.02 129.29,-61.60 132.08,-58.89 134.22,-56.57 136.32,-54.27"/>
+        <lane id="gneE12_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="36.50,-52.16 39.57,-55.26 42.23,-57.46 44.73,-59.58 47.60,-61.83 50.49,-63.94 53.43,-65.91 56.46,-67.78 59.53,-69.46 62.65,-70.99 65.88,-72.38 69.13,-73.56 72.43,-74.57 75.86,-75.39 79.28,-75.98 82.75,-76.37 86.28,-76.52 89.76,-76.44 93.24,-76.12 96.75,-75.57 100.15,-74.78 103.48,-73.80 106.77,-72.57 109.96,-71.17 113.04,-69.58 116.05,-67.81 118.94,-65.89 121.75,-63.83 124.49,-61.59 127.11,-59.25 129.79,-56.65 131.86,-54.41 133.95,-52.12"/>
+        <lane id="gneE12_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="38.77,-49.91 41.73,-52.90 44.29,-55.01 46.75,-57.10 49.53,-59.28 52.32,-61.32 55.16,-63.22 58.06,-65.01 61.01,-66.62 63.98,-68.09 67.06,-69.40 70.15,-70.53 73.28,-71.48 76.50,-72.26 79.73,-72.81 82.99,-73.18 86.31,-73.32 89.58,-73.24 92.85,-72.95 96.13,-72.43 99.33,-71.69 102.46,-70.76 105.57,-69.61 108.58,-68.28 111.50,-66.77 114.36,-65.10 117.10,-63.27 119.79,-61.30 122.42,-59.15 124.93,-56.91 127.50,-54.42 129.50,-52.25 131.59,-49.96"/>
+        <lane id="gneE12_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="41.04,-47.66 43.90,-50.53 46.34,-52.56 48.78,-54.62 51.46,-56.73 54.16,-58.70 56.89,-60.53 59.67,-62.24 62.49,-63.78 65.32,-65.18 68.24,-66.42 71.16,-67.49 74.12,-68.39 77.15,-69.12 80.18,-69.64 83.24,-69.99 86.34,-70.12 89.40,-70.04 92.45,-69.77 95.52,-69.28 98.51,-68.59 101.45,-67.72 104.36,-66.64 107.20,-65.39 109.96,-63.97 112.66,-62.38 115.27,-60.65 117.83,-58.77 120.34,-56.72 122.75,-54.57 125.21,-52.19 127.14,-50.09 129.23,-47.80"/>
+        <lane id="gneE12_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="43.31,-45.40 46.06,-48.17 48.40,-50.10 50.80,-52.14 53.40,-54.18 55.99,-56.08 58.62,-57.84 61.28,-59.47 63.96,-60.94 66.66,-62.27 69.42,-63.45 72.18,-64.46 74.96,-65.30 77.80,-65.99 80.63,-66.47 83.49,-66.79 86.37,-66.92 89.22,-66.85 92.06,-66.59 94.91,-66.14 97.70,-65.49 100.44,-64.68 103.16,-63.67 105.82,-62.50 108.41,-61.17 110.96,-59.67 113.44,-58.02 115.87,-56.24 118.26,-54.29 120.57,-52.22 122.91,-49.95 124.78,-47.93 126.86,-45.64"/>
+        <lane id="gneE12_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="45.58,-43.15 48.22,-45.80 50.45,-47.65 52.82,-49.66 55.33,-51.63 57.83,-53.45 60.35,-55.14 62.88,-56.70 65.44,-58.10 68.00,-59.36 70.59,-60.47 73.19,-61.42 75.80,-62.21 78.44,-62.85 81.08,-63.30 83.73,-63.60 86.40,-63.71 89.04,-63.65 91.67,-63.41 94.30,-63.00 96.88,-62.40 99.43,-61.64 101.96,-60.71 104.44,-59.61 106.87,-58.36 109.26,-56.96 111.60,-55.40 113.91,-53.71 116.18,-51.85 118.39,-49.88 120.62,-47.72 122.42,-45.76 124.50,-43.49"/>
+        <lane id="gneE12_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="47.86,-40.90 50.38,-43.44 52.51,-45.20 54.85,-47.18 57.26,-49.08 59.67,-50.83 62.08,-52.45 64.49,-53.93 66.92,-55.26 69.33,-56.45 71.77,-57.49 74.21,-58.38 76.64,-59.12 79.09,-59.71 81.53,-60.13 83.98,-60.41 86.43,-60.51 88.85,-60.45 91.27,-60.24 93.69,-59.85 96.06,-59.30 98.42,-58.61 100.75,-57.74 103.06,-56.72 105.33,-55.56 107.57,-54.24 109.77,-52.78 111.95,-51.18 114.10,-49.42 116.21,-47.54 118.33,-45.48 120.06,-43.60 122.14,-41.33"/>
+        <lane id="gneE12_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="104.40" shape="50.13,-38.64 52.54,-41.07 54.56,-42.75 56.87,-44.70 59.19,-46.53 61.50,-48.21 63.81,-49.76 66.10,-51.16 68.39,-52.42 70.67,-53.54 72.95,-54.52 75.22,-55.35 77.48,-56.03 79.74,-56.58 81.98,-56.96 84.23,-57.22 86.46,-57.31 88.67,-57.26 90.88,-57.06 93.08,-56.71 95.25,-56.21 97.41,-55.57 99.55,-54.77 101.68,-53.83 103.78,-52.75 105.87,-51.53 107.94,-50.15 109.99,-48.65 112.02,-46.99 114.03,-45.19 116.04,-43.25 117.70,-41.44 119.77,-39.17"/>
+    </edge>
+    <edge id="gneE13" from="gneJ13" to="gneJ14" priority="11" type="highway.secondary" shape="118.75,-37.92 119.44,-37.13 120.41,-36.01 121.62,-34.61 123.03,-32.97 124.61,-31.13 126.31,-29.14 128.11,-27.04 129.96,-24.88 131.83,-22.69 133.67,-20.52 135.46,-18.42 137.16,-16.43 138.73,-14.58 140.13,-12.93 141.32,-11.52 142.27,-10.38 142.95,-9.57">
+        <lane id="gneE13_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="141.76,-57.79 142.37,-57.09 143.40,-55.90 144.65,-54.46 146.09,-52.78 147.70,-50.90 149.41,-48.91 151.20,-46.82 153.06,-44.64 154.98,-42.39 156.83,-40.21 158.59,-38.15 160.31,-36.14 161.91,-34.25 163.33,-32.57 164.61,-31.06 165.08,-30.50"/>
+        <lane id="gneE13_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="139.35,-55.68 139.96,-54.99 140.98,-53.81 142.22,-52.37 143.66,-50.70 145.27,-48.82 146.98,-46.82 148.77,-44.74 150.63,-42.56 152.55,-40.32 154.39,-38.14 156.15,-36.08 157.87,-34.06 159.47,-32.18 160.89,-30.50 162.16,-29.01 162.63,-28.44"/>
+        <lane id="gneE13_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="136.94,-53.57 137.54,-52.89 138.56,-51.71 139.80,-50.28 141.23,-48.61 142.84,-46.74 144.54,-44.74 146.34,-42.66 148.20,-40.48 150.11,-38.24 151.96,-36.06 153.72,-34.00 155.43,-31.99 157.03,-30.11 158.45,-28.44 159.70,-26.95 160.18,-26.38"/>
+        <lane id="gneE13_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="134.54,-51.46 135.13,-50.79 136.14,-49.62 137.38,-48.19 138.81,-46.53 140.41,-44.66 142.11,-42.66 143.91,-40.57 145.77,-38.40 147.67,-36.17 149.52,-33.99 151.28,-31.92 153.00,-29.92 154.59,-28.04 156.01,-26.37 157.25,-24.89 157.73,-24.32"/>
+        <lane id="gneE13_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="132.13,-49.35 132.71,-48.69 133.72,-47.52 134.95,-46.10 136.38,-44.44 137.98,-42.58 139.68,-40.58 141.48,-38.49 143.34,-36.32 145.23,-34.10 147.08,-31.92 148.85,-29.84 150.56,-27.84 152.15,-25.97 153.56,-24.30 154.80,-22.83 155.27,-22.27"/>
+        <lane id="gneE13_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="129.73,-47.24 130.30,-46.59 131.30,-45.43 132.53,-44.01 133.95,-42.35 135.55,-40.50 137.25,-38.50 139.05,-36.41 140.90,-34.24 142.80,-32.02 144.64,-29.85 146.41,-27.77 148.12,-25.77 149.71,-23.90 151.12,-22.23 152.35,-20.78 152.82,-20.21"/>
+        <lane id="gneE13_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="127.32,-45.13 127.89,-44.48 128.88,-43.34 130.10,-41.92 131.53,-40.27 133.12,-38.42 134.82,-36.42 136.62,-34.33 138.47,-32.16 140.36,-29.95 142.20,-27.77 143.98,-25.69 145.69,-23.69 147.27,-21.83 148.68,-20.17 149.90,-18.72 150.37,-18.15"/>
+        <lane id="gneE13_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="124.91,-43.02 125.47,-42.38 126.46,-41.24 127.68,-39.83 129.10,-38.18 130.69,-36.33 132.39,-34.34 134.19,-32.25 136.04,-30.08 137.92,-27.87 139.77,-25.70 141.55,-23.61 143.25,-21.62 144.83,-19.76 146.24,-18.10 147.45,-16.66 147.92,-16.09"/>
+        <lane id="gneE13_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="122.51,-40.91 123.06,-40.28 124.04,-39.15 125.26,-37.74 126.67,-36.10 128.26,-34.25 129.96,-32.26 131.76,-30.16 133.61,-28.00 135.49,-25.80 137.33,-23.63 139.11,-21.54 140.81,-19.54 142.39,-17.69 143.79,-16.03 145.00,-14.61 145.47,-14.04"/>
+        <lane id="gneE13_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="35.59" shape="120.10,-38.80 120.65,-38.18 121.62,-37.06 122.83,-35.65 124.24,-34.01 125.83,-32.17 127.53,-30.18 129.33,-28.08 131.18,-25.92 133.05,-23.73 134.89,-21.56 136.68,-19.46 138.38,-17.47 139.95,-15.62 141.35,-13.96 142.55,-12.55 143.02,-11.98"/>
+    </edge>
+    <edge id="gneE14" from="gneJ14" to="gneJ15" priority="11" type="highway.secondary" shape="141.45,-11.72 144.97,-7.12 146.82,-4.69 148.51,-2.30 150.02,0.07 151.37,2.41 152.54,4.72 153.54,6.99 154.38,9.24 155.04,11.46 155.54,13.65 155.86,15.81 156.02,17.94 156.01,20.05 155.82,22.12 155.47,24.16 154.95,26.18 154.25,28.16 153.39,30.12 152.36,32.04 151.16,33.94 149.79,35.81 148.24,37.64 146.53,39.45 144.65,41.23 142.17,42.98">
+        <lane id="gneE14_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="166.69,-28.76 169.13,-25.57 171.33,-22.68 173.75,-19.25 176.02,-15.70 178.12,-12.06 180.03,-8.29 181.71,-4.46 183.22,-0.42 184.46,3.74 185.44,8.03 186.09,12.44 186.43,16.87 186.40,21.51 185.98,26.09 185.22,30.53 184.06,35.05 182.54,39.35 180.75,43.43 178.64,47.36 176.30,51.06 173.68,54.64 170.90,57.92 168.05,60.94 163.96,64.81 163.82,64.91"/>
+        <lane id="gneE14_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="164.15,-26.81 166.59,-23.63 168.75,-20.79 171.10,-17.47 173.28,-14.04 175.30,-10.54 177.14,-6.92 178.75,-3.26 180.19,0.60 181.36,4.55 182.29,8.62 182.91,12.79 183.22,16.98 183.20,21.36 182.81,25.67 182.09,29.86 180.99,34.12 179.56,38.17 177.87,42.03 175.87,45.75 173.66,49.26 171.17,52.66 168.52,55.78 165.78,58.68 161.97,62.29"/>
+        <lane id="gneE14_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="161.61,-24.87 164.04,-21.69 166.17,-18.89 168.44,-15.68 170.54,-12.38 172.49,-9.02 174.24,-5.55 175.78,-2.05 177.15,1.61 178.27,5.36 179.14,9.21 179.73,13.15 180.02,17.10 180.00,21.21 179.63,25.25 178.96,29.19 177.93,33.18 176.58,36.99 174.99,40.63 173.11,44.14 171.01,47.46 168.65,50.68 166.13,53.65 163.52,56.42 160.10,59.65"/>
+        <lane id="gneE14_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="159.07,-22.92 161.50,-19.74 163.59,-17.00 165.78,-13.90 167.81,-10.72 169.67,-7.49 171.35,-4.18 172.82,-0.85 174.11,2.63 175.17,6.18 176.00,9.81 176.55,13.50 176.82,17.21 176.81,21.05 176.46,24.83 175.83,28.52 174.87,32.25 173.61,35.82 172.11,39.23 170.34,42.52 168.36,45.65 166.14,48.69 163.75,51.51 161.25,54.16 158.24,57.01"/>
+        <lane id="gneE14_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="156.53,-20.98 158.96,-17.80 161.01,-15.10 163.13,-12.11 165.07,-9.06 166.85,-5.97 168.46,-2.81 169.85,0.36 171.08,3.65 172.07,6.99 172.85,10.40 173.36,13.86 173.62,17.32 173.61,20.90 173.28,24.42 172.69,27.85 171.80,31.32 170.63,34.64 169.23,37.83 167.57,40.91 165.72,43.85 163.62,46.71 161.36,49.38 158.99,51.89 156.37,54.37"/>
+        <lane id="gneE14_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="153.99,-19.04 156.41,-15.86 158.43,-13.21 160.47,-10.33 162.33,-7.40 164.04,-4.45 165.56,-1.44 166.89,1.56 168.04,4.66 168.98,7.80 169.70,10.99 170.18,14.21 170.42,17.43 170.41,20.74 170.11,24.00 169.56,27.18 168.74,30.38 167.65,33.46 166.35,36.43 164.81,39.30 163.07,42.05 161.11,44.73 158.98,47.25 156.72,49.63 154.51,51.73"/>
+        <lane id="gneE14_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="151.44,-17.09 153.87,-13.92 155.85,-11.32 157.81,-8.55 159.60,-5.74 161.22,-2.92 162.67,-0.07 163.92,2.77 165.01,5.68 165.88,8.61 166.56,11.58 167.00,14.57 167.22,17.55 167.21,20.59 166.93,23.58 166.43,26.51 165.67,29.45 164.67,32.28 163.47,35.02 162.04,37.68 160.42,40.25 158.59,42.75 156.59,45.11 154.46,47.37 152.64,49.09"/>
+        <lane id="gneE14_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="148.90,-15.15 151.33,-11.98 153.27,-9.42 155.15,-6.76 156.86,-4.08 158.41,-1.40 159.77,1.30 160.95,3.98 161.97,6.70 162.78,9.43 163.41,12.17 163.82,14.92 164.02,17.66 164.01,20.44 163.76,23.16 163.30,25.84 162.61,28.51 161.69,31.10 160.59,33.62 159.28,36.07 157.78,38.45 156.08,40.77 154.20,42.98 152.19,45.11 150.78,46.45"/>
+        <lane id="gneE14_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="146.36,-13.20 148.78,-10.03 150.69,-7.53 152.50,-4.98 154.12,-2.42 155.59,0.12 156.88,2.67 157.99,5.18 158.93,7.71 159.69,10.24 160.26,12.76 160.63,15.28 160.82,17.77 160.81,20.28 160.58,22.75 160.17,25.17 159.55,27.58 158.72,29.93 157.71,32.22 156.51,34.46 155.13,36.64 153.56,38.78 151.82,40.84 149.93,42.84 148.91,43.81"/>
+        <lane id="gneE14_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="82.39" shape="143.82,-11.26 146.24,-8.09 148.11,-5.64 149.84,-3.19 151.39,-0.76 152.78,1.65 153.99,4.04 155.02,6.39 155.90,8.73 156.59,11.05 157.11,13.35 157.45,15.63 157.62,17.88 157.61,20.13 157.41,22.33 157.04,24.50 156.48,26.65 155.74,28.75 154.83,30.82 153.74,32.85 152.48,34.84 151.05,36.80 149.43,38.71 147.66,40.58 147.04,41.17"/>
+    </edge>
+    <edge id="gneE15" from="gneJ15" to="gneJ8" priority="11" type="highway.secondary" shape="142.60,42.98 111.48,68.38 109.28,70.08">
+        <lane id="gneE15_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="163.73,64.98 130.66,91.97 128.13,93.93"/>
+        <lane id="gneE15_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="161.71,62.50 128.64,89.48 126.18,91.40"/>
+        <lane id="gneE15_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="159.69,60.02 126.62,87.00 124.22,88.87"/>
+        <lane id="gneE15_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="157.66,57.54 124.60,84.52 122.26,86.33"/>
+        <lane id="gneE15_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="155.64,55.06 122.58,82.03 120.30,83.80"/>
+        <lane id="gneE15_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="153.62,52.58 120.57,79.55 118.35,81.27"/>
+        <lane id="gneE15_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="151.59,50.10 118.55,77.07 116.39,78.74"/>
+        <lane id="gneE15_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="149.57,47.62 116.53,74.59 114.43,76.21"/>
+        <lane id="gneE15_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="147.55,45.14 114.51,72.10 112.48,73.68"/>
+        <lane id="gneE15_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.51" shape="145.52,42.66 112.49,69.62 110.52,71.14"/>
+    </edge>
+    <edge id="gneE8" from="gneJ8" to="gneJ9" priority="11" shape="109.41,69.95 107.29,71.61 105.17,73.16 103.06,74.60 100.94,75.92 98.82,77.13 96.71,78.22 94.59,79.19 92.48,80.05 90.36,80.80 88.25,81.43 86.14,81.95 84.03,82.35 81.92,82.64 79.81,82.81 77.70,82.87 75.59,82.81 73.48,82.64 71.37,82.35 69.27,81.95 67.16,81.43 65.05,80.80 62.95,80.05 60.85,79.19 58.74,78.22 56.64,77.13 54.54,75.92 52.44,74.60 50.34,73.16 48.24,71.61 46.14,69.95">
+        <lane id="gneE8_0" index="0" speed="16.00" length="87.00" shape="127.90,94.08 125.64,95.85 122.72,97.98 119.67,100.07 116.52,102.03 113.34,103.84 110.02,105.56 106.66,107.09 103.29,108.47 99.78,109.71 96.24,110.77 92.61,111.66 88.93,112.36 85.21,112.87 81.46,113.18 77.70,113.28 73.94,113.18 70.19,112.87 66.45,112.36 62.78,111.66 59.17,110.77 55.58,109.70 52.07,108.45 48.73,107.07 45.38,105.54 42.04,103.80 38.85,101.96 35.75,100.01 32.71,97.93 30.24,96.10"/>
+        <lane id="gneE8_1" index="1" speed="16.00" length="87.00" shape="125.93,91.56 123.71,93.30 120.87,95.37 117.92,97.39 114.88,99.28 111.81,101.03 108.62,102.68 105.39,104.15 102.15,105.48 98.79,106.67 95.40,107.68 91.93,108.54 88.42,109.20 84.87,109.69 81.29,109.98 77.70,110.08 74.11,109.98 70.53,109.69 66.97,109.20 63.47,108.53 60.01,107.68 56.58,106.66 53.22,105.46 50.01,104.14 46.79,102.66 43.58,101.00 40.50,99.22 37.51,97.34 34.57,95.32 32.22,93.59"/>
+        <lane id="gneE8_2" index="2" speed="16.00" length="87.00" shape="123.96,89.04 121.78,90.75 119.02,92.76 116.17,94.71 113.24,96.53 110.28,98.21 107.22,99.81 104.12,101.22 101.02,102.49 97.80,103.63 94.56,104.59 91.25,105.41 87.90,106.04 84.52,106.51 81.12,106.78 77.70,106.88 74.28,106.78 70.88,106.51 67.49,106.04 64.15,105.41 60.85,104.59 57.58,103.62 54.36,102.47 51.28,101.20 48.19,99.79 45.12,98.19 42.16,96.48 39.26,94.66 36.42,92.71 34.21,91.08"/>
+        <lane id="gneE8_3" index="3" speed="16.00" length="87.00" shape="121.99,86.52 119.84,88.19 117.18,90.15 114.42,92.03 111.60,93.78 108.76,95.40 105.82,96.93 102.85,98.28 99.88,99.50 96.81,100.58 93.72,101.50 90.57,102.28 87.39,102.88 84.17,103.33 80.94,103.59 77.70,103.68 74.46,103.59 71.23,103.33 68.01,102.88 64.83,102.28 61.69,101.50 58.57,100.57 55.51,99.48 52.56,98.27 49.60,96.91 46.65,95.38 43.81,93.74 41.02,91.99 38.28,90.10 36.20,88.57"/>
+        <lane id="gneE8_4" index="4" speed="16.00" length="87.00" shape="120.02,84.00 117.91,85.64 115.33,87.53 112.68,89.35 109.96,91.03 107.23,92.59 104.41,94.05 101.58,95.34 98.74,96.50 95.82,97.54 92.88,98.42 89.89,99.15 86.87,99.73 83.83,100.14 80.77,100.39 77.70,100.48 74.63,100.39 71.57,100.14 68.52,99.72 65.52,99.15 62.53,98.42 59.57,97.53 56.65,96.49 53.83,95.33 51.01,94.04 48.19,92.57 45.46,91.00 42.78,89.31 40.13,87.50 38.18,86.06"/>
+        <lane id="gneE8_5" index="5" speed="16.00" length="87.00" shape="118.04,81.48 115.98,83.09 113.48,84.92 110.93,86.66 108.32,88.29 105.70,89.78 103.01,91.17 100.31,92.41 97.60,93.51 94.82,94.50 92.03,95.33 89.21,96.03 86.35,96.57 83.48,96.96 80.59,97.19 77.70,97.28 74.81,97.19 71.92,96.96 69.04,96.57 66.20,96.02 63.38,95.33 60.57,94.49 57.80,93.50 55.11,92.40 52.41,91.16 49.73,89.77 47.11,88.25 44.53,86.64 41.99,84.89 40.17,83.55"/>
+        <lane id="gneE8_6" index="6" speed="16.00" length="87.00" shape="116.07,78.96 114.05,80.54 111.63,82.31 109.18,83.98 106.68,85.54 104.17,86.97 101.61,88.29 99.04,89.47 96.46,90.52 93.83,91.45 91.19,92.24 88.52,92.90 85.84,93.41 83.13,93.78 80.42,94.00 77.70,94.07 74.98,94.00 72.27,93.78 69.56,93.41 66.88,92.90 64.22,92.24 61.56,91.45 58.94,90.51 56.39,89.46 53.82,88.28 51.26,86.96 48.76,85.51 46.29,83.96 43.84,82.28 42.15,81.04"/>
+        <lane id="gneE8_7" index="7" speed="16.00" length="87.00" shape="114.10,76.44 112.12,77.99 109.79,79.69 107.43,81.30 105.04,82.79 102.64,84.16 100.21,85.42 97.77,86.53 95.33,87.53 92.84,88.41 90.35,89.15 87.84,89.77 85.32,90.25 82.79,90.60 80.25,90.80 77.70,90.87 75.15,90.80 72.61,90.60 70.08,90.25 67.56,89.77 65.06,89.15 62.56,88.41 60.09,87.52 57.66,86.53 55.22,85.41 52.80,84.15 50.41,82.77 48.05,81.29 45.70,79.68 44.14,78.52"/>
+        <lane id="gneE8_8" index="8" speed="16.00" length="87.00" shape="112.13,73.92 110.19,75.44 107.94,77.08 105.68,78.62 103.40,80.04 101.11,81.35 98.81,82.54 96.50,83.60 94.19,84.54 91.85,85.37 89.51,86.06 87.16,86.64 84.80,87.09 82.44,87.41 80.07,87.60 77.70,87.67 75.33,87.60 72.96,87.41 70.59,87.09 68.25,86.64 65.90,86.06 63.56,85.36 61.23,84.53 58.94,83.59 56.63,82.53 54.34,81.34 52.06,80.03 49.80,78.61 47.56,77.07 46.12,76.01"/>
+        <lane id="gneE8_9" index="9" speed="16.00" length="87.00" shape="110.15,71.40 108.26,72.89 106.09,74.47 103.93,75.94 101.76,77.29 99.58,78.54 97.41,79.66 95.23,80.66 93.05,81.55 90.86,82.32 88.67,82.97 86.48,83.51 84.29,83.93 82.09,84.23 79.90,84.41 77.70,84.47 75.50,84.41 73.31,84.23 71.11,83.93 68.93,83.51 66.74,82.97 64.55,82.32 62.38,81.54 60.21,80.66 58.04,79.66 55.87,78.53 53.71,77.29 51.56,75.94 49.41,74.46 48.11,73.50"/>
+    </edge>
+    <edge id="gneE9" from="gneJ9" to="gneJ10" priority="11" type="highway.secondary" shape="49.34,72.48 46.32,69.51 43.28,65.78 41.93,63.77 40.40,61.49 38.74,59.02 37.00,56.42 35.22,53.75 33.44,51.08 31.70,48.47 30.05,46.00 28.52,43.71 27.17,41.68 26.04,39.98 24.36,37.45">
+        <lane id="gneE9_0" index="0" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="27.79,93.92 23.81,90.01 18.83,83.90 16.69,80.71 15.16,78.44 13.49,75.95 11.72,73.31 9.93,70.61 8.15,67.94 6.41,65.34 4.77,62.89 3.23,60.57 1.85,58.51 0.72,56.81 -0.67,54.71"/>
+        <lane id="gneE9_1" index="1" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="30.03,91.64 26.18,87.85 21.40,81.99 19.35,78.93 17.82,76.65 16.15,74.17 14.38,71.53 12.59,68.84 10.81,66.17 9.08,63.57 7.43,61.11 5.89,58.80 4.52,56.74 3.39,55.03 1.99,52.94"/>
+        <lane id="gneE9_2" index="2" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="32.27,89.36 28.55,85.70 23.98,80.08 22.00,77.15 20.48,74.87 18.81,72.39 17.04,69.75 15.25,67.06 13.47,64.39 11.74,61.79 10.09,59.33 8.55,57.02 7.18,54.97 6.05,53.26 4.66,51.16"/>
+        <lane id="gneE9_3" index="3" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="34.52,87.08 30.92,83.54 26.55,78.18 24.66,75.36 23.13,73.09 21.46,70.60 19.70,67.97 17.91,65.29 16.13,62.62 14.40,60.02 12.75,57.55 11.21,55.25 9.85,53.20 8.72,51.49 7.32,49.39"/>
+        <lane id="gneE9_4" index="4" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="36.76,84.80 33.29,81.38 29.12,76.27 27.32,73.58 25.79,71.30 24.12,68.82 22.36,66.20 20.58,63.51 18.80,60.84 17.06,58.24 15.42,55.78 13.88,53.47 12.51,51.42 11.38,49.72 9.99,47.62"/>
+        <lane id="gneE9_5" index="5" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="39.01,82.51 35.66,79.22 31.70,74.36 29.97,71.80 28.45,69.52 26.78,67.04 25.03,64.42 23.24,61.74 21.46,59.07 19.72,56.46 18.08,54.00 16.54,51.70 15.18,49.65 14.05,47.95 12.65,45.85"/>
+        <lane id="gneE9_6" index="6" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="41.25,80.23 38.03,77.06 34.27,72.45 32.63,70.01 31.10,67.73 29.44,65.26 27.69,62.64 25.90,59.96 24.12,57.29 22.38,54.69 20.74,52.22 19.20,49.92 17.84,47.88 16.71,46.18 15.32,44.08"/>
+        <lane id="gneE9_7" index="7" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="43.49,77.95 40.40,74.91 36.85,70.55 35.29,68.23 33.76,65.95 32.10,63.48 30.35,60.86 28.56,58.19 26.78,55.52 25.05,52.91 23.40,50.44 21.86,48.15 20.51,46.11 19.38,44.41 17.98,42.31"/>
+        <lane id="gneE9_8" index="8" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="45.74,75.67 42.77,72.75 39.42,68.64 37.94,66.45 36.42,64.17 34.75,61.69 33.01,59.09 31.23,56.41 29.45,53.74 27.71,51.13 26.06,48.67 24.53,46.37 23.17,44.34 22.04,42.64 20.65,40.54"/>
+        <lane id="gneE9_9" index="9" disallow="tram rail_urban rail rail_electric rail_fast ship" speed="16.00" length="45.58" shape="47.98,73.39 45.14,70.59 41.99,66.73 40.60,64.66 39.07,62.38 37.41,59.91 35.67,57.31 33.89,54.64 32.11,51.97 30.37,49.36 28.72,46.89 27.19,44.60 25.84,42.57 24.71,40.87 23.31,38.77"/>
+    </edge>
+
+    <junction id="gneJ10" type="priority" x="24.36" y="37.45" incLanes="gneE9_0 gneE9_1 gneE9_2 gneE9_3 gneE9_4 gneE9_5 gneE9_6 gneE9_7 gneE9_8 gneE9_9" intLanes=":gneJ10_0_0 :gneJ10_0_1 :gneJ10_0_2 :gneJ10_0_3 :gneJ10_0_4 :gneJ10_0_5 :gneJ10_0_6 :gneJ10_0_7 :gneJ10_0_8 :gneJ10_0_9" shape="-2.01,55.59 24.65,37.88 24.61,37.82 24.59,37.76 24.58,37.73 -2.20,55.25">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ11" type="priority" x="24.70" y="-11.30" incLanes="gneE10_0 gneE10_1 gneE10_2 gneE10_3 gneE10_4 gneE10_5 gneE10_6 gneE10_7 gneE10_8 gneE10_9" intLanes=":gneJ11_0_0 :gneJ11_0_1 :gneJ11_0_2 :gneJ11_0_3 :gneJ11_0_4 :gneJ11_0_5 :gneJ11_0_6 :gneJ11_0_7 :gneJ11_0_8 :gneJ11_0_9" shape="24.40,-11.20 2.01,-34.07 1.61,-33.62 1.37,-33.26 1.22,-33.06 0.98,-32.80 24.04,-10.61 24.18,-10.82 24.25,-11.00 24.30,-11.09">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ12" type="priority" x="50.98" y="-37.23" incLanes="gneE11_0 gneE11_1 gneE11_2 gneE11_3 gneE11_4 gneE11_5 gneE11_6 gneE11_7 gneE11_8 gneE11_9" intLanes=":gneJ12_0_0 :gneJ12_0_1 :gneJ12_0_2 :gneJ12_0_3 :gneJ12_0_4 :gneJ12_0_5 :gneJ12_0_6 :gneJ12_0_7 :gneJ12_0_8 :gneJ12_0_9" shape="51.26,-37.51 28.55,-60.05 28.31,-59.81 50.69,-36.95">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ13" type="priority" x="118.75" y="-37.92" incLanes="gneE12_0 gneE12_1 gneE12_2 gneE12_3 gneE12_4 gneE12_5 gneE12_6 gneE12_7 gneE12_8 gneE12_9" intLanes=":gneJ13_0_0 :gneJ13_0_1 :gneJ13_0_2 :gneJ13_0_3 :gneJ13_0_4 :gneJ13_0_5 :gneJ13_0_6 :gneJ13_0_7 :gneJ13_0_8 :gneJ13_0_9" shape="118.90,-37.75 142.96,-58.84 142.22,-59.67 118.59,-38.09">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ14" type="priority" x="142.95" y="-9.57" incLanes="gneE13_0 gneE13_1 gneE13_2 gneE13_3 gneE13_4 gneE13_5 gneE13_6 gneE13_7 gneE13_8 gneE13_9" intLanes=":gneJ14_0_0 :gneJ14_0_1 :gneJ14_0_2 :gneJ14_0_3 :gneJ14_0_4 :gneJ14_0_5 :gneJ14_0_6 :gneJ14_0_7 :gneJ14_0_8 :gneJ14_0_9" shape="142.55,-10.29 167.97,-29.73 167.38,-30.42 167.15,-30.64 166.92,-30.86 166.65,-31.13 166.30,-31.53 141.79,-10.95 142.06,-10.70 142.29,-10.55 142.41,-10.45">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ15" type="priority" x="142.60" y="42.98" incLanes="gneE14_0 gneE14_1 gneE14_2 gneE14_3 gneE14_4 gneE14_5 gneE14_6 gneE14_7 gneE14_8 gneE14_9" intLanes=":gneJ15_0_0 :gneJ15_0_1 :gneJ15_0_2 :gneJ15_0_3 :gneJ15_0_4 :gneJ15_0_5 :gneJ15_0_6 :gneJ15_0_7 :gneJ15_0_8 :gneJ15_0_9" shape="164.74,66.22 146.11,39.85 144.51,41.42">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ8" type="priority" x="109.41" y="69.95" incLanes="gneE15_0 gneE15_1 gneE15_2 gneE15_3 gneE15_4 gneE15_5 gneE15_6 gneE15_7 gneE15_8 gneE15_9" intLanes=":gneJ8_0_0 :gneJ8_0_1 :gneJ8_0_2 :gneJ8_0_3 :gneJ8_0_4 :gneJ8_0_5 :gneJ8_0_6 :gneJ8_0_7 :gneJ8_0_8 :gneJ8_0_9" shape="129.11,95.20 109.54,69.88 109.17,70.14 128.89,95.34">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+    <junction id="gneJ9" type="priority" x="46.14" y="69.95" incLanes="gneE8_0 gneE8_1 gneE8_2 gneE8_3 gneE8_4 gneE8_5 gneE8_6 gneE8_7 gneE8_8 gneE8_9" intLanes=":gneJ9_0_0 :gneJ9_0_1 :gneJ9_0_2 :gneJ9_0_3 :gneJ9_0_4 :gneJ9_0_5 :gneJ9_0_6 :gneJ9_0_7 :gneJ9_0_8 :gneJ9_0_9" shape="29.25,97.36 49.10,72.25 26.67,95.06 27.57,95.97 27.90,96.28 28.23,96.58 28.66,96.92">
+        <request index="0" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="1" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="2" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="3" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="4" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="5" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="6" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="7" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="8" response="0000000000" foes="0000000000" cont="0"/>
+        <request index="9" response="0000000000" foes="0000000000" cont="0"/>
+    </junction>
+
+    <connection from="gneE10" to="gneE11" fromLane="0" toLane="0" via=":gneJ11_0_0" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="1" toLane="1" via=":gneJ11_0_1" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="2" toLane="2" via=":gneJ11_0_2" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="3" toLane="3" via=":gneJ11_0_3" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="4" toLane="4" via=":gneJ11_0_4" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="5" toLane="5" via=":gneJ11_0_5" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="6" toLane="6" via=":gneJ11_0_6" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="7" toLane="7" via=":gneJ11_0_7" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="8" toLane="8" via=":gneJ11_0_8" dir="s" state="M"/>
+    <connection from="gneE10" to="gneE11" fromLane="9" toLane="9" via=":gneJ11_0_9" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="0" toLane="0" via=":gneJ12_0_0" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="1" toLane="1" via=":gneJ12_0_1" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="2" toLane="2" via=":gneJ12_0_2" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="3" toLane="3" via=":gneJ12_0_3" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="4" toLane="4" via=":gneJ12_0_4" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="5" toLane="5" via=":gneJ12_0_5" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="6" toLane="6" via=":gneJ12_0_6" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="7" toLane="7" via=":gneJ12_0_7" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="8" toLane="8" via=":gneJ12_0_8" dir="s" state="M"/>
+    <connection from="gneE11" to="gneE12" fromLane="9" toLane="9" via=":gneJ12_0_9" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="0" toLane="0" via=":gneJ13_0_0" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="1" toLane="1" via=":gneJ13_0_1" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="2" toLane="2" via=":gneJ13_0_2" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="3" toLane="3" via=":gneJ13_0_3" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="4" toLane="4" via=":gneJ13_0_4" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="5" toLane="5" via=":gneJ13_0_5" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="6" toLane="6" via=":gneJ13_0_6" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="7" toLane="7" via=":gneJ13_0_7" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="8" toLane="8" via=":gneJ13_0_8" dir="s" state="M"/>
+    <connection from="gneE12" to="gneE13" fromLane="9" toLane="9" via=":gneJ13_0_9" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="0" toLane="0" via=":gneJ14_0_0" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="1" toLane="1" via=":gneJ14_0_1" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="2" toLane="2" via=":gneJ14_0_2" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="3" toLane="3" via=":gneJ14_0_3" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="4" toLane="4" via=":gneJ14_0_4" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="5" toLane="5" via=":gneJ14_0_5" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="6" toLane="6" via=":gneJ14_0_6" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="7" toLane="7" via=":gneJ14_0_7" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="8" toLane="8" via=":gneJ14_0_8" dir="s" state="M"/>
+    <connection from="gneE13" to="gneE14" fromLane="9" toLane="9" via=":gneJ14_0_9" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="0" toLane="0" via=":gneJ15_0_0" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="1" toLane="1" via=":gneJ15_0_1" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="2" toLane="2" via=":gneJ15_0_2" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="3" toLane="3" via=":gneJ15_0_3" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="4" toLane="4" via=":gneJ15_0_4" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="5" toLane="5" via=":gneJ15_0_5" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="6" toLane="6" via=":gneJ15_0_6" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="7" toLane="7" via=":gneJ15_0_7" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="8" toLane="8" via=":gneJ15_0_8" dir="s" state="M"/>
+    <connection from="gneE14" to="gneE15" fromLane="9" toLane="9" via=":gneJ15_0_9" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="0" toLane="0" via=":gneJ8_0_0" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="1" toLane="1" via=":gneJ8_0_1" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="2" toLane="2" via=":gneJ8_0_2" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="3" toLane="3" via=":gneJ8_0_3" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="4" toLane="4" via=":gneJ8_0_4" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="5" toLane="5" via=":gneJ8_0_5" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="6" toLane="6" via=":gneJ8_0_6" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="7" toLane="7" via=":gneJ8_0_7" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="8" toLane="8" via=":gneJ8_0_8" dir="s" state="M"/>
+    <connection from="gneE15" to="gneE8" fromLane="9" toLane="9" via=":gneJ8_0_9" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="0" toLane="0" via=":gneJ9_0_0" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="1" toLane="1" via=":gneJ9_0_1" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="2" toLane="2" via=":gneJ9_0_2" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="3" toLane="3" via=":gneJ9_0_3" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="4" toLane="4" via=":gneJ9_0_4" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="5" toLane="5" via=":gneJ9_0_5" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="6" toLane="6" via=":gneJ9_0_6" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="7" toLane="7" via=":gneJ9_0_7" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="8" toLane="8" via=":gneJ9_0_8" dir="s" state="M"/>
+    <connection from="gneE8" to="gneE9" fromLane="9" toLane="9" via=":gneJ9_0_9" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="0" toLane="0" via=":gneJ10_0_0" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="1" toLane="1" via=":gneJ10_0_1" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="2" toLane="2" via=":gneJ10_0_2" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="3" toLane="3" via=":gneJ10_0_3" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="4" toLane="4" via=":gneJ10_0_4" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="5" toLane="5" via=":gneJ10_0_5" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="6" toLane="6" via=":gneJ10_0_6" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="7" toLane="7" via=":gneJ10_0_7" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="8" toLane="8" via=":gneJ10_0_8" dir="s" state="M"/>
+    <connection from="gneE9" to="gneE10" fromLane="9" toLane="9" via=":gneJ10_0_9" dir="s" state="M"/>
+
+    <connection from=":gneJ10_0" to="gneE10" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ10_0" to="gneE10" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ11_0" to="gneE11" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ12_0" to="gneE12" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ13_0" to="gneE13" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ14_0" to="gneE14" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ15_0" to="gneE15" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ8_0" to="gneE8" fromLane="9" toLane="9" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="0" toLane="0" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="1" toLane="1" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="2" toLane="2" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="3" toLane="3" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="4" toLane="4" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="5" toLane="5" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="6" toLane="6" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="7" toLane="7" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="8" toLane="8" dir="s" state="M"/>
+    <connection from=":gneJ9_0" to="gneE9" fromLane="9" toLane="9" dir="s" state="M"/>
+
+</net>
