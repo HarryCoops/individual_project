@@ -30,6 +30,12 @@
             "name" : "dqn_discrete",
             "locator" : "dqn_discrete-v0"
         },
+        "ppo_discrete" : {
+            "path" : "marl_scalability.baselines.ppo_discrete",
+            "class" : "DiscretePPOPolicy",
+            "name" : "ppo_discrete",
+            "locator" : "ppo_discrete-v0"
+        },
         "bdqn" : {
             "path" : "marl_scalability.baselines.bdqn",
             "class" : "BehavioralDQNPolicy",

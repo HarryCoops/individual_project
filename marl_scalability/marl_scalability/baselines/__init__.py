@@ -25,6 +25,7 @@ from .ppo.ppo.policy import PPOPolicy
 from .dqn.dqn.policy import DQNPolicy
 from .td3.td3.policy import TD3Policy
 from .dqn_discrete.dqn_discrete.policy import DiscreteDQNPolicy
+from .ppo_discrete.ppo_discrete.policy import DiscretePPOPolicy
 from .sac_discrete.sac_discrete.policy import DiscreteSACPolicy
 from .bdqn.bdqn.policy import BehavioralDQNPolicy
 from smarts.core.controllers import ActionSpaceType
@@ -64,6 +65,12 @@ register(
     locator="sac_discrete-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, policy_class=DiscreteSACPolicy, **kwargs
+    ),
+)
+register(
+    locator="ppo_discrete-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, policy_class=DiscretePPOPolicy, **kwargs
     ),
 )
 register(
