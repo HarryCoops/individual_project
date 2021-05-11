@@ -88,7 +88,7 @@ def outer_train(f, *args, **kwargs):
             agent_id: agent_spec.build_agent()
             for agent_id, agent_spec in agent_specs.items()
         }
-
+        print(list(agents.values())[0])
         # Create the environment.
         env = gym.make(
             "marl_scalability.env:scalability-v0",
@@ -156,7 +156,6 @@ def outer_train(f, *args, **kwargs):
                 # Active agents are those that receive observations in this step and the next
                 # step. Step each active agent (obtaining their network loss if applicable).
                 active_agent_ids = observations.keys() & next_observations.keys()
-                print(len(active_agent_ids))
                 surviving_vehicles.append(len(active_agent_ids))
                 loss_outputs = {
                     agent_id: agents[agent_id].step(

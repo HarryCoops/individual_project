@@ -12,6 +12,12 @@
             "name" : "sac",
             "locator" : "sac-v0"
         },
+        "sac_discrete" : {
+            "path" : "marl_scalability.baselines.sac_discrete",
+            "class" : "DiscreteSACPolicy",
+            "name" : "sac_discrete",
+            "locator" : "sac_discrete-v0"
+        },
         "dqn" : {
             "path" : "marl_scalability.baselines.dqn",
             "class" : "DQNPolicy",

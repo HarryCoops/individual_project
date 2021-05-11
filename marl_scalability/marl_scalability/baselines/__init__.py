@@ -24,6 +24,8 @@ from .sac.sac.policy import SACPolicy
 from .ppo.ppo.policy import PPOPolicy
 from .dqn.dqn.policy import DQNPolicy
 from .td3.td3.policy import TD3Policy
+from .dqn_discrete.dqn_discrete.policy import DiscreteDQNPolicy
+from .sac_discrete.sac_discrete.policy import DiscreteSACPolicy
 from .bdqn.bdqn.policy import BehavioralDQNPolicy
 from smarts.core.controllers import ActionSpaceType
 from marl_scalability.baselines.agent_spec import BaselineAgentSpec
@@ -55,7 +57,13 @@ register(
 register(
     locator="dqn_discrete-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
-        action_type=ActionSpaceType.Lane, policy_class=DQNPolicy, **kwargs
+        action_type=ActionSpaceType.Lane, policy_class=DiscreteDQNPolicy, **kwargs
+    ),
+)
+register(
+    locator="sac_discrete-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, policy_class=DiscreteSACPolicy, **kwargs
     ),
 )
 register(
