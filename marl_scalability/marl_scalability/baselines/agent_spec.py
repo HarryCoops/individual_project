@@ -28,6 +28,7 @@ from smarts.core.agent_interface import (
     AgentType,
     OGM,
     Waypoints,
+    DoneCriteria,
     NeighborhoodVehicles,
 )
 
@@ -104,6 +105,12 @@ class BaselineAgentSpec(AgentSpec):
                     rgb=False,
                     max_episode_steps=max_episode_steps,
                     debug=True,
+                    done_criteria=DoneCriteria(
+                        not_moving=True,
+                        off_road=True,
+                        collision=True,
+                        off_route=True
+                    ),
                 ),
                 agent_params=dict(
                     policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
