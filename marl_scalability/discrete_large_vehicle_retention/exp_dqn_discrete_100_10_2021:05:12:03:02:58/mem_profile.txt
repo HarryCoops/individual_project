@@ -1,0 +1,148 @@
+Filename: marl_scalability/train.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    55    477.2 MiB    477.2 MiB           1       @profile(stream=f)
+    56                                             def train(
+    57                                                 scenario,
+    58                                                 n_agents,
+    59                                                 num_episodes,
+    60                                                 max_episode_steps,
+    61                                                 eval_info,
+    62                                                 timestep_sec,
+    63                                                 headless,
+    64                                                 policy_class,
+    65                                                 seed,
+    66                                                 log_dir,
+    67                                                 experiment_name,
+    68                                                 record_vehicle_lifespan
+    69                                             ):
+    70    477.2 MiB      0.0 MiB           1           torch.set_num_threads(1)
+    71    477.2 MiB      0.0 MiB           1           total_step = 0
+    72    477.2 MiB      0.0 MiB           1           finished = False
+    73                                                 # Make agent_ids in the form of 000, 001, ..., 010, 011, ..., 999, 1000, ...;
+    74    477.2 MiB      0.0 MiB         103           agent_ids = ["0" * max(0, 3 - len(str(i))) + str(i) for i in range(n_agents)]
+    75                                         
+    76                                                 # Assign the agent classes
+    77    477.2 MiB      0.0 MiB         103           agent_classes = {
+    78                                                     agent_id: policy_class
+    79    477.2 MiB      0.0 MiB         101               for agent_id in agent_ids
+    80                                                 }
+    81                                                 # Create the agent specifications matched with their associated ID.
+    82    554.3 MiB      0.0 MiB         103           agent_specs = {
+    83                                                     agent_id: make(locator=policy_class, max_episode_steps=max_episode_steps)
+    84    554.3 MiB     77.1 MiB         101               for agent_id, policy_class in agent_classes.items()
+    85                                                 }
+    86                                                 # Create the agents matched with their associated ID.
+    87    624.2 MiB      0.0 MiB         103           agents = {
+    88                                                     agent_id: agent_spec.build_agent()
+    89    624.2 MiB     69.9 MiB         101               for agent_id, agent_spec in agent_specs.items()
+    90                                                 }
+    91    624.2 MiB      0.0 MiB           1           print(list(agents.values())[0])
+    92                                                 # Create the environment.
+    93    624.2 MiB      0.0 MiB           1           env = gym.make(
+    94    624.2 MiB      0.0 MiB           1               "marl_scalability.env:scalability-v0",
+    95    624.2 MiB      0.0 MiB           1               agent_specs=agent_specs,
+    96    624.2 MiB      0.0 MiB           1               scenarios=[scenario,],
+    97    624.2 MiB      0.0 MiB           1               headless=headless,
+    98    624.2 MiB      0.0 MiB           1               timestep_sec=0.1,
+    99    711.0 MiB     86.8 MiB           1               seed=seed,
+   100                                                 )
+   101                                         
+   102                                                 # Define an 'etag' for this experiment's data directory based off policy_classes.
+   103                                                 # E.g. From a ["marl_scalability.baselines.dqn:dqn-v0", "marl_scalability.baselines.ppo:ppo-v0"]
+   104                                                 # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
+   105                                                 #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
+   106    711.0 MiB      0.0 MiB           1           surviving_vehicles_total = []
+   107   1057.9 MiB      0.3 MiB          11           for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
+   108                                                     # Reset the environment and retrieve the initial observations.
+   109   1031.1 MiB      0.0 MiB          10               surviving_vehicles = []
+   110   1036.5 MiB    123.8 MiB          10               observations = env.reset()
+   111   1036.5 MiB      0.0 MiB          10               dones = {"__all__": False}
+   112   1036.5 MiB     -0.2 MiB          10               infos = None
+   113   1036.5 MiB      0.0 MiB          10               episode.reset()
+   114   1036.5 MiB      0.0 MiB          10               experiment_dir = episode.experiment_dir
+   115                                                     # Save relevant agent metadata.
+   116   1036.5 MiB      0.0 MiB          10               if not os.path.exists(f"{experiment_dir}/agent_metadata.pkl"):
+   117    786.4 MiB      0.0 MiB           1                   if not os.path.exists(experiment_dir):
+   118                                                             os.makedirs(experiment_dir)
+   119    786.4 MiB      0.0 MiB           1                   with open(f"{experiment_dir}/agent_metadata.pkl", "wb") as metadata_file:
+   120    786.4 MiB      0.0 MiB           1                       dill.dump(
+   121                                                                 {
+   122    786.4 MiB      0.0 MiB           1                               "agent_ids": agent_ids,
+   123    786.4 MiB      0.0 MiB           1                               "agent_classes": agent_classes,
+   124    786.4 MiB      0.0 MiB           1                               "agent_specs": agent_specs,
+   125                                                                 },
+   126    786.4 MiB      0.0 MiB           1                           metadata_file,
+   127    786.6 MiB      0.2 MiB           1                           pickle.HIGHEST_PROTOCOL,
+   128                                                             )
+   129                                         
+   130   1057.7 MiB      0.0 MiB        1000               while not dones["__all__"]:
+   131                                                         # Break if any of the agent's step counts is 1000000 or greater.
+   132   1057.7 MiB      0.0 MiB      101970                   if any([episode.get_itr(agent_id) >= 1000000 for agent_id in agents]):
+   133                                                             finished = True
+   134                                                             break
+   135                                         
+   136                                                         # Perform the evaluation check.
+   137                                                         '''
+   138                                                         evaluation_check(
+   139                                                             agents=agents,
+   140                                                             agent_ids=agent_ids,
+   141                                                             policy_classes=agent_classes,
+   142                                                             episode=episode,
+   143                                                             log_dir=log_dir,
+   144                                                             max_episode_steps=max_episode_steps,
+   145                                                             **eval_info,
+   146                                                             **env.info,
+   147                                                         )
+   148                                                         '''
+   149                                         
+   150                                                         # Request and perform actions on each agent that received an observation.
+   151   1057.7 MiB      0.0 MiB       49033                   actions = {
+   152                                                             agent_id: agents[agent_id].act(observation, explore=True)
+   153   1057.7 MiB      2.9 MiB       47053                       for agent_id, observation in observations.items()
+   154                                                         }
+   155   1057.7 MiB     66.1 MiB         990                   next_observations, rewards, dones, infos = env.step(actions)
+   156                                                         # Active agents are those that receive observations in this step and the next
+   157                                                         # step. Step each active agent (obtaining their network loss if applicable).
+   158   1057.7 MiB      0.0 MiB         990                   active_agent_ids = observations.keys() & next_observations.keys()
+   159   1057.7 MiB      0.0 MiB         990                   surviving_vehicles.append(len(active_agent_ids))
+   160   1057.7 MiB      0.0 MiB       48169                   loss_outputs = {
+   161                                                             agent_id: agents[agent_id].step(
+   162                                                                 state=observations[agent_id],
+   163                                                                 action=actions[agent_id],
+   164                                                                 reward=rewards[agent_id],
+   165                                                                 next_state=next_observations[agent_id],
+   166                                                                 done=dones[agent_id],
+   167                                                                 info=infos[agent_id],
+   168                                                             )
+   169   1057.7 MiB    154.0 MiB       46189                       for agent_id in active_agent_ids
+   170                                                         }
+   171                                         
+   172                                                         # Record the data from this episode.
+   173   1057.7 MiB      0.0 MiB         990                   episode.record_step(
+   174   1057.7 MiB      0.0 MiB         990                       agent_ids_to_record=active_agent_ids,
+   175   1057.7 MiB      0.0 MiB         990                       infos=infos,
+   176   1057.7 MiB      0.0 MiB         990                       rewards=rewards,
+   177   1057.7 MiB      0.0 MiB         990                       total_step=total_step,
+   178   1057.7 MiB      0.1 MiB         990                       loss_outputs=loss_outputs,
+   179                                                         )
+   180                                         
+   181                                                         # Update variables for the next step.
+   182   1057.7 MiB      0.0 MiB         990                   total_step += 1
+   183   1057.7 MiB      0.0 MiB         990                   observations = next_observations
+   184                                         
+   185                                                     # Normalize the data and record this episode on tensorboard.
+   186   1057.7 MiB      0.0 MiB          10               episode.record_episode()
+   187   1057.7 MiB      0.0 MiB          10               episode.record_tensorboard()
+   188   1057.7 MiB      0.0 MiB          10               surviving_vehicles += [0,] * (max_episode_steps - len(surviving_vehicles))
+   189   1057.7 MiB      0.0 MiB          10               surviving_vehicles_total.append(surviving_vehicles)
+   190   1057.7 MiB      0.0 MiB          10               if finished:
+   191                                                         break
+   192   1057.9 MiB      0.0 MiB           1           if record_vehicle_lifespan:
+   193   1057.9 MiB      0.0 MiB           1               with open(Path(log_dir) / experiment_name / "surviving_vehicle_data.csv", "w") as f:
+   194   1057.9 MiB      0.0 MiB           1                   writer = csv.writer(f)
+   195   1057.9 MiB      0.0 MiB           1                   writer.writerows(surviving_vehicles_total)
+   196   1039.9 MiB    -18.0 MiB           1           env.close()
+
+
