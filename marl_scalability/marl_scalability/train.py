@@ -46,11 +46,16 @@ from marl_scalability.utils.episode import episodes
 
 num_gpus = 1 if torch.cuda.is_available() else 0
 
-from datetime import datetime 
+from datetime import datetime
+from memory_profiler import profile 
 # @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
 #@ray.remote(num_gpus=num_gpus / 2)
 
-from memory_profiler import profile
+def no_op_profile(stream):
+    def _no_op_profile(func):
+        return func
+    return _no_op_profile
+
 def outer_train(f, *args, **kwargs):
     @profile(stream=f)
     def train(
@@ -318,7 +323,9 @@ if __name__ == "__main__":
     f = open(log_dir / experiment_name / "mem_profile.txt", "w")
     if args.memprof:
         from memory_profiler import memory_usage
-        mem_usage = memory_usage((train, train_args.values(), {}),1)
+        profile = no_op_profile
+        print(train_args)
+        mem_usage = memory_usage((outer_train, [None,] + list(train_args.values()), {}),1)
         import pandas as pd 
         mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage)})
         mem_usage.to_csv(log_dir / experiment_name / "mem_usage.csv")
