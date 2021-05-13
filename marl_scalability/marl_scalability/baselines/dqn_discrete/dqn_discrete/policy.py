@@ -44,7 +44,6 @@ class DiscreteDQNPolicy(Agent):
         policy_params=None,
         checkpoint_dir=None,
     ):
-        print(policy_params)
         self.policy_params = policy_params
         self.agent_type = policy_params["agent_type"]
         if self.agent_type == "image":
@@ -240,9 +239,12 @@ class DiscreteDQNPolicy(Agent):
                 np.append(state["low_dim_states"], self.prev_action)
             )
             if self.agent_type == "image":
+
                 state["top_down_rgb"] = (
-                    torch.from_numpy(state["top_down_rgb"]).unsqueeze(0).to(self.device)
+                    torch.Tensor(state["top_down_rgb"]).unsqueeze(0).to(self.device)
                 )
+                # Normalise to 0..1 expected by network
+                state["top_down_rgb"].div_(255)
             elif self.agent_type == "social":
                 state["social_vehicles"] = (
                     torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
@@ -385,7 +387,11 @@ class DiscreteDQNPolicy(Agent):
         ]
 
         self.online_q_network.train()
-        qs, aux_losses = self.online_q_network(states, training=True)
+        aux_losses = {}
+        if self.agent_type == "social":
+            qs, aux_losses = self.online_q_network(states, training=True)
+        else:
+            qs = self.online_q_network(states)
         qs = [torch.gather(q, 1, action.long()) for q, action in zip(qs, actions)]
         qs_target_value = [
             rewards + self.gamma * (1 - dones) * q_next_target

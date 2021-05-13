@@ -82,8 +82,7 @@ class ImageStatePreprocessor(StatePreprocessor):
         )
         
         H, W, C = state.top_down_rgb.data.shape
-        rgb_data = state.top_down_rgb.data.reshape(C,W,H).astype(np.float32)
-        rgb_data /= 255
+        rgb_data = state.top_down_rgb.data.reshape(C,W,H)
         # Get image state 
         out = {
             "low_dim_states": low_dim_states.numpy(),

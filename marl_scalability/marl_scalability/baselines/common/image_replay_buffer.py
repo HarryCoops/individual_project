@@ -139,14 +139,11 @@ class ImageReplayBuffer:
         return self.replay_buffer_dataset[idx]
 
     def make_state_from_dict(self, states, device):
-        image_keys = states[0]["top_down_rgb"].keys()
-        images = {}
-        for k in image_keys:
-            _images = torch.cat([e[k] for e in states], dim=0).float().to(device)
-            images = normalize_im(_images)
-            images[k] = _images
         low_dim_states = (
             torch.cat([e["low_dim_states"] for e in states], dim=0).float().to(device)
+        )
+        images = (
+            torch.cat([e["top_down_rgb"] for e in states], dim=0).float().to(device)
         )
         out = {
             "top_down_rgb": images,

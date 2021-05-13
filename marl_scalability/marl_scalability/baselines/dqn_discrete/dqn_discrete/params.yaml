@@ -7,7 +7,7 @@ lr: 1e-5
 train_step: 4
 prev_action_size: 1
 target_update: 0.01
-warmup: 10000
+warmup: 500
 gamma: 0.99
 use_ddqn: True
 observation_num_lookahead: 20
