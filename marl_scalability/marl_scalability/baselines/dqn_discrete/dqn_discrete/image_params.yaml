@@ -1,0 +1,18 @@
+action_space_type: discrete
+seed: 765749
+batch_size: 64
+sticky_actions: 1
+agent_type: image
+lr: 1e-5
+train_step: 4
+prev_action_size: 1
+target_update: 0.01
+n_in_channels: 3
+image_height: 256
+image_width: 256
+warmup: 10000
+gamma: 0.99
+use_ddqn: True
+replay_buffer:
+  buffer_size: 1e6
+  batch_size: 64

@@ -30,6 +30,12 @@
             "name" : "dqn_discrete",
             "locator" : "dqn_discrete-v0"
         },
+        "dqn_discreteRGB" : {
+            "path" : "marl_scalability.baselines.dqn_discrete",
+            "class" : "DiscreteDQNPolicy",
+            "name" : "dqn_discreteRGB",
+            "locator" : "dqn_discreteRGB-v0"
+        },
         "ppo_discrete" : {
             "path" : "marl_scalability.baselines.ppo_discrete",
             "class" : "DiscretePPOPolicy",

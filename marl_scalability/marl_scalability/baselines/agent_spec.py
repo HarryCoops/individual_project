@@ -35,6 +35,7 @@ from smarts.core.agent_interface import (
 from marl_scalability.baselines.common.yaml_loader import load_yaml
 from smarts.core.agent import AgentSpec
 from marl_scalability.baselines.adapter import BaselineAdapter
+from marl_scalability.baselines.image_adapter import ImageBaselineAdapter
 
 
 class BaselineAgentSpec(AgentSpec):
@@ -53,6 +54,7 @@ class BaselineAgentSpec(AgentSpec):
         self,
         policy_class,
         action_type,
+        image_agent=False,
         checkpoint_dir=None,
         task=None,
         max_episode_steps=1200,
@@ -95,28 +97,52 @@ class BaselineAgentSpec(AgentSpec):
                         break
 
             assert agent_name != None
-
-            adapter = BaselineAdapter(agent_name)
-            spec = AgentSpec(
-                interface=AgentInterface(
-                    waypoints=Waypoints(lookahead=20),
-                    neighborhood_vehicles=NeighborhoodVehicles(200),
-                    action=action_type,
-                    rgb=False,
-                    max_episode_steps=max_episode_steps,
-                    debug=True,
-                    done_criteria=DoneCriteria(
-                        not_moving=True,
-                        off_road=True,
-                        collision=True,
-                        off_route=True
+            if image_agent:
+                adapter = ImageBaselineAdapter(agent_name)
+                spec = AgentSpec(
+                    interface=AgentInterface(
+                        waypoints=False,
+                        neighborhood_vehicles=False,
+                        action=action_type,
+                        rgb=True,
+                        max_episode_steps=max_episode_steps,
+                        debug=True,
+                        done_criteria=DoneCriteria(
+                            not_moving=True,
+                            off_road=True,
+                            collision=True,
+                            off_route=True
+                        ),
                     ),
-                ),
-                agent_params=dict(
-                    policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
-                ),
-                agent_builder=policy_class,
-                observation_adapter=adapter.observation_adapter,
-                reward_adapter=adapter.reward_adapter,
-            )
+                    agent_params=dict(
+                        policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
+                    ),
+                    agent_builder=policy_class,
+                    observation_adapter=adapter.observation_adapter,
+                    reward_adapter=adapter.reward_adapter,
+                )
+            else:
+                adapter = BaselineAdapter(agent_name)
+                spec = AgentSpec(
+                    interface=AgentInterface(
+                        waypoints=Waypoints(10),
+                        neighborhood_vehicles=NeighborhoodVehicles(20),
+                        action=action_type,
+                        rgb=False,
+                        max_episode_steps=max_episode_steps,
+                        debug=True,
+                        done_criteria=DoneCriteria(
+                            not_moving=True,
+                            off_road=True,
+                            collision=True,
+                            off_route=True
+                        ),
+                    ),
+                    agent_params=dict(
+                        policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
+                    ),
+                    agent_builder=policy_class,
+                    observation_adapter=adapter.observation_adapter,
+                    reward_adapter=adapter.reward_adapter,
+                )
         return spec

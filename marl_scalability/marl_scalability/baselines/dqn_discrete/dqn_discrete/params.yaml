@@ -1,4 +1,5 @@
 action_space_type: discrete
+agent_type: social
 seed: 765749
 batch_size: 64
 sticky_actions: 1

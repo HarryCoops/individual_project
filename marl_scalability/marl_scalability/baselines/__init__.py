@@ -56,6 +56,12 @@ register(
     ),
 )
 register(
+    locator="dqn_discreteRGB-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, image_agent=True, policy_class=DiscreteDQNPolicy, **kwargs
+    ),
+)
+register(
     locator="dqn_discrete-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, policy_class=DiscreteDQNPolicy, **kwargs

@@ -26,11 +26,13 @@ from marl_scalability.baselines.dqn.dqn.network import *
 from smarts.core.agent import Agent
 from marl_scalability.utils.common import merge_discrete_action_spaces, to_3d_action, to_2d_action
 import pathlib, os, copy
-from marl_scalability.baselines.dqn.dqn.network import DQNWithSocialEncoder
+from marl_scalability.baselines.dqn_discrete.dqn_discrete.network import DQNCNN, DQNWithSocialEncoder
 from marl_scalability.baselines.dqn.dqn.explore import EpsilonExplore
+from marl_scalability.baselines.common.image_replay_buffer import ImageReplayBuffer
 from marl_scalability.baselines.common.replay_buffer import ReplayBuffer
 from marl_scalability.baselines.common.social_vehicle_config import get_social_vehicle_configs
 from marl_scalability.baselines.common.yaml_loader import load_yaml
+from marl_scalability.baselines.common.image_state_preprocessor import ImageStatePreprocessor
 from marl_scalability.baselines.common.baseline_state_preprocessor import BaselineStatePreprocessor
 
 
@@ -42,8 +44,13 @@ class DiscreteDQNPolicy(Agent):
         policy_params=None,
         checkpoint_dir=None,
     ):
+        print(policy_params)
         self.policy_params = policy_params
-        network_class = DQNWithSocialEncoder
+        self.agent_type = policy_params["agent_type"]
+        if self.agent_type == "image":
+            network_class = DQNCNN
+        elif self.agent_type == "social":
+            network_class = DQNWithSocialEncoder
         self.epsilon_obj = EpsilonExplore(1.0, 0.05, 10000)
         action_space_type = policy_params["action_space_type"]
         discrete_action_spaces = [[0],[1],[2],[3]]
@@ -70,6 +77,7 @@ class DiscreteDQNPolicy(Agent):
         prev_action_size = int(policy_params["prev_action_size"])
         self.prev_action = np.zeros(prev_action_size)
         self.action_size = prev_action_size
+        
 
         index_to_actions = [
             e.tolist() if not isinstance(e, list) else e for e in action_size
@@ -85,49 +93,61 @@ class DiscreteDQNPolicy(Agent):
             [action_to_indexs],
         )
         self.num_actions = [len(index_to_actions)]
-
-        # state preprocessing
-        self.social_policy_hidden_units = int(
-            policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
-        )
-        self.social_capacity = int(
-            policy_params["social_vehicles"].get("social_capacity", 0)
-        )
-        self.observation_num_lookahead = int(
-            policy_params.get("observation_num_lookahead", 0)
-        )
-        self.social_policy_init_std = int(
-            policy_params["social_vehicles"].get("social_policy_init_std", 0)
-        )
-        self.num_social_features = int(
-            policy_params["social_vehicles"].get("num_social_features", 0)
-        )
-        self.social_vehicle_config = get_social_vehicle_configs(
-            **policy_params["social_vehicles"]
-        )
-
-        self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
-        self.state_description = BaselineStatePreprocessor.get_state_description(
-            policy_params["social_vehicles"],
-            policy_params["observation_num_lookahead"],
-            prev_action_size,
-        )
-        self.social_feature_encoder_class = self.social_vehicle_encoder[
-            "social_feature_encoder_class"
-        ]
-        self.social_feature_encoder_params = self.social_vehicle_encoder[
-            "social_feature_encoder_params"
-        ]
+        if self.agent_type == "social":
+            # state preprocessing
+            self.social_policy_hidden_units = int(
+                policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
+            )
+            self.social_capacity = int(
+                policy_params["social_vehicles"].get("social_capacity", 0)
+            )
+            self.observation_num_lookahead = int(
+                policy_params.get("observation_num_lookahead", 0)
+            )
+            self.social_policy_init_std = int(
+                policy_params["social_vehicles"].get("social_policy_init_std", 0)
+            )
+            self.num_social_features = int(
+                policy_params["social_vehicles"].get("num_social_features", 0)
+            )
+            self.social_vehicle_config = get_social_vehicle_configs(
+                **policy_params["social_vehicles"]
+            )
+            self.state_description = BaselineStatePreprocessor.get_state_description(
+                policy_params["social_vehicles"],
+                policy_params["observation_num_lookahead"],
+                prev_action_size,
+            )
+            self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
+            
+            self.social_feature_encoder_class = self.social_vehicle_encoder[
+                "social_feature_encoder_class"
+            ]
+            self.social_feature_encoder_params = self.social_vehicle_encoder[
+                "social_feature_encoder_params"
+            ]
+            network_params = {
+                "state_size": self.state_size,
+                "social_feature_encoder_class": self.social_feature_encoder_class,
+                "social_feature_encoder_params": self.social_feature_encoder_params,
+            }
+        elif self.agent_type == "image":
+            self.n_in_channels = int(policy_params["n_in_channels"])
+            self.image_height = int(policy_params["image_height"])
+            self.image_width = int(policy_params["image_width"])
+            self.state_description = ImageStatePreprocessor.get_state_description(
+                (self.image_height, self.image_width),
+            )
+            network_params = {
+                "state_size": self.state_size,
+                "n_in_channels": self.n_in_channels,
+                "image_dim": (self.image_width, self.image_height)
+            }
 
         self.checkpoint_dir = checkpoint_dir
         self.reset()
 
         torch.manual_seed(seed)
-        network_params = {
-            "state_size": self.state_size,
-            "social_feature_encoder_class": self.social_feature_encoder_class,
-            "social_feature_encoder_params": self.social_feature_encoder_params,
-        }
         self.online_q_network = network_class(
             num_actions=self.num_actions,
             **(network_params if network_params else {}),
@@ -148,12 +168,18 @@ class DiscreteDQNPolicy(Agent):
 
         self.action_space_type = action_space_type
         self.to_real_action = to_3d_action
-
-        self.replay = ReplayBuffer(
-            buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
-            batch_size=int(policy_params["replay_buffer"]["batch_size"]),
-            device_name=self.device_name,
-        )
+        if self.agent_type == "social":
+            self.replay = ReplayBuffer(
+                buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
+                batch_size=int(policy_params["replay_buffer"]["batch_size"]),
+                device_name=self.device_name,
+            )
+        else:
+            self.replay = ImageReplayBuffer(
+                buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
+                batch_size=int(policy_params["replay_buffer"]["batch_size"]),
+                device_name=self.device_name,
+            )
 
     def lane_action_to_index(self, state):
         state = state.copy()
@@ -170,6 +196,8 @@ class DiscreteDQNPolicy(Agent):
     def state_size(self):
         # Adjusting state_size based on number of features (ego+social)
         size = sum(self.state_description["low_dim_states"].values())
+        if self.agent_type == "image":
+            return size + self.action_size
         if self.social_feature_encoder_class:
             size += self.social_feature_encoder_class(
                 **self.social_feature_encoder_params
@@ -211,12 +239,19 @@ class DiscreteDQNPolicy(Agent):
             state["low_dim_states"] = np.float32(
                 np.append(state["low_dim_states"], self.prev_action)
             )
-            state["social_vehicles"] = (
-                torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
-            )
+            if self.agent_type == "image":
+                state["top_down_rgb"] = (
+                    torch.from_numpy(state["top_down_rgb"]).unsqueeze(0).to(self.device)
+                )
+            elif self.agent_type == "social":
+                state["social_vehicles"] = (
+                    torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
+                )
+            
             state["low_dim_states"] = (
                 torch.from_numpy(state["low_dim_states"]).unsqueeze(0).to(self.device)
             )
+            
             self.online_q_network.eval()
             with torch.no_grad():
                 qs = self.online_q_network(state)
@@ -294,9 +329,6 @@ class DiscreteDQNPolicy(Agent):
             next_state=next_state,
             done=done,
             others=others,
-            social_capacity=self.social_capacity,
-            observation_num_lookahead=self.observation_num_lookahead,
-            social_vehicle_config=self.social_vehicle_config,
             prev_action=self.prev_action,
         )
         if (

@@ -70,9 +70,9 @@ class LogInfo:
         self.data["env_score"] += int(infos["logs"]["env_score"])
         self.data["speed"] += infos["logs"]["speed"]
         self.data["max_speed_violation"] += (
-            1 if infos["logs"]["speed"] > infos["logs"]["closest_wp"].speed_limit else 0
+            1 if infos["logs"]["closest_wp"] is not None and infos["logs"]["speed"] > infos["logs"]["closest_wp"].speed_limit else 0
         )
-        self.data["dist_center"] += infos["logs"]["dist_center"]
+        self.data["dist_center"] += infos["logs"]["dist_center"] if infos["logs"]["dist_center"] is not None else 0
         #self.data["ego_num_violations"] += int(infos["logs"]["ego_num_violations"] > 0)
         #self.data["social_num_violations"] += int(
         #    infos["logs"]["social_num_violations"] > 0

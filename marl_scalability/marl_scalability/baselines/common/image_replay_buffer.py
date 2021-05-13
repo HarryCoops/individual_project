@@ -79,15 +79,15 @@ class ReplayBufferDataset(Dataset):
         state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(
             self.device
         )
-        state["social_vehicles"] = torch.from_numpy(state["social_vehicles"]).to(
+        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"]).to(
             self.device
         )
 
         next_state["low_dim_states"] = np.float32(
             np.append(next_state["low_dim_states"], action)
         )
-        next_state["social_vehicles"] = torch.from_numpy(
-            next_state["social_vehicles"]
+        next_state["top_down_rgb"] = torch.from_numpy(
+            next_state["top_down_rgb"]
         ).to(self.device)
         next_state["low_dim_states"] = torch.from_numpy(
             next_state["low_dim_states"]
@@ -110,7 +110,7 @@ class ReplayBufferDataset(Dataset):
         return state, action, reward, next_state, done, others
 
 
-class ReplayBuffer:
+class ImageReplayBuffer:
     def __init__(
         self,
         buffer_size,
@@ -139,25 +139,18 @@ class ReplayBuffer:
         return self.replay_buffer_dataset[idx]
 
     def make_state_from_dict(self, states, device):
-        # image_keys = states[0]["images"].keys()
-        # images = {}
-        # for k in image_keys:
-        #     _images = torch.cat([e[k] for e in states], dim=0).float().to(device)
-        #     _images = normalize_im(_images)
-        #     images[k] = _images
+        image_keys = states[0]["top_down_rgb"].keys()
+        images = {}
+        for k in image_keys:
+            _images = torch.cat([e[k] for e in states], dim=0).float().to(device)
+            images = normalize_im(_images)
+            images[k] = _images
         low_dim_states = (
             torch.cat([e["low_dim_states"] for e in states], dim=0).float().to(device)
         )
-        if "social_vehicles" in states[0]:
-            social_vehicles = [
-                e["social_vehicles"][0].float().to(device) for e in states
-            ]
-        else:
-            social_vehicles = False
         out = {
-            # "images": images,
+            "top_down_rgb": images,
             "low_dim_states": low_dim_states,
-            "social_vehicles": social_vehicles,
         }
         return out
 
