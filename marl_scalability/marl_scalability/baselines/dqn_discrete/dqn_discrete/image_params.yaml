@@ -14,5 +14,5 @@ warmup: 500
 gamma: 0.99
 use_ddqn: True
 replay_buffer:
-  buffer_size: 1e6
+  buffer_size: 1e3
   batch_size: 64
