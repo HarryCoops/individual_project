@@ -26,6 +26,7 @@ from smarts.core.controllers import ActionSpaceType
 from smarts.core.agent_interface import (
     AgentInterface,
     AgentType,
+    RGB,
     OGM,
     Waypoints,
     DoneCriteria,
@@ -123,12 +124,18 @@ class BaselineAgentSpec(AgentSpec):
                 )
             else:
                 adapter = BaselineAdapter(agent_name)
+                image_width = adapter.policy_params["image_width"]
+                image_height = adapter.policy_params["image_height"]
                 spec = AgentSpec(
                     interface=AgentInterface(
                         waypoints=Waypoints(10),
                         neighborhood_vehicles=NeighborhoodVehicles(20),
                         action=action_type,
-                        rgb=False,
+                        rgb=RGB(
+                            width=image_width, 
+                            height=image_height, 
+                            resolution=image_height/50
+                        ),
                         max_episode_steps=max_episode_steps,
                         debug=True,
                         done_criteria=DoneCriteria(
