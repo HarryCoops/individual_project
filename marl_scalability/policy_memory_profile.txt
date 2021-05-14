@@ -1,0 +1,81 @@
+<marl_scalability.baselines.dqn_discre....eteDQNPolicy object at 0x7f09f9cada10> size=121080 flat=64
+    __dict__ size=121016 flat=416
+        [V] online_q_network: DQNCNN(\n  (im_feature): Sequential(\n...._features=4, bias=True)\n    )\n  )\n) size=45568 flat=64
+        [V] target_q_network: DQNCNN(\n  (im_feature): Sequential(\n...._features=4, bias=True)\n    )\n  )\n) size=43752 flat=64
+        [V] replay: <marl_scalability.baselines.common.ima....ReplayBuffer object at 0x7f09f9c1d410> size=10912 flat=64
+        [V] optimizers: Adam (\nParameter Group 0\n    amsgrad....n    lr: 1e-05\n    weight_decay: 0\n) size=9152 flat=64
+        [V] loss_func: MSELoss() size=2840 flat=64
+        [V] policy_params: {'action_space_type': 'discrete', 'see....ffer_size': 1000.0, 'batch_size': 64}} size=2480 flat=656
+        [V] state_description: {'low_dim_states': {'speed': 1, 'steer....ding': 1}, 'top_down_rgb': (256, 256)} size=872 flat=248
+        [V] action2indexs: [{'[0]': 0, '[1]': 1, '[2]': 2, '[3]': 3}] size=680 flat=80
+        [V] epsilon_obj: <marl_scalability.baselines.dqn.dqn.ex....silonExplore object at 0x7f09f9cadf10> size=648 flat=64
+        [V] index2actions: [[[0], [1], [2], [3]]] size=536 flat=80
+        [V] action: array([2]) size=104 flat=104
+        [V] num_actions: [4] size=80 flat=80
+        [K] merge_action_spaces size=72 flat=72
+        [K] current_iteration size=72 flat=72
+        [K] state_description size=72 flat=72
+        [V] eps_throttles: [] size=72 flat=72
+        [V] eps_steers: [] size=72 flat=72
+        [K] online_q_network size=72 flat=72
+        [K] target_q_network size=72 flat=72
+        [K] action_space_type size=72 flat=72
+        [K] policy_params size=64 flat=64
+        [K] agent_type size=64 flat=64
+        [K] epsilon_obj size=64 flat=64
+        [K] step_count size=64 flat=64
+        [K] update_count size=64 flat=64
+        [K] num_updates size=64 flat=64
+        [K] current_sticky size=64 flat=64
+        [K] train_step size=64 flat=64
+        [K] target_update size=64 flat=64
+        [K] device_name size=64 flat=64
+        [K] batch_size size=64 flat=64
+        [K] use_ddqn size=64 flat=64
+        [K] sticky_actions size=64 flat=64
+        [K] prev_action size=64 flat=64
+        [K] action_size size=64 flat=64
+        [K] index2actions size=64 flat=64
+        [K] action2indexs size=64 flat=64
+        [K] num_actions size=64 flat=64
+        [K] n_in_channels size=64 flat=64
+        [K] image_height size=64 flat=64
+        [K] image_width size=64 flat=64
+        [K] checkpoint_dir size=64 flat=64
+        [K] eps_throttles size=64 flat=64
+        [K] eps_steers size=64 flat=64
+        [K] eps_step size=64 flat=64
+        [K] optimizers size=64 flat=64
+        [K] loss_func size=64 flat=64
+        [K] to_real_action size=64 flat=64
+        [V] device_name: 'cpu' size=56 flat=56
+        [K] device size=56 flat=56
+        [K] warmup size=56 flat=56
+        [K] gamma size=56 flat=56
+        [K] replay size=56 flat=56
+        [K] action size=56 flat=56
+        [V] merge_action_spaces: -1 size=32 flat=32
+        [V] step_count: 10000 size=32 flat=32
+        [V] update_count: 2375 size=32 flat=32
+        [V] num_updates: 2375 size=32 flat=32
+        [V] current_iteration: 10000 size=32 flat=32
+        [V] prev_action: 2 size=32 flat=32
+        [V] eps_step: 10000 size=32 flat=32
+        [V] current_sticky: 0 size=24 flat=24
+        [V] device: device(type='cpu') size=24 flat=24
+        [V] agent_type: 'image' size=0 flat=0
+        [V] train_step: 4 size=0 flat=0
+        [V] target_update: 0.01 size=0 flat=0
+        [V] warmup: 500 size=0 flat=0
+        [V] gamma: 0.99 size=0 flat=0
+        [V] batch_size: 64 size=0 flat=0
+        [V] use_ddqn: True size=0 flat=0
+        [V] sticky_actions: 1 size=0 flat=0
+        [V] action_size: 1 size=0 flat=0
+        [V] n_in_channels: 1 size=0 flat=0
+        [V] image_height: 256 size=0 flat=0
+        [V] image_width: 256 size=0 flat=0
+        [V] checkpoint_dir: None size=0 flat=0
+        [V] action_space_type: 'discrete' size=0 flat=0
+        [V] to_real_action: <function to_3d_action at 0x7f0a5d4cfef0> size=0 flat=0
+    __class__ size=0 flat=0
