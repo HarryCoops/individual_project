@@ -8,8 +8,8 @@ train_step: 4
 prev_action_size: 1
 target_update: 0.01
 n_in_channels: 1
-image_height: 512
-image_width: 512
+image_height: 84
+image_width: 84
 warmup: 500
 gamma: 0.99
 use_ddqn: True

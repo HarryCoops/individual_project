@@ -87,7 +87,7 @@ class ImageStatePreprocessor(StatePreprocessor):
              img_data = np.dot(
                  rgb_data[...,:3], [0.299, 0.587, 0.114]
             ).astype(np.uint8)
-             img_data = np.expand_dims(img_data, axis=2)
+             img_data = np.expand_dims(img_data, axis=0)
         else:
             H, W, C = state.top_down_rgb.data.shape
             img_data = state.top_down_rgb.data.reshape(C, H, W)
