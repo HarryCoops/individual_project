@@ -55,7 +55,7 @@ class SceneColors(Enum):
     SocialAgent = Colors.Silver.value
     SocialVehicle = Colors.Silver.value
 
-    Road = Colors.DarkGrey.value
+    Road = Colors.Grey.value
     EgoWaypoint = Colors.CyanTransparent.value
     EgoDrivenPath = Colors.CyanTransparent.value
     BubbleLine = Colors.LightGreyTransparent.value

@@ -110,7 +110,7 @@ class BaselineAgentSpec(AgentSpec):
                         rgb=RGB(
                             width=image_width, 
                             height=image_height, 
-                            resolution=image_height/50
+                            resolution=50/image_height
                         ),
                         max_episode_steps=max_episode_steps,
                         debug=True,
