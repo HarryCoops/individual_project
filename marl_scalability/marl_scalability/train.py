@@ -114,7 +114,7 @@ def outer_train(f, *args, **kwargs):
         #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
         surviving_vehicles_total = []
         mem_usage = []
-        mem_usage_interval = 100
+        mem_usage_interval = 10
         for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
@@ -188,11 +188,12 @@ def outer_train(f, *args, **kwargs):
                     total_step=total_step,
                     loss_outputs=loss_outputs,
                 )
-
                 # Update variables for the next step.
                 total_step += 1
                 observations = next_observations
-                if total_step % mem_usage_interval == 0:
+                if len(list(agents.values())[0].replay) == 1000:
+                    from pympler import asizeof
+                    print(asizeof.asized(list(agents.values())[0].replay, detail=4).format())
                     process = psutil.Process(os.getpid())
                     mem_usage.append((total_step, process.memory_info().rss))
                 if max_steps and total_step >= max_steps:
