@@ -48,6 +48,7 @@ setup(
         "smarts[train,test]==0.4.15",
         "setuptools>=41.0.0,!=50.0",
         "dill",
+        "psutil",
         "pyinstrument",
         "memory_profiler",
         "black==20.8b1",

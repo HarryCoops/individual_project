@@ -23,6 +23,7 @@ import json
 import os
 import sys
 import csv
+import psutil
 from pathlib import Path
 
 from marl_scalability.utils.ray import default_ray_kwargs
@@ -32,6 +33,7 @@ os.environ["MKL_NUM_THREADS"] = "1"
 import argparse
 import pickle
 import time
+import pandas as pd 
 
 import dill
 import gym
@@ -70,7 +72,9 @@ def outer_train(f, *args, **kwargs):
         seed,
         log_dir,
         experiment_name,
-        record_vehicle_lifespan
+        record_vehicle_lifespan,
+        record_mem_usage,
+        max_steps
     ):
         torch.set_num_threads(1)
         total_step = 0
@@ -109,6 +113,8 @@ def outer_train(f, *args, **kwargs):
         # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
         #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
         surviving_vehicles_total = []
+        mem_usage = []
+        mem_usage_interval = 100
         for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
@@ -186,6 +192,12 @@ def outer_train(f, *args, **kwargs):
                 # Update variables for the next step.
                 total_step += 1
                 observations = next_observations
+                if total_step % mem_usage_interval == 0:
+                    process = psutil.Process(os.getpid())
+                    mem_usage.append((total_step, process.memory_info().rss))
+                if max_steps and total_step >= max_steps:
+                    finished = True
+                    break
 
             # Normalize the data and record this episode on tensorboard.
             episode.record_episode()
@@ -198,8 +210,13 @@ def outer_train(f, *args, **kwargs):
             with open(Path(log_dir) / experiment_name / "surviving_vehicle_data.csv", "w") as f:
                 writer = csv.writer(f)
                 writer.writerows(surviving_vehicles_total)
+        if record_mem_usage:
+            mem_usage, steps = zip(*mem_usage)
+            mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage), "step": pd.Series(steps)})
+            mem_usage.to_csv(Path(log_dir) / experiment_name / "mem_usage.csv")
         env.close()
     train(*args, **kwargs)
+    f.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("intersection-training")
@@ -271,6 +288,12 @@ if __name__ == "__main__":
         default="logs",
         type=str,
     )
+    parser.add_argument(
+        "--max-steps",
+        help="Maximum number of steps to run",
+        default=None,
+        type=int,
+    )
 
     base_dir = os.path.dirname(__file__)
     pool_path = os.path.join(base_dir, "agent_pool.json")
@@ -309,7 +332,9 @@ if __name__ == "__main__":
         "seed": args.seed,
         "log_dir": args.log_dir,
         "experiment_name": experiment_name,
-        "record_vehicle_lifespan": args.record_vehicle_lifespan
+        "record_vehicle_lifespan": args.record_vehicle_lifespan,
+        "record mem_usage": args.memprof,
+        "max_steps": args.max_steps
     }
 
     if args.profiler == "pyinstrument":
@@ -321,6 +346,7 @@ if __name__ == "__main__":
         pr = cProfile.Profile()
         pr.enable()
     f = open(log_dir / experiment_name / "mem_profile.txt", "w")
+    """
     if args.memprof:
         from memory_profiler import memory_usage
         profile = no_op_profile
@@ -331,7 +357,8 @@ if __name__ == "__main__":
         mem_usage.to_csv(log_dir / experiment_name / "mem_usage.csv")
     else:
         outer_train(f, *train_args.values())
-
+    """
+    outer_train(f, *train_args.values())
     if args.profiler == "pyinstrument":
         pr.stop()
         with open(log_dir / experiment_name / "profile.html", "w") as f:
@@ -351,4 +378,3 @@ if __name__ == "__main__":
 
     with open(log_dir / experiment_name / "train_args.json", "w") as f:
         f.write(json.dumps(train_args))
-    f.close()
