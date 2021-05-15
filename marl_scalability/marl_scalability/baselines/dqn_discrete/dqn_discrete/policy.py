@@ -178,6 +178,8 @@ class DiscreteDQNPolicy(Agent):
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
+                compression=policy_params["replay_buffer"].get("compression", None),
+                dimensions=(self.n_in_channels, self.image_height, self.image_width)
             )
 
     def lane_action_to_index(self, state):

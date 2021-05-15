@@ -23,11 +23,13 @@
 from collections import deque, namedtuple
 import numpy as np
 import random, copy
+from numpy.core.fromnumeric import compress
 import torch
 from marl_scalability.utils.common import normalize_im
 from collections.abc import Iterable
 
 from torch.utils.data import Dataset, Sampler, DataLoader
+import zlib
 
 Transition = namedtuple(
     "Transition",
@@ -53,10 +55,12 @@ class RandomRLSampler(Sampler):
 class ReplayBufferDataset(Dataset):
     cpu = torch.device("cpu")
 
-    def __init__(self, buffer_size, device):
+    def __init__(self, buffer_size, device, dimensions, compression=None):
         self.buffer_size = buffer_size
         self.memory = deque(maxlen=self.buffer_size)
         self.device = device
+        self.compression = compression
+        self.dimensions = dimensions
 
     def add(
         self,
@@ -72,41 +76,53 @@ class ReplayBufferDataset(Dataset):
             others = {}
         # dereference the states
         state = copy.deepcopy(state)
-        next_state = copy.deepcopy(next_state)
+        next_state = copy.deepcopy(state)
         state["low_dim_states"] = np.float32(
             np.append(state["low_dim_states"], prev_action)
         )
-        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(
-            self.device
-        )
-        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"]).to(
-            self.device
-        )
-
         next_state["low_dim_states"] = np.float32(
             np.append(next_state["low_dim_states"], action)
         )
-        next_state["top_down_rgb"] = torch.from_numpy(
-            next_state["top_down_rgb"]
-        ).to(self.device)
-        next_state["low_dim_states"] = torch.from_numpy(
-            next_state["low_dim_states"]
-        ).to(self.device)
+        if self.compression == "zlib":
+            state["top_down_rgb"] = zlib.compress(state["top_down_rgb"], 1)
+            next_state["top_down_rgb"] = zlib.compress(next_state["top_down_rgb"])
 
         action = np.asarray([action]) if not isinstance(action, Iterable) else action
-        action = torch.from_numpy(action).float()
-        reward = torch.from_numpy(np.asarray([reward])).float()
-        done = torch.from_numpy(np.asarray([done])).float()
+        reward = np.asarray([reward])
+        done = np.asarray([done])
         new_experience = Transition(state, action, reward, next_state, done, others)
         self.memory.append(new_experience)
 
     def __len__(self):
         return len(self.memory)
 
-    def __getitem__(self, idx):
+    def _get_raw(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         state, action, reward, next_state, done, others = tuple(self.memory[idx])
+        return state, action, reward, next_state, done, others
+
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        transition = tuple(self.memory[idx])
+        transition = copy.deepcopy(transition)
+        state, action, reward, next_state, done, others = transition
+        if self.compression == "zlib":
+            state["top_down_rgb"] = np.fromstring(zlib.decompress(state["top_down_rgb"]), np.uint8)
+            state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
+            next_state["top_down_rgb"] = np.fromstring(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
+            next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
+    
+        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"])
+        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"])
+        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"])
+        next_state["low_dimstates"] = torch.from_numpy(next_state["low_dim_states"])
+        
+        action = torch.from_numpy(action)
+        done = torch.from_numpy(done)
+        reward = torch.from_numpy(reward).float()
         return state, action, reward, next_state, done, others
 
 
@@ -118,8 +134,15 @@ class ImageReplayBuffer:
         device_name,
         pin_memory=False,
         num_workers=0,
+        compression=None,
+        dimensions=[]
     ):
-        self.replay_buffer_dataset = ReplayBufferDataset(buffer_size, device=None)
+        self.replay_buffer_dataset = ReplayBufferDataset(
+            buffer_size, 
+            device=None,
+            compression=compression,
+            dimensions=dimensions,
+        )
         self.sampler = RandomRLSampler(self.replay_buffer_dataset, batch_size)
         self.data_loader = DataLoader(
             self.replay_buffer_dataset,
@@ -137,13 +160,20 @@ class ImageReplayBuffer:
 
     def __getitem__(self, idx):
         return self.replay_buffer_dataset[idx]
+    
+    def _get_raw(self, idx):
+        return self.replay_buffer_dataset._get_raw(idx)
 
     def make_state_from_dict(self, states, device):
         low_dim_states = (
-            torch.cat([e["low_dim_states"] for e in states], dim=0).float().to(device)
+            torch.cat(
+                [e["low_dim_states"] for e in states], 
+                dim=0).float().to(device)
         )
         images = (
-            torch.cat([e["top_down_rgb"] for e in states], dim=0).float().to(device)
+            torch.cat(
+                [e["top_down_rgb"] for e in states],
+                dim=0).float().to(device)
         )
         out = {
             "top_down_rgb": images,

@@ -191,9 +191,21 @@ def outer_train(f, *args, **kwargs):
                 # Update variables for the next step.
                 total_step += 1
                 observations = next_observations
-                if len(list(agents.values())[0].replay) == 1000:
+                """
+                if len(list(agents.values())[0].replay) == 100:
+                    
+                    import sys 
                     from pympler import asizeof
-                    print(asizeof.asized(list(agents.values())[0].replay, detail=4).format())
+                    replay = list(agents.values())[0].replay
+                    print(sys.getsizeof(replay))
+                    print(asizeof.asizeof(replay))
+                    first_state = replay._get_raw(0)[0]["top_down_rgb"]
+                    print(asizeof.asizeof(first_state))
+                    print(sys.getsizeof(first_state))
+                    1/0
+                    print(asizeof.asized(replay, detail=4).format())
+                    """
+                if total_step % mem_usage_interval == 0:
                     process = psutil.Process(os.getpid())
                     mem_usage.append((total_step, process.memory_info().rss))
                 if max_steps and total_step >= max_steps:
