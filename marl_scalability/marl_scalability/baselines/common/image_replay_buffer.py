@@ -30,6 +30,7 @@ from collections.abc import Iterable
 
 from torch.utils.data import Dataset, Sampler, DataLoader
 import zlib
+from pympler import asizeof
 
 Transition = namedtuple(
     "Transition",
@@ -102,6 +103,8 @@ class ReplayBufferDataset(Dataset):
         state, action, reward, next_state, done, others = tuple(self.memory[idx])
         return state, action, reward, next_state, done, others
 
+    def __sizeof__(self): 
+        return sum(asizeof.asizeof(transition) for transition in self.memory)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
@@ -160,7 +163,12 @@ class ImageReplayBuffer:
 
     def __getitem__(self, idx):
         return self.replay_buffer_dataset[idx]
-    
+
+    def __sizeof__(self):
+        return (self.replay_buffer_dataset.__sizeof__() +
+        self.sampler.__sizeof__() +
+        self.data_loader.__sizeof__()
+        )
     def _get_raw(self, idx):
         return self.replay_buffer_dataset._get_raw(idx)
 

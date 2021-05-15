@@ -97,7 +97,7 @@ def outer_train(f, *args, **kwargs):
             agent_id: agent_spec.build_agent()
             for agent_id, agent_spec in agent_specs.items()
         }
-        print(list(agents.values())[0])
+
         # Create the environment.
         env = gym.make(
             "marl_scalability.env:scalability-v0",
@@ -107,7 +107,6 @@ def outer_train(f, *args, **kwargs):
             timestep_sec=0.1,
             seed=seed,
         )
-
         # Define an 'etag' for this experiment's data directory based off policy_classes.
         # E.g. From a ["marl_scalability.baselines.dqn:dqn-v0", "marl_scalability.baselines.ppo:ppo-v0"]
         # policy_classes list, transform it to an etag of "dqn-v0:ppo-v0".
@@ -191,23 +190,15 @@ def outer_train(f, *args, **kwargs):
                 # Update variables for the next step.
                 total_step += 1
                 observations = next_observations
-                """
-                if len(list(agents.values())[0].replay) == 100:
-                    
-                    import sys 
-                    from pympler import asizeof
-                    replay = list(agents.values())[0].replay
-                    print(sys.getsizeof(replay))
-                    print(asizeof.asizeof(replay))
-                    first_state = replay._get_raw(0)[0]["top_down_rgb"]
-                    print(asizeof.asizeof(first_state))
-                    print(sys.getsizeof(first_state))
-                    1/0
-                    print(asizeof.asized(replay, detail=4).format())
-                    """
+                
                 if total_step % mem_usage_interval == 0:
                     process = psutil.Process(os.getpid())
-                    mem_usage.append((total_step, process.memory_info().rss))
+                    replay_buffer_mem_usage = sum(sys.getsizeof(p.replay)
+                        for p in agents.values()
+                    )
+                    mem_usage.append(
+                        (total_step, process.memory_info().rss, replay_buffer_mem_usage)
+                    )
                 if max_steps and total_step >= max_steps:
                     finished = True
                     break
@@ -224,12 +215,19 @@ def outer_train(f, *args, **kwargs):
                 writer = csv.writer(f)
                 writer.writerows(surviving_vehicles_total)
         if record_mem_usage:
-            mem_usage, steps = zip(*mem_usage)
-            mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage), "step": pd.Series(steps)})
+            mem_usage, steps, replay_usage = zip(*mem_usage)
+            mem_usage = pd.DataFrame(
+                {
+                    "mem_usage": pd.Series(mem_usage), 
+                    "step": pd.Series(steps),
+                    "replay_usage": pd.Series(replay_usage)
+                }
+            )
             mem_usage.to_csv(Path(log_dir) / experiment_name / "mem_usage.csv")
         env.close()
     train(*args, **kwargs)
-    f.close()
+    if f is not None:
+        f.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("intersection-training")
@@ -307,6 +305,13 @@ if __name__ == "__main__":
         default=None,
         type=int,
     )
+    parser.add_argument(
+        "--full-memory-profile",
+        help="Run a full memory profile line by line",
+        default=False,
+        action="store_true"
+    )
+
 
     base_dir = os.path.dirname(__file__)
     pool_path = os.path.join(base_dir, "agent_pool.json")
@@ -358,7 +363,12 @@ if __name__ == "__main__":
         import cProfile 
         pr = cProfile.Profile()
         pr.enable()
-    f = open(log_dir / experiment_name / "mem_profile.txt", "w")
+    if args.full_memory_profile:
+        f = open(log_dir / experiment_name / "mem_profile.txt", "w")
+    else:
+        f = None 
+        profile = no_op_profile
+    outer_train(f, *train_args.values())
     """
     if args.memprof:
         from memory_profiler import memory_usage
@@ -371,7 +381,7 @@ if __name__ == "__main__":
     else:
         outer_train(f, *train_args.values())
     """
-    outer_train(f, *train_args.values())
+    
     if args.profiler == "pyinstrument":
         pr.stop()
         with open(log_dir / experiment_name / "profile.html", "w") as f:
