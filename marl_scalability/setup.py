@@ -49,6 +49,7 @@ setup(
         "setuptools>=41.0.0,!=50.0",
         "dill",
         "psutil",
+        "pympler",
         "pyinstrument",
         "memory_profiler",
         "black==20.8b1",
