@@ -113,9 +113,9 @@ class ReplayBufferDataset(Dataset):
         transition = copy.deepcopy(transition)
         state, action, reward, next_state, done, others = transition
         if self.compression == "zlib":
-            state["top_down_rgb"] = np.fromstring(zlib.decompress(state["top_down_rgb"]), np.uint8)
+            state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.uint8)
             state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
-            next_state["top_down_rgb"] = np.fromstring(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
+            next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
     
         state["low_dim_states"] = torch.from_numpy(state["low_dim_states"])
