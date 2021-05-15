@@ -1,5 +1,7 @@
 import csv
 import os
+import json
+import dill
 import pandas as pd
 import numpy as np
 import argparse 
@@ -7,7 +9,9 @@ from pathlib import Path
 from pprint import pprint
 
 import matplotlib as mpl
+from matplotlib import cm
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 def extract_experiment_info(runs):
 	info = {}
@@ -34,7 +38,23 @@ def extract_experiment_info(runs):
 		info[policy].sort(key=lambda run_info: run_info["n_agents"])
 	return info 
 
-def extract_mem_usage(info):
+def extract_agent_metadata(info):
+	for policy in info:
+		for run in info[policy]:
+			agent_metadata_path = Path(run["path"]) / "agent_metadata.pkl"
+			with open(agent_metadata_path, "rb") as f:
+				run["agent_metadata"] = dill.loads(f.read())
+			print(run["agent_metadata"])
+
+def extract_args_info(info):
+	for policy in info:
+		for run in info[policy]:
+			train_args_path = Path(run["path"]) / "train_args.json"
+			with open(train_args_path) as f:
+				run["train_args"] = json.loads(f.read())
+
+
+def extract_mem_usage(info, store_df=False):
 	for policy in info:
 		for run in info[policy]:
 			mem_usage_csv_path = Path(run["path"]) / "mem_usage.csv"
@@ -49,6 +69,8 @@ def extract_mem_usage(info):
 				run["mem_usage"]["min"] = min_mem_usage
 				std_mem_usage = mem_usage["mem_usage"].std()
 				run["mem_usage"]["std"] = std_mem_usage
+				if store_df:
+					run["mem_usage"]["df"] = mem_usage
 
 def extract_stats_csv_info(info):
 	for policy in info:
@@ -72,6 +94,7 @@ def extract_stats_csv_info(info):
 				run["run_episode_stats"]["total_steps"]["max"] = stats["total steps"].max()
 				run["run_episode_stats"]["total_steps"]["min"] = stats["total steps"].min()
 				run["run_episode_stats"]["total_steps"]["std"] = stats["total steps"].std()
+				run["run_episode_stats"]["overall_total_steps"] = stats["total steps"].sum()
 
 
 def extract_profile_info(info, add_norm=True):
@@ -131,7 +154,7 @@ def extract_vehicle_retention_info(info):
 def plot_mem_usage_graph(info, log_dir, errorbars=True):
 	graphs_dir = log_dir / "graphs"
 	graphs_dir.mkdir(exist_ok=True)
-	fig, axs = plt.subplots(3)
+	fig, axs = plt.subplots(len(info))
 	#ax.set_xlabel("Number of Ego Agents")
 	#ax.set_ylabel("Memory Usage")
 	colours = ["b", "g", "orange"]
@@ -154,7 +177,7 @@ def plot_max_mem_usage_graph(info, log_dir):
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	ax.set_xlabel("Number of Ego Agents")
-	ax.set_ylabel("Memory Usage")
+	ax.set_ylabel("Peak Memory Usage")
 	for policy in info:
 		ys = [run["mem_usage"]["max"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
@@ -291,6 +314,55 @@ def plot_vehicle_retention(policy_exp, name, log_dir, max_steps=None):
 	else:
 		plt.savefig(graphs_dir / f"vehicle_retention_{name}.png")
 
+def gigabyte(y, pos):
+	return "%1.1fGB" % (y*1e-9)
+
+def hours(x, pos):
+	seconds = int(x)
+	hours, seconds = divmod(seconds, 3600)
+	minutes, seconds = divmod(seconds, 60)
+	return f"{hours}:{minutes}:{seconds}"
+
+def plot_mem_usage_over_time(policy_exp, name, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Step")
+	ax.set_ylabel("Memory usage")
+	labels = ["84", "256_compressed", "256_greyscale", "256", "84_greyscale"]
+	cmap = cm.get_cmap("hsv")
+	colors = cmap(np.linspace(0, .9, len(policy_exp)))
+	for color, run, label in zip(colors, policy_exp, labels):
+		if "mem_usage" not in run:
+			continue
+		df = run["mem_usage"]["df"]
+		col_list = list(df)
+		ind, mem_usage, step = col_list
+		col_list = [ind, step, mem_usage]
+		df.columns = col_list
+		ax.plot(
+			df["step"], 
+			df["mem_usage"], 
+			color=color,
+			label=label
+		)
+	ax.legend()
+	ax.set_title("Memory usage over time for DQN agent with top-down RGB input")
+	gig_formatter = FuncFormatter(gigabyte)
+	ax.yaxis.set_major_formatter(gig_formatter)
+	ax.set_ylim(bottom=0)
+	"""
+	hrs_formatter = FuncFormatter(hours)
+	ax.xaxis.set_major_formatter(hrs_formatter)
+	ax.set_title(f"Memory usage over time for {name}")
+	max_hours = len(run["mem_usage"]["df"]["mem_usage"]) // 3600
+	ticks = [3600 * i for i in range(0, max_hours, 2)]
+	ax.set_xticks(ticks)
+	"""
+	plt.savefig(graphs_dir / f"mem_usage_over_time_{name}.png")
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate-graphs")
 	parser.add_argument(
@@ -300,8 +372,8 @@ if __name__ == "__main__":
 	log_dir = Path(args.log_dir)
 	runs = [f.path for f in os.scandir(log_dir) if f.is_dir() and f.name != "graphs"]
 	experiment_info = extract_experiment_info(runs)
-	#extract_mem_usage(experiment_info)
-	#extract_stats_csv_info(experiment_info)
+	extract_mem_usage(experiment_info, store_df=True)
+	extract_stats_csv_info(experiment_info)
 	#extract_profile_info(experiment_info)
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)
@@ -314,12 +386,19 @@ if __name__ == "__main__":
 	#plot_profile_chart(experiment_info["dqn-discrete"], "dqn-discrete", log_dir)
 	#plot_exeuction_time(experiment_info, log_dir)
 
-	extract_vehicle_retention_info(experiment_info)
+	#extract_vehicle_retention_info(experiment_info)
 	#plot_vehicle_retention(experiment_info["dqn"], "dqn", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["ppo"], "ppo", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["sac"], "sac", log_dir, max_steps=50)
-	plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=100)
-	plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=50)
-	plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=100)
-	plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["ppo_discrete"], "ppo discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["ppo_discrete"], "ppo discrete", log_dir, max_steps=50)
 
+	#plot_mem_usage_graph(experiment_info, log_dir)
+	#plot_max_mem_usage_graph(experiment_info, log_dir)
+	extract_args_info(experiment_info)
+	extract_agent_metadata(experiment_info)
+	plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn discrete (high dim)", log_dir)
