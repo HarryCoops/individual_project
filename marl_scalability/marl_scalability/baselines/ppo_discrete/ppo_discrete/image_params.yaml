@@ -1,4 +1,5 @@
 action_size: 1
+agent_type: image
 discrete_action_choices: 4
 batch_size: 2048  # size of batch
 lr: 3e-5

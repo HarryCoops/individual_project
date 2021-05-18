@@ -196,7 +196,6 @@ class DiscretePPOPolicy(Agent):
         if explore:  # training mode
             action = dist.sample()
             log_prob = dist.log_prob(action)
-
             self.current_log_prob = log_prob
             self.current_value = value
         else:  # testing mode
@@ -214,7 +213,6 @@ class DiscretePPOPolicy(Agent):
 
         # pass social_vehicle_rep through the network
         # state['low_dim_states'] = torch.from_numpy(np.float32(np.append(state['low_dim_states'],self.prev_action))).unsqueeze(0)
-
         self.log_probs.append(self.current_log_prob.to(self.device))
         self.values.append(self.current_value.to(self.device))
         self.states.append(state)
@@ -257,12 +255,24 @@ class DiscretePPOPolicy(Agent):
         low_dim_states = (
             torch.cat([e["low_dim_states"] for e in states], dim=0).float().to(device)
         )
-        social_vehicles = [e["social_vehicles"] for e in states]
+        if self.agent_type == "social":
+            social_vehicles = [e["social_vehicles"] for e in states]
 
-        out = {
-            "low_dim_states": low_dim_states,
-            "social_vehicles": social_vehicles,
-        }
+            out = {
+                "low_dim_states": low_dim_states,
+                "social_vehicles": social_vehicles,
+            }
+        elif self.agent_type == "image":
+            images = (
+                torch.cat(
+                    [e["top_down_rgb"] for e in states],
+                    dim=0).float().to(device)
+            )
+            
+            out = {
+                "low_dim_states": low_dim_states,
+                "top_down_rgb": images
+            }
 
         return out
 
@@ -287,7 +297,6 @@ class DiscretePPOPolicy(Agent):
             states_mini_batch = self.make_state_from_dict(
                 states_mini_batch, device=self.device
             )
-
             yield (
                 states_mini_batch,
                 actions[splits[i], :].to(self.device),
@@ -388,15 +397,13 @@ class DiscretePPOPolicy(Agent):
         returns = self.compute_returns(
             self.rewards, self.terminals, self.values, self.gamma, self.l
         )
-
         # convert lists into Pytorch tensors
         states = self.states
         actions = torch.stack(self.actions)
-        log_probs = torch.cat(self.log_probs).detach()
+        log_probs = torch.stack(self.log_probs).detach()
         values = torch.cat(self.values).detach()
         returns = torch.cat(returns).detach()
         advantages = returns - values
-
         # normalize advatages
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-5)
 

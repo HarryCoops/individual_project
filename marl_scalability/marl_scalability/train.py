@@ -113,7 +113,7 @@ def outer_train(f, *args, **kwargs):
         #etag = ":".join([policy_class.split(":")[-1] for policy_class in policy_classes])
         surviving_vehicles_total = []
         mem_usage = []
-        mem_usage_interval = 10
+        mem_usage_interval = 100
         for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
@@ -193,8 +193,8 @@ def outer_train(f, *args, **kwargs):
                 
                 if total_step % mem_usage_interval == 0:
                     process = psutil.Process(os.getpid())
-                    replay_buffer_mem_usage = sum(sys.getsizeof(p.replay)
-                        for p in agents.values()
+                    replay_buffer_mem_usage = sum(sys.getsizeof(p.replay) 
+                        if getattr(p, "replay", None) is not None else 0 for p in agents.values() 
                     )
                     mem_usage.append(
                         (total_step, process.memory_info().rss, replay_buffer_mem_usage)

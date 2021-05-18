@@ -37,7 +37,7 @@ class ActorNetwork(nn.Module):
         image_dim,
         state_size, 
         action_size, 
-        hidden_dim=128
+        hidden_dim=128,
         activation = nn.ReLU
     ):
         super(ActorNetwork, self).__init__()
@@ -77,7 +77,7 @@ class CriticNetwork(nn.Module):
         n_in_channels, 
         image_dim,
         state_size, 
-        hidden_dim=128
+        hidden_dim=128,
         activation = nn.ReLU
     ):
         super(ActorNetwork, self).__init__()

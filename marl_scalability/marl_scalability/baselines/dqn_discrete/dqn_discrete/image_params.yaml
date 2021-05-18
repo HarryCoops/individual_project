@@ -4,15 +4,16 @@ batch_size: 64
 sticky_actions: 1
 agent_type: image
 lr: 1e-5
-train_step: 4
+train_step: 5
 prev_action_size: 1
 target_update: 0.01
-n_in_channels: 3
-image_height: 256
-image_width: 256
-warmup: 500
+n_in_channels: 1
+image_height: 128
+image_width: 128
+warmup: 2000
 gamma: 0.99
 use_ddqn: True
 replay_buffer:
-  buffer_size: 1e3
-  batch_size: 64 
+  buffer_size: 1e6
+  batch_size: 64
+  compression: zlib
