@@ -80,6 +80,12 @@ register(
     ),
 )
 register(
+    locator="ppo_discreteRGB-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, policy_class=DiscretePPOPolicy, **kwargs
+    ),
+)
+register(
     locator="bdqn-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, policy_class=BehavioralDQNPolicy, **kwargs

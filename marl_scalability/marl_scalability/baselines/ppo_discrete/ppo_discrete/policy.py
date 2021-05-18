@@ -23,6 +23,7 @@
 import torch, os, yaml
 import numpy as np
 from marl_scalability.baselines.ppo_discrete.ppo_discrete.network import PPONetwork
+from marl_scalability.baselines.ppo_discrete.ppo_discrete.conv_network import ImagePPONetwork
 from smarts.core.agent import Agent
 import pathlib
 import os
@@ -32,6 +33,7 @@ from marl_scalability.utils.common import (
     to_3d_action,
     to_2d_action,
 )
+from marl_scalability.baselines.common.image_state_preprocessor import ImageStatePreprocessor
 from marl_scalability.baselines.common.yaml_loader import load_yaml
 from marl_scalability.baselines.common.social_vehicle_config import get_social_vehicle_configs
 from marl_scalability.baselines.common.baseline_state_preprocessor import BaselineStatePreprocessor
@@ -44,6 +46,7 @@ class DiscretePPOPolicy(Agent):
         checkpoint_dir=None,
     ):
         self.policy_params = policy_params
+        self.agent_type = policy_params["agent_type"]
         self.lane_actions = ["keep_lane", "slow_down", "change_lane_left", "change_lane_right"]
         self.batch_size = int(policy_params["batch_size"])
         self.discrete_action_choices = int(policy_params["discrete_action_choices"])
@@ -71,41 +74,54 @@ class DiscretePPOPolicy(Agent):
         self.action_size = int(policy_params["action_size"])
         self.prev_action = np.zeros(self.action_size)
 
-        # state preprocessing
-        self.social_policy_hidden_units = int(
-            policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
-        )
-        self.social_capacity = int(
-            policy_params["social_vehicles"].get("social_capacity", 0)
-        )
-        self.observation_num_lookahead = int(
-            policy_params.get("observation_num_lookahead", 0)
-        )
-        self.social_policy_init_std = int(
-            policy_params["social_vehicles"].get("social_policy_init_std", 0)
-        )
-        self.num_social_features = int(
-            policy_params["social_vehicles"].get("num_social_features", 0)
-        )
-        self.social_vehicle_config = get_social_vehicle_configs(
-            **policy_params["social_vehicles"]
-        )
+        if self.agent_type == "social":
+            # state preprocessing
+            self.social_policy_hidden_units = int(
+                policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
+            )
+            self.social_capacity = int(
+                policy_params["social_vehicles"].get("social_capacity", 0)
+            )
+            self.observation_num_lookahead = int(
+                policy_params.get("observation_num_lookahead", 0)
+            )
+            self.social_policy_init_std = int(
+                policy_params["social_vehicles"].get("social_policy_init_std", 0)
+            )
+            self.num_social_features = int(
+                policy_params["social_vehicles"].get("num_social_features", 0)
+            )
+            self.social_vehicle_config = get_social_vehicle_configs(
+                **policy_params["social_vehicles"]
+            )
 
-        self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
-        self.state_description = BaselineStatePreprocessor.get_state_description(
-            policy_params["social_vehicles"],
-            policy_params["observation_num_lookahead"],
-            self.action_size,
-        )
-        # self.state_preprocessor = StatePreprocessor(
-        #     preprocess_state, to_2d_action, self.state_description
-        # )
-        self.social_feature_encoder_class = self.social_vehicle_encoder[
-            "social_feature_encoder_class"
-        ]
-        self.social_feature_encoder_params = self.social_vehicle_encoder[
-            "social_feature_encoder_params"
-        ]
+            self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
+            self.state_description = BaselineStatePreprocessor.get_state_description(
+                policy_params["social_vehicles"],
+                policy_params["observation_num_lookahead"],
+                self.action_size,
+            )
+            # self.state_preprocessor = StatePreprocessor(
+            #     preprocess_state, to_2d_action, self.state_description
+            # )
+            self.social_feature_encoder_class = self.social_vehicle_encoder[
+                "social_feature_encoder_class"
+            ]
+            self.social_feature_encoder_params = self.social_vehicle_encoder[
+                "social_feature_encoder_params"
+            ]
+        elif self.agent_type == "image":
+            self.n_in_channels = int(policy_params["n_in_channels"])
+            self.image_height = int(policy_params["image_height"])
+            self.image_width = int(policy_params["image_width"])
+            self.state_description = ImageStatePreprocessor.get_state_description(
+                (self.image_height, self.image_width),
+            )
+            network_params = {
+                "state_size": self.state_size,
+                "n_in_channels": self.n_in_channels,
+                "image_dim": (self.image_width, self.image_height)
+            }
 
         # others
         self.checkpoint_dir = checkpoint_dir
@@ -114,17 +130,27 @@ class DiscretePPOPolicy(Agent):
         self.save_codes = (
             policy_params["save_codes"] if "save_codes" in policy_params else None
         )
+        if self.agent_type == "social":
+            # PPO
+            self.ppo_net = PPONetwork(
+                self.discrete_action_choices,
+                self.state_size,
+                hidden_units=self.hidden_units,
+                init_std=self.social_policy_init_std,
+                seed=self.seed,
+                social_feature_encoder_class=self.social_feature_encoder_class,
+                social_feature_encoder_params=self.social_feature_encoder_params,
+            ).to(self.device)
+        elif self.agent_type == "image":
+            self.ppo_net = ImagePPONetwork(
+                self.n_in_channels,
+                (self.image_width, self.image_height),
+                self.action_size,
+                self.state_size,
+                seed=self.seed,
+                hidden_units=self.hidden_units,
+            )
 
-        # PPO
-        self.ppo_net = PPONetwork(
-            self.discrete_action_choices,
-            self.state_size,
-            hidden_units=self.hidden_units,
-            init_std=self.social_policy_init_std,
-            seed=self.seed,
-            social_feature_encoder_class=self.social_feature_encoder_class,
-            social_feature_encoder_params=self.social_feature_encoder_params,
-        ).to(self.device)
         self.optimizer = torch.optim.Adam(self.ppo_net.parameters(), lr=self.lr)
         self.step_count = 0
         if self.checkpoint_dir:
@@ -134,6 +160,8 @@ class DiscretePPOPolicy(Agent):
     def state_size(self):
         # Adjusting state_size based on number of features (ego+social)
         size = sum(self.state_description["low_dim_states"].values())
+        if self.agent_type == "image":
+            return size + self.action_size
         if self.social_feature_encoder_class:
             size += self.social_feature_encoder_class(
                 **self.social_feature_encoder_params
@@ -149,9 +177,16 @@ class DiscretePPOPolicy(Agent):
         state["low_dim_states"] = np.float32(
             np.append(state["low_dim_states"], self.prev_action)
         )
-        state["social_vehicles"] = (
-            torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
-        )
+        if self.agent_type == "social":
+            state["social_vehicles"] = (
+                torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
+            )
+        elif self.agent_type == "image":
+            state["top_down_rgb"] = (
+                    torch.Tensor(state["top_down_rgb"]).unsqueeze(0).to(self.device)
+                )
+            # Normalise to 0..1 expected by network
+            state["top_down_rgb"].div_(255)
         state["low_dim_states"] = (
             torch.from_numpy(state["low_dim_states"]).unsqueeze(0).to(self.device)
         )
