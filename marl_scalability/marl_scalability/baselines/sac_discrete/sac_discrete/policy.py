@@ -30,9 +30,11 @@ import pathlib, os, yaml, copy
 from marl_scalability.utils.common import compute_sum_aux_losses, to_3d_action, to_2d_action
 from smarts.core.agent import Agent
 from marl_scalability.baselines.common.replay_buffer import ReplayBuffer
+from marl_scalability.baselines.common.image_replay_buffer import ImageReplayBuffer
 from marl_scalability.baselines.common.social_vehicle_config import get_social_vehicle_configs
 from marl_scalability.baselines.common.yaml_loader import load_yaml
 from marl_scalability.baselines.common.baseline_state_preprocessor import BaselineStatePreprocessor
+from marl_scalability.baselines.common.image_state_preprocessor import ImageStatePreprocessor
 
 
 class DiscreteSACPolicy(Agent):
@@ -45,6 +47,7 @@ class DiscreteSACPolicy(Agent):
         # print("LOADING THE PARAMS", policy_params, checkpoint_dir)
         self.lane_actions = ["keep_lane", "slow_down", "change_lane_left", "change_lane_right"]
         self.policy_params = policy_params
+        self.agent_type = policy_params["agent_type"]
         self.gamma = float(policy_params["gamma"])
         self.critic_lr = float(policy_params["critic_lr"])
         self.actor_lr = float(policy_params["actor_lr"])
@@ -61,39 +64,47 @@ class DiscreteSACPolicy(Agent):
         self.discrete_action_choices = int(policy_params["discrete_action_choices"])
         self.prev_action = np.zeros(self.action_size)
 
-        # state preprocessing
-        self.social_policy_hidden_units = int(
-            policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
-        )
-        self.social_capacity = int(
-            policy_params["social_vehicles"].get("social_capacity", 0)
-        )
-        self.observation_num_lookahead = int(
-            policy_params.get("observation_num_lookahead", 0)
-        )
-        self.social_policy_init_std = int(
-            policy_params["social_vehicles"].get("social_policy_init_std", 0)
-        )
-        self.num_social_features = int(
-            policy_params["social_vehicles"].get("num_social_features", 0)
-        )
-        self.social_vehicle_config = get_social_vehicle_configs(
-            **policy_params["social_vehicles"]
-        )
-        self.prev_action_size = 1
+        if self.agent_type == "social":
+            # state preprocessing
+            self.social_policy_hidden_units = int(
+                policy_params["social_vehicles"].get("social_policy_hidden_units", 0)
+            )
+            self.social_capacity = int(
+                policy_params["social_vehicles"].get("social_capacity", 0)
+            )
+            self.observation_num_lookahead = int(
+                policy_params.get("observation_num_lookahead", 0)
+            )
+            self.social_policy_init_std = int(
+                policy_params["social_vehicles"].get("social_policy_init_std", 0)
+            )
+            self.num_social_features = int(
+                policy_params["social_vehicles"].get("num_social_features", 0)
+            )
+            self.social_vehicle_config = get_social_vehicle_configs(
+                **policy_params["social_vehicles"]
+            )
+            self.prev_action_size = 1
 
-        self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
-        self.state_description = BaselineStatePreprocessor.get_state_description(
-            policy_params["social_vehicles"],
-            policy_params["observation_num_lookahead"],
-            self.action_size,
-        )
-        self.social_feature_encoder_class = self.social_vehicle_encoder[
-            "social_feature_encoder_class"
-        ]
-        self.social_feature_encoder_params = self.social_vehicle_encoder[
-            "social_feature_encoder_params"
-        ]
+            self.social_vehicle_encoder = self.social_vehicle_config["encoder"]
+            self.state_description = BaselineStatePreprocessor.get_state_description(
+                policy_params["social_vehicles"],
+                policy_params["observation_num_lookahead"],
+                self.action_size,
+            )
+            self.social_feature_encoder_class = self.social_vehicle_encoder[
+                "social_feature_encoder_class"
+            ]
+            self.social_feature_encoder_params = self.social_vehicle_encoder[
+                "social_feature_encoder_params"
+            ]
+        elif self.agent_type == "image":
+            self.n_in_channels = int(policy_params["n_in_channels"])
+            self.image_height = int(policy_params["image_height"])
+            self.image_width = int(policy_params["image_width"])
+            self.state_description = ImageStatePreprocessor.get_state_description(
+                (self.image_height, self.image_width),
+            )
 
         # others
         self.checkpoint_dir = checkpoint_dir
@@ -102,11 +113,21 @@ class DiscreteSACPolicy(Agent):
         self.save_codes = (
             policy_params["save_codes"] if "save_codes" in policy_params else None
         )
-        self.memory = ReplayBuffer(
-            buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
-            batch_size=int(policy_params["replay_buffer"]["batch_size"]),
-            device_name=self.device_name,
-        )
+        if self.agent_type == "image":
+            self.replay = ImageReplayBuffer(
+                buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
+                batch_size=int(policy_params["replay_buffer"]["batch_size"]),
+                device_name=self.device_name,
+                compression=policy_params["replay_buffer"].get("compression", None),
+                dimensions=(self.n_in_channels, self.image_height, self.image_width)
+            )
+
+        elif self.agent_type == "social":
+            self.memory = ReplayBuffer(
+                buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
+                batch_size=int(policy_params["replay_buffer"]["batch_size"]),
+                device_name=self.device_name,
+            )
         self.current_iteration = 0
         self.steps = 0
         self.init_networks()
@@ -117,6 +138,8 @@ class DiscreteSACPolicy(Agent):
     def state_size(self):
         # Adjusting state_size based on number of features (ego+social)
         size = sum(self.state_description["low_dim_states"].values())
+        if self.agent_type == "image":
+            return size + self.action_size
         if self.social_feature_encoder_class:
             size += self.social_feature_encoder_class(
                 **self.social_feature_encoder_params
@@ -128,15 +151,26 @@ class DiscreteSACPolicy(Agent):
         return size
 
     def init_networks(self):
-        self.sac_net = SACNetwork(
-            action_size=self.discrete_action_choices,
-            state_size=self.state_size,
-            hidden_units=self.hidden_units,
-            seed=self.seed,
-            initial_alpha=self.initial_alpha,
-            social_feature_encoder_class=self.social_feature_encoder_class,
-            social_feature_encoder_params=self.social_feature_encoder_params,
-        ).to(self.device_name)
+        if self.agent_type == "social":
+            self.sac_net = SACNetwork(
+                action_size=self.discrete_action_choices,
+                state_size=self.state_size,
+                hidden_units=self.hidden_units,
+                seed=self.seed,
+                initial_alpha=self.initial_alpha,
+                social_feature_encoder_class=self.social_feature_encoder_class,
+                social_feature_encoder_params=self.social_feature_encoder_params,
+            ).to(self.device_name)
+        elif self.agent_type == "image":
+            self.sac_net = SACNetwork(
+                n_in_channels=self.n_in_channels,
+                image_dim=(self.image_width, self.image_height)
+                action_size=self.discrete_action_choices,
+                state_size=self.state_size,
+                hidden_units=self.hidden_units,
+                seed=self.seed,
+                initial_alpha=self.initial_alpha,
+            ).to(self.device_name)
 
         self.actor_optimizer = torch.optim.Adam(
             self.sac_net.actor.parameters(), lr=self.actor_lr
@@ -155,9 +189,17 @@ class DiscreteSACPolicy(Agent):
         state["low_dim_states"] = np.float32(
             np.append(state["low_dim_states"], self.prev_action)
         )
-        state["social_vehicles"] = (
-            torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
-        )
+        if self.agent_type == "social":
+            state["social_vehicles"] = (
+                torch.from_numpy(state["social_vehicles"]).unsqueeze(0).to(self.device)
+            )
+        elif self.agent_type == "image":
+            state["top_down_rgb"] = (
+                    torch.Tensor(state["top_down_rgb"]).unsqueeze(0).to(self.device)
+                )
+                # Normalise to 0..1 expected by network
+                state["top_down_rgb"].div_(255)
+
         state["low_dim_states"] = (
             torch.from_numpy(state["low_dim_states"]).unsqueeze(0).to(self.device)
         )

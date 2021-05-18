@@ -1,0 +1,22 @@
+seed: 2
+action_size: 1
+discrete_action_choices: 4
+action_space_type: discrete
+gamma: 0.99
+critic_lr: 5e-4
+actor_lr: 1e-4
+critic_update_rate: 5
+policy_update_rate: 10
+warmup: 1000
+batch_size: 32
+hidden_units: 512
+tau: 0.005
+logging_freq: 2
+initial_alpha: 0.02
+observation_num_lookahead: 20
+n_in_channels: 3
+image_height: 256
+image_width: 256
+replay_buffer:
+    buffer_size: 1e6
+    batch_size: 32

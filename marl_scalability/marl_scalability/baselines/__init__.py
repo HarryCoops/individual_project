@@ -74,6 +74,12 @@ register(
     ),
 )
 register(
+    locator="sac_discreteRGB-v0",
+    entry_point=lambda **kwargs: BaselineAgentSpec(
+        action_type=ActionSpaceType.Lane, image_agent=True, policy_class=DiscreteSACPolicy, **kwargs
+    ),
+)
+register(
     locator="ppo_discrete-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, policy_class=DiscretePPOPolicy, **kwargs

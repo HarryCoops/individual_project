@@ -18,6 +18,12 @@
             "name" : "sac_discrete",
             "locator" : "sac_discrete-v0"
         },
+        "sac_discreteRGB" : {
+            "path" : "marl_scalability.baselines.sac_discrete",
+            "class" : "DiscreteSACPolicy",
+            "name" : "sac_discreteRGB",
+            "locator" : "sac_discreteRGB-v0"
+        },
         "dqn" : {
             "path" : "marl_scalability.baselines.dqn",
             "class" : "DQNPolicy",
@@ -42,7 +48,7 @@
             "name" : "ppo_discrete",
             "locator" : "ppo_discrete-v0"
         },
-	"ppo_discreteRGB" : {
+	   "ppo_discreteRGB" : {
             "path" : "marl_scalability.baselines.ppo_discrete",
             "class" : "DiscretePPOPolicy",
             "name" : "ppo_discreteRGB",
