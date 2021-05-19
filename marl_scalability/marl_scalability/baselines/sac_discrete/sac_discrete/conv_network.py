@@ -40,7 +40,7 @@ class ImageSACNetwork(nn.Module):
         n_in_channels,
         image_dim,
         action_size,
-        discrete_action_size,
+        discrete_action_choices,
         state_size,
         seed=None,
         hidden_units=64,
@@ -73,7 +73,7 @@ class ImageSACNetwork(nn.Module):
         self.actor = Actor(
             n_in_channels=n_in_channels,
             image_dim=image_dim,
-            action_size=discrete_action_size,
+            action_size=discrete_action_choices,
             state_size=state_size,
             seed=seed,
             hidden_units=hidden_units,
@@ -187,6 +187,7 @@ class Actor(nn.Module):
             activation(),
             nn.Conv2d(32, 64, 4, 2),
             activation(),
+            nn.Conv2d(64, 64, 4, 2),
             Flatten()
         )
 
@@ -210,7 +211,6 @@ class Actor(nn.Module):
         common_state = self.common(top_down_rgb)
         x = torch.cat([common_state, low_dim_state], dim=-1)
         action_probs = self.action_probs(x)
-
         action_distribution = Categorical(action_probs)
         action = action_distribution.sample().cpu()
         max_prob_action = torch.argmax(action_probs)

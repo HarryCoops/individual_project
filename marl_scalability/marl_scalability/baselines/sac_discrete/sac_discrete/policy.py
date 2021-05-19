@@ -208,7 +208,7 @@ class DiscreteSACPolicy(Agent):
         )
 
         action, _, mean = self.sac_net.sample(state)
-
+        
         if explore:  # training mode
             action = torch.squeeze(action, 0)
             action = action.detach().cpu().numpy()
@@ -276,20 +276,18 @@ class DiscreteSACPolicy(Agent):
         q1_current, q2_current, aux_losses = self.sac_net.critic(
             states, actions, training=True
         )
-        print(q1_current.shape, q2_current.shape)
         with torch.no_grad():
             next_actions, log_probs, _ = self.sac_net.sample(next_states)
             q1_next, q2_next = self.sac_net.target(next_states, next_actions.unsqueeze(1))
-            print(q1_next.shape, q2_next.shape)
             v_next = (
                 torch.min(q1_next, q2_next) - self.sac_net.alpha.detach() * log_probs
             )
+            v_next = v_next.sum(dim=1).unsqueeze(-1)
             q_target = (rewards + ((1 - dones) * self.gamma * v_next)).detach()
 
         critic_loss = F.mse_loss(q1_current, q_target) + F.mse_loss(
             q2_current, q_target
         )
-        print(q_target.shape, q1_current.shape)
         aux_losses = compute_sum_aux_losses(aux_losses)
         overall_loss = critic_loss + aux_losses
         self.critic_optimizer.zero_grad()
@@ -318,6 +316,7 @@ class DiscreteSACPolicy(Agent):
         overall_loss = actor_loss + aux_losses
         self.actor_optimizer.zero_grad()
         overall_loss.backward()
+        nn.utils.clip_grad_norm_(self.sac_net.actor.parameters(), 0.5)
         self.actor_optimizer.step()
 
         # update temp:

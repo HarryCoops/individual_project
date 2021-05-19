@@ -227,7 +227,6 @@ class Actor(nn.Module):
         # feed the state into the networks to get action probabilities
         common_state = self.common(state)
         action_probs = self.action_probs(common_state)
-
         action_distribution = Categorical(action_probs)
         action = action_distribution.sample().cpu()
         max_prob_action = torch.argmax(action_probs)
