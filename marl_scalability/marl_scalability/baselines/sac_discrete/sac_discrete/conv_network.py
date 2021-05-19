@@ -46,7 +46,7 @@ class ImageSACNetwork(nn.Module):
         initial_alpha=0.02,
         activation=nn.ReLU(),
     ):
-        super(SACNetwork, self).__init__()
+        super(ImageSACNetwork, self).__init__()
 
         if seed is not None:
             torch.manual_seed(seed)
@@ -121,7 +121,7 @@ class DoubleCritic(nn.Module):
         )
 
         self.im_feature_2 = nn.Sequential(
-            nn.Conv2d(n_in_channels, 32, 8, 4),
+            nn.Conv2d(n_in_channels, 16, 8, 4),
             activation(),
             nn.Conv2d(16, 32, 4, 2),
             activation(),
@@ -150,15 +150,14 @@ class DoubleCritic(nn.Module):
         )
 
     def forward(self, state, action, training=False):
-
         low_dim_state = state["low_dim_states"]
         top_down_rgb = state["top_down_rgb"]
         im_q1 = self.im_feature_1(top_down_rgb)
         im_q2 = self.im_feature_2(top_down_rgb)
-        action_state_1 = torch.cat((im_q1, action, state), 1)
-        action_state_2 = torch.cat((im_q2, action, state), 1)
-        q1 = self.q1(action_state)
-        q2 = self.q2(action_state)
+        action_state_1 = torch.cat((im_q1, action, low_dim_state), 1)
+        action_state_2 = torch.cat((im_q2, action, low_dim_state), 1)
+        q1 = self.q1(action_state_1)
+        q2 = self.q2(action_state_2)
 
         if training:
             return q1, q2, {}
@@ -184,14 +183,14 @@ class Actor(nn.Module):
 
         self.common = nn.Sequential(
             nn.Conv2d(n_in_channels, 32, 8, 4),
-            activation()
+            activation(),
             nn.Conv2d(32, 64, 4, 2),
             activation(),
             Flatten()
         )
 
         dummy = torch.zeros((1, n_in_channels, *image_dim))
-        im_feature_size = self.im_feature(dummy).data.cpu().numpy().size
+        im_feature_size = self.common(dummy).data.cpu().numpy().size
 
         self.action_probs = nn.Sequential(
             nn.Linear(im_feature_size + state_size, hidden_units),

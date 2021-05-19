@@ -25,6 +25,7 @@ import numpy as np
 import torch.nn as nn
 from sys import path
 from marl_scalability.baselines.sac_discrete.sac_discrete.network import SACNetwork
+from marl_scalability.baselines.sac_discrete.sac_discrete.conv_network import ImageSACNetwork
 import torch.nn.functional as F
 import pathlib, os, yaml, copy
 from marl_scalability.utils.common import compute_sum_aux_losses, to_3d_action, to_2d_action
@@ -114,7 +115,7 @@ class DiscreteSACPolicy(Agent):
             policy_params["save_codes"] if "save_codes" in policy_params else None
         )
         if self.agent_type == "image":
-            self.replay = ImageReplayBuffer(
+            self.memory = ImageReplayBuffer(
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
@@ -162,9 +163,9 @@ class DiscreteSACPolicy(Agent):
                 social_feature_encoder_params=self.social_feature_encoder_params,
             ).to(self.device_name)
         elif self.agent_type == "image":
-            self.sac_net = SACNetwork(
+            self.sac_net = ImageSACNetwork(
                 n_in_channels=self.n_in_channels,
-                image_dim=(self.image_width, self.image_height)
+                image_dim=(self.image_width, self.image_height),
                 action_size=self.discrete_action_choices,
                 state_size=self.state_size,
                 hidden_units=self.hidden_units,
@@ -197,8 +198,8 @@ class DiscreteSACPolicy(Agent):
             state["top_down_rgb"] = (
                     torch.Tensor(state["top_down_rgb"]).unsqueeze(0).to(self.device)
                 )
-                # Normalise to 0..1 expected by network
-                state["top_down_rgb"].div_(255)
+            # Normalise to 0..1 expected by network
+            state["top_down_rgb"].div_(255)
 
         state["low_dim_states"] = (
             torch.from_numpy(state["low_dim_states"]).unsqueeze(0).to(self.device)
@@ -226,9 +227,7 @@ class DiscreteSACPolicy(Agent):
             reward=reward,
             next_state=next_state,
             done=float(done),
-            social_capacity=self.social_capacity,
-            observation_num_lookahead=self.observation_num_lookahead,
-            social_vehicle_config=self.social_vehicle_config,
+            others=None,
             prev_action=self.prev_action,
         )
         self.steps += 1
