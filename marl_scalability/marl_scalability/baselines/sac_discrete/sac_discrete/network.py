@@ -31,6 +31,7 @@ class SACNetwork(nn.Module):
     def __init__(
         self,
         action_size,
+        discrete_action_choices,
         state_size,
         seed=None,
         hidden_units=64,
@@ -70,7 +71,7 @@ class SACNetwork(nn.Module):
         )
 
         self.actor = Actor(
-            action_size=action_size,
+            action_size=discrete_action_choices,
             state_size=state_size,
             seed=seed,
             hidden_units=hidden_units,
@@ -160,7 +161,7 @@ class DoubleCritic(nn.Module):
             else low_dim_state
         )
 
-        action_state = torch.cat((action, state), 1)
+        action_state = torch.cat((action.float(), state), 1)
         q1 = self.q1(action_state)
         q2 = self.q1(action_state)
 

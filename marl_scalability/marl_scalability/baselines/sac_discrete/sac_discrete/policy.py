@@ -154,7 +154,8 @@ class DiscreteSACPolicy(Agent):
     def init_networks(self):
         if self.agent_type == "social":
             self.sac_net = SACNetwork(
-                action_size=self.discrete_action_choices,
+                action_size=self.action_size,
+                discrete_action_choices=self.discrete_action_choices,
                 state_size=self.state_size,
                 hidden_units=self.hidden_units,
                 seed=self.seed,
@@ -166,7 +167,8 @@ class DiscreteSACPolicy(Agent):
             self.sac_net = ImageSACNetwork(
                 n_in_channels=self.n_in_channels,
                 image_dim=(self.image_width, self.image_height),
-                action_size=self.discrete_action_choices,
+                action_size=self.action_size,
+                discrete_action_choices=self.discrete_action_choices,
                 state_size=self.state_size,
                 hidden_units=self.hidden_units,
                 seed=self.seed,
@@ -271,13 +273,14 @@ class DiscreteSACPolicy(Agent):
         return output
 
     def update_critic(self, states, actions, rewards, next_states, dones):
-
         q1_current, q2_current, aux_losses = self.sac_net.critic(
             states, actions, training=True
         )
+        print(q1_current.shape, q2_current.shape)
         with torch.no_grad():
             next_actions, log_probs, _ = self.sac_net.sample(next_states)
-            q1_next, q2_next = self.sac_net.target(next_states, next_actions)
+            q1_next, q2_next = self.sac_net.target(next_states, next_actions.unsqueeze(1))
+            print(q1_next.shape, q2_next.shape)
             v_next = (
                 torch.min(q1_next, q2_next) - self.sac_net.alpha.detach() * log_probs
             )
@@ -286,7 +289,7 @@ class DiscreteSACPolicy(Agent):
         critic_loss = F.mse_loss(q1_current, q_target) + F.mse_loss(
             q2_current, q_target
         )
-
+        print(q_target.shape, q1_current.shape)
         aux_losses = compute_sum_aux_losses(aux_losses)
         overall_loss = critic_loss + aux_losses
         self.critic_optimizer.zero_grad()
@@ -304,7 +307,11 @@ class DiscreteSACPolicy(Agent):
 
         # update actor:
         actions, log_probs, aux_losses = self.sac_net.sample(states, training=True)
-        q1, q2 = self.sac_net.critic(states, actions)
+        if len(actions.shape) == 1:
+            q1, q2 = self.sac_net.critic(states, actions.unsqueeze(1))
+        else:
+            q1, q2 = self.sac_net.critic(states, actions)
+        
         q_old = torch.min(q1, q2)
         actor_loss = (self.sac_net.alpha.detach() * log_probs - q_old).mean()
         aux_losses = compute_sum_aux_losses(aux_losses)

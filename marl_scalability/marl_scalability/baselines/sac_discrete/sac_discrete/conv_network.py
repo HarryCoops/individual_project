@@ -40,6 +40,7 @@ class ImageSACNetwork(nn.Module):
         n_in_channels,
         image_dim,
         action_size,
+        discrete_action_size,
         state_size,
         seed=None,
         hidden_units=64,
@@ -72,7 +73,7 @@ class ImageSACNetwork(nn.Module):
         self.actor = Actor(
             n_in_channels=n_in_channels,
             image_dim=image_dim,
-            action_size=action_size,
+            action_size=discrete_action_size,
             state_size=state_size,
             seed=seed,
             hidden_units=hidden_units,
@@ -154,8 +155,8 @@ class DoubleCritic(nn.Module):
         top_down_rgb = state["top_down_rgb"]
         im_q1 = self.im_feature_1(top_down_rgb)
         im_q2 = self.im_feature_2(top_down_rgb)
-        action_state_1 = torch.cat((im_q1, action, low_dim_state), 1)
-        action_state_2 = torch.cat((im_q2, action, low_dim_state), 1)
+        action_state_1 = torch.cat((im_q1, action.float(), low_dim_state), 1)
+        action_state_2 = torch.cat((im_q2, action.float(), low_dim_state), 1)
         q1 = self.q1(action_state_1)
         q2 = self.q2(action_state_2)
 
