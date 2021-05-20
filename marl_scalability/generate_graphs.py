@@ -338,29 +338,53 @@ def plot_mem_usage_over_time(policy_exp, name, log_dir):
 			continue
 		df = run["mem_usage"]["df"]
 		col_list = list(df)
-		ind, mem_usage, step = col_list
-		col_list = [ind, step, mem_usage]
+		if len(col_list) == 3:
+			ind, mem_usage, step = col_list
+			col_list = [ind, step, mem_usage]
+		elif len(col_list) == 4:
+			ind, mem_usage, step, replay_usage = col_list
+			col_list = [ind, step, mem_usage, replay_usage]
 		df.columns = col_list
 		ax.plot(
 			df["step"], 
 			df["mem_usage"], 
 			color=color,
-			label=label
+			label=run["train_args"]["desc"] if "train_args" in run else label
 		)
 	ax.legend()
-	ax.set_title("Memory usage over time for DQN agent with top-down RGB input")
+	ax.set_title(f"Memory usage over time for {name} agent with top-down RGB input")
 	gig_formatter = FuncFormatter(gigabyte)
 	ax.yaxis.set_major_formatter(gig_formatter)
 	ax.set_ylim(bottom=0)
-	"""
-	hrs_formatter = FuncFormatter(hours)
-	ax.xaxis.set_major_formatter(hrs_formatter)
-	ax.set_title(f"Memory usage over time for {name}")
-	max_hours = len(run["mem_usage"]["df"]["mem_usage"]) // 3600
-	ticks = [3600 * i for i in range(0, max_hours, 2)]
-	ax.set_xticks(ticks)
-	"""
 	plt.savefig(graphs_dir / f"mem_usage_over_time_{name}.png")
+
+
+def plot_replay_usage_over_time(policy_exp, name, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Step")
+	ax.set_ylabel("Memory usage")
+	labels = ["84", "256_compressed", "256_greyscale", "256", "84_greyscale"]
+	cmap = cm.get_cmap("hsv")
+	colors = cmap(np.linspace(0, .9, len(policy_exp)))
+	for color, run, label in zip(colors, policy_exp, labels):
+		if "mem_usage" not in run:
+			continue
+		df = run["mem_usage"]["df"]
+		ax.plot(
+			df["step"], 
+			df["replay_usage"], 
+			color=color,
+			label=run["train_args"]["desc"] if "train_args" in run else label
+		)
+	ax.legend()
+	ax.set_title(f"Replay buffer memory usage over time for {name} agent\n with top-down RGB input")
+	gig_formatter = FuncFormatter(gigabyte)
+	ax.yaxis.set_major_formatter(gig_formatter)
+	ax.set_ylim(bottom=0)
+	plt.savefig(graphs_dir / f"replay_usage_over_time_{name}.png", bbox_inches="tight")
 
 
 if __name__ == "__main__":
@@ -400,5 +424,5 @@ if __name__ == "__main__":
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)
 	extract_args_info(experiment_info)
-	extract_agent_metadata(experiment_info)
-	plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn discrete (high dim)", log_dir)
+	plot_mem_usage_over_time(experiment_info["sac_discreteRGB"], "SAC (discrete)", log_dir)
+	#plot_replay_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn discrete (high dim)", log_dir)
