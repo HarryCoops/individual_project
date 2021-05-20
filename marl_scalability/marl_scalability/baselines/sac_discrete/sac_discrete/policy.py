@@ -37,6 +37,8 @@ from marl_scalability.baselines.common.yaml_loader import load_yaml
 from marl_scalability.baselines.common.baseline_state_preprocessor import BaselineStatePreprocessor
 from marl_scalability.baselines.common.image_state_preprocessor import ImageStatePreprocessor
 
+torch.autograd.set_detect_anomaly(True)
+
 
 class DiscreteSACPolicy(Agent):
 
@@ -109,7 +111,7 @@ class DiscreteSACPolicy(Agent):
 
         # others
         self.checkpoint_dir = checkpoint_dir
-        self.device_name = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device_name = "cuda:2" if torch.cuda.is_available() else "cpu"
         self.device = torch.device(self.device_name)
         self.save_codes = (
             policy_params["save_codes"] if "save_codes" in policy_params else None
@@ -174,7 +176,7 @@ class DiscreteSACPolicy(Agent):
                 seed=self.seed,
                 initial_alpha=self.initial_alpha,
             ).to(self.device_name)
-
+        
         self.actor_optimizer = torch.optim.Adam(
             self.sac_net.actor.parameters(), lr=self.actor_lr
         )
@@ -200,15 +202,17 @@ class DiscreteSACPolicy(Agent):
             state["top_down_rgb"] = (
                     torch.Tensor(state["top_down_rgb"]).unsqueeze(0).to(self.device)
                 )
-            # Normalise to 0..1 expected by network
-            state["top_down_rgb"].div_(255)
 
         state["low_dim_states"] = (
             torch.from_numpy(state["low_dim_states"]).unsqueeze(0).to(self.device)
         )
 
         action, _, mean = self.sac_net.sample(state)
-        
+        for name, param in self.sac_net.actor.named_parameters():
+            if hasattr(param, "data"):
+                pass
+                #print(name, param.data.max())
+
         if explore:  # training mode
             action = torch.squeeze(action, 0)
             action = action.detach().cpu().numpy()
@@ -314,11 +318,11 @@ class DiscreteSACPolicy(Agent):
         actor_loss = (self.sac_net.alpha.detach() * log_probs - q_old).mean()
         aux_losses = compute_sum_aux_losses(aux_losses)
         overall_loss = actor_loss + aux_losses
+        
+        nn.utils.clip_grad_norm_(self.sac_net.actor.parameters(), 0.5)
         self.actor_optimizer.zero_grad()
         overall_loss.backward()
-        nn.utils.clip_grad_norm_(self.sac_net.actor.parameters(), 0.5)
         self.actor_optimizer.step()
-
         # update temp:
         temp_loss = (
             self.sac_net.log_alpha.exp()
@@ -326,6 +330,7 @@ class DiscreteSACPolicy(Agent):
         )
         self.log_alpha_optimizer.zero_grad()
         temp_loss.backward()
+        nn.utils.clip_grad_norm_(self.sac_net.actor.parameters(), 0.5)
         self.log_alpha_optimizer.step()
         self.sac_net.alpha.data = self.sac_net.log_alpha.exp().detach()
 

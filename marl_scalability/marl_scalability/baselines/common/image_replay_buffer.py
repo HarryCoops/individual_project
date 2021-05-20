@@ -118,14 +118,14 @@ class ReplayBufferDataset(Dataset):
             next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
     
-        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"])
-        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"])
-        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"])
-        next_state["low_dimstates"] = torch.from_numpy(next_state["low_dim_states"])
+        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(self.device)
+        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"]).to(self.device)
+        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"]).to(self.device)
+        next_state["low_dimstates"] = torch.from_numpy(next_state["low_dim_states"]).to(self.device)
         
-        action = torch.from_numpy(action)
-        done = torch.from_numpy(done)
-        reward = torch.from_numpy(reward).float()
+        action = torch.from_numpy(action).to(self.device)
+        done = torch.from_numpy(done).to(self.device)
+        reward = torch.from_numpy(reward).float().to(self.device)
         return state, action, reward, next_state, done, others
 
 

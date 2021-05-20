@@ -66,7 +66,7 @@ class DiscreteDQNPolicy(Agent):
         seed = int(policy_params["seed"])
         self.train_step = int(policy_params["train_step"])
         self.target_update = float(policy_params["target_update"])
-        self.device_name = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device_name = "cuda:2" if torch.cuda.is_available() else "cpu"
         self.device = torch.device(self.device_name)
         self.warmup = int(policy_params["warmup"])
         self.gamma = float(policy_params["gamma"])

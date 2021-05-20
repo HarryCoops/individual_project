@@ -5,7 +5,7 @@ discrete_action_choices: 4
 action_space_type: discrete
 gamma: 0.99
 critic_lr: 5e-4
-actor_lr: 1e-4
+actor_lr: 1e-6
 critic_update_rate: 5
 policy_update_rate: 10
 warmup: 1000

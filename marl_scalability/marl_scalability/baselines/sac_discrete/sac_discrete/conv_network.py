@@ -48,7 +48,6 @@ class ImageSACNetwork(nn.Module):
         activation=nn.ReLU(),
     ):
         super(ImageSACNetwork, self).__init__()
-
         if seed is not None:
             torch.manual_seed(seed)
 
@@ -185,9 +184,8 @@ class Actor(nn.Module):
         self.common = nn.Sequential(
             nn.Conv2d(n_in_channels, 32, 8, 4),
             activation(),
-            nn.Conv2d(32, 64, 4, 2),
+            nn.Conv2d(32, 64, 4, 4),
             activation(),
-            nn.Conv2d(64, 64, 4, 2),
             Flatten()
         )
 
@@ -196,6 +194,7 @@ class Actor(nn.Module):
 
         self.action_probs = nn.Sequential(
             nn.Linear(im_feature_size + state_size, hidden_units),
+            nn.ReLU(),
             nn.Linear(hidden_units, action_size),
             nn.Softmax(dim=1)
         )
@@ -207,12 +206,12 @@ class Actor(nn.Module):
     def forward(self, state, training=False):
         # get the low dimensional states from the obs dict
         low_dim_state = state["low_dim_states"]
-        top_down_rgb = state["top_down_rgb"]
+        top_down_rgb = state["top_down_rgb"] / 255
         common_state = self.common(top_down_rgb)
         x = torch.cat([common_state, low_dim_state], dim=-1)
         action_probs = self.action_probs(x)
         action_distribution = Categorical(action_probs)
-        action = action_distribution.sample().cpu()
+        action = action_distribution.sample()
         max_prob_action = torch.argmax(action_probs)
 
         z = action_probs == 0.0

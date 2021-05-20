@@ -125,7 +125,7 @@ class DiscretePPOPolicy(Agent):
 
         # others
         self.checkpoint_dir = checkpoint_dir
-        self.device_name = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device_name = "cuda:2" if torch.cuda.is_available() else "cpu"
         self.device = torch.device(self.device_name)
         self.save_codes = (
             policy_params["save_codes"] if "save_codes" in policy_params else None

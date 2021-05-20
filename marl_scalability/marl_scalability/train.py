@@ -92,12 +92,13 @@ def outer_train(f, *args, **kwargs):
             agent_id: make(locator=policy_class, max_episode_steps=max_episode_steps)
             for agent_id, policy_class in agent_classes.items()
         }
+        print("Building agents...")
         # Create the agents matched with their associated ID.
         agents = {
             agent_id: agent_spec.build_agent()
             for agent_id, agent_spec in agent_specs.items()
         }
-
+        print("Making env...")
         # Create the environment.
         env = gym.make(
             "marl_scalability.env:scalability-v0",
@@ -114,6 +115,7 @@ def outer_train(f, *args, **kwargs):
         surviving_vehicles_total = []
         mem_usage = []
         mem_usage_interval = 100
+        print("Starting training...")
         for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
