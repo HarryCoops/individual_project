@@ -193,7 +193,7 @@ def outer_train(f, *args, **kwargs):
                 total_step += 1
                 observations = next_observations
                 
-                if total_step % mem_usage_interval == 0:
+                if record_mem_usage and total_step % mem_usage_interval == 0:
                     process = psutil.Process(os.getpid())
                     replay_buffer_mem_usage = sum(sys.getsizeof(p.replay) 
                         if getattr(p, "replay", None) is not None else 0 for p in agents.values() 
