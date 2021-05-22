@@ -121,6 +121,9 @@ class DiscretePPOPolicy(Agent):
             self.state_description = ImageStatePreprocessor.get_state_description(
                 (self.image_height, self.image_width),
             )
+            self.image_shape = (
+                1, self.n_in_channels, self.image_width, self.image_height
+            )
             network_params = {
                 "state_size": self.state_size,
                 "n_in_channels": self.n_in_channels,
@@ -153,7 +156,7 @@ class DiscretePPOPolicy(Agent):
                 self.state_size,
                 seed=self.seed,
                 hidden_units=self.hidden_units,
-            )
+            ).to(self.device)
 
         self.optimizer = torch.optim.Adam(self.ppo_net.parameters(), lr=self.lr)
         self.step_count = 0
