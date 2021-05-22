@@ -87,9 +87,9 @@ class ReplayBufferDataset(Dataset):
         )
         if self.compression == "zlib":
             state["top_down_rgb"] = zlib.compress(state["top_down_rgb"], 1)
-            next_state["top_down_rgb"] = zlib.compress(next_state["top_down_rgb"])
+            next_state["top_down_rgb"] = zlib.compress(next_state["top_down_rgb"], 1)
         elif self.compression == "lz4":
-            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"], 1)
+            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"])
             next_state["top_down_rgb"] = lz4.frame.compress(next_state["top_down_rgb"])
 
         action = np.asarray([action]) if not isinstance(action, Iterable) else action

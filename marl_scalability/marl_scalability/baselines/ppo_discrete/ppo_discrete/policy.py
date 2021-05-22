@@ -38,6 +38,10 @@ from marl_scalability.baselines.common.yaml_loader import load_yaml
 from marl_scalability.baselines.common.social_vehicle_config import get_social_vehicle_configs
 from marl_scalability.baselines.common.baseline_state_preprocessor import BaselineStatePreprocessor
 
+import zlib
+import lz4.frame
+import copy
+
 
 class DiscretePPOPolicy(Agent):
     def __init__(
@@ -215,6 +219,12 @@ class DiscretePPOPolicy(Agent):
         # state['low_dim_states'] = torch.from_numpy(np.float32(np.append(state['low_dim_states'],self.prev_action))).unsqueeze(0)
         self.log_probs.append(self.current_log_prob.to(self.device))
         self.values.append(self.current_value.to(self.device))
+        if self.compression == "zlib":
+            state = copy.deepcopy(state)
+            state["top_down_rgb"] = zlib.compress(state["top_down_rgb"], 1)
+        elif self.compression == "lz4":
+            state = copy.deepcopy(state)
+            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"])
         self.states.append(state)
         self.rewards.append(torch.FloatTensor([reward]).to(self.device))
         self.actions.append(
@@ -263,11 +273,28 @@ class DiscretePPOPolicy(Agent):
                 "social_vehicles": social_vehicles,
             }
         elif self.agent_type == "image":
-            images = (
-                torch.cat(
-                    [e["top_down_rgb"] for e in states],
-                    dim=0).float().to(device)
-            )
+            if self.compression == "zlib":
+                images = [
+                    torch.from_numpy(
+                        np.frombuffer(zlib.decompress(e["top_down_rgb"]), dtype=np.uint8)
+                        .reshape(self.image_shape)
+                    ) for e in states
+                ]
+                images = torch.cat(images, dim=0).float().to(device)
+            elif self.compression = "lz4":
+                images = [
+                    torch.from_numpy(
+                        np.frombuffer(lz4.frame.decompress(e["top_down_rgb"]), dtype=np.uint8)
+                        .reshape(self.image_shape)
+                    ) for e in states
+                ]
+                images = torch.cat(images, dim=0).float().to(device)
+            else:
+                images = (
+                    torch.cat(
+                        [e["top_down_rgb"] for e in states],
+                        dim=0).float().to(device)
+                )
             
             out = {
                 "low_dim_states": low_dim_states,
