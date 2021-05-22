@@ -284,7 +284,7 @@ class DiscretePPOPolicy(Agent):
                     ) for e in states
                 ]
                 images = torch.cat(images, dim=0).float().to(device)
-            elif self.compression = "lz4":
+            elif self.compression == "lz4":
                 images = [
                     torch.from_numpy(
                         np.frombuffer(lz4.frame.decompress(e["top_down_rgb"]), dtype=np.uint8)
