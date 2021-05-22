@@ -31,6 +31,7 @@ from collections.abc import Iterable
 from torch.utils.data import Dataset, Sampler, DataLoader
 import zlib
 from pympler import asizeof
+import lz4.frame
 
 Transition = namedtuple(
     "Transition",
@@ -87,6 +88,9 @@ class ReplayBufferDataset(Dataset):
         if self.compression == "zlib":
             state["top_down_rgb"] = zlib.compress(state["top_down_rgb"], 1)
             next_state["top_down_rgb"] = zlib.compress(next_state["top_down_rgb"])
+        elif self.compression == "lz4":
+            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"], 1)
+            next_state["top_down_rgb"] = lz4.frame.compress(next_state["top_down_rgb"])
 
         action = np.asarray([action]) if not isinstance(action, Iterable) else action
         reward = np.asarray([reward])
@@ -116,6 +120,11 @@ class ReplayBufferDataset(Dataset):
             state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.uint8)
             state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
             next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
+            next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
+        elif self.compression == "lz4":
+            state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(state["top_down_rgb"]), np.uint8)
+            state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
+            next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
     
         state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(self.device)
