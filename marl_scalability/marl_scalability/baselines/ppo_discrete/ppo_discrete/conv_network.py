@@ -65,6 +65,7 @@ class ActorNetwork(nn.Module):
 
     def forward(self, state, training=False):
         low_dim_state = state["low_dim_states"]
+        image = state["top_down_rgb"] / 255
         im_feature = self.model(image)
         x = torch.cat([im_feature, low_dim_state], dim=-1)
         x = self.outs(x)
@@ -80,7 +81,7 @@ class CriticNetwork(nn.Module):
         hidden_dim=128,
         activation = nn.ReLU
     ):
-        super(ActorNetwork, self).__init__()
+        super(CriticNetwork, self).__init__()
 
         self.model = nn.Sequential(
             nn.Conv2d(n_in_channels, 32, 8, 4),
@@ -104,6 +105,7 @@ class CriticNetwork(nn.Module):
 
     def forward(self, state, training=False):
         low_dim_state = state["low_dim_states"]
+        image = state["top_down_rgb"] / 255
         im_feature = self.model(image)
         x = torch.cat([im_feature, low_dim_state], dim=-1)
         x = self.out(x)
