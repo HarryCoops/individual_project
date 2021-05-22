@@ -88,7 +88,7 @@ register(
 register(
     locator="ppo_discreteRGB-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
-        action_type=ActionSpaceType.Lane, policy_class=DiscretePPOPolicy, **kwargs
+        action_type=ActionSpaceType.Lane, image_agent=True, policy_class=DiscretePPOPolicy, **kwargs
     ),
 )
 register(
