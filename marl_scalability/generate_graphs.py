@@ -355,7 +355,7 @@ def plot_mem_usage_over_time(policy_exp, name, log_dir):
 	ax.set_title(f"Memory usage over time for {name} agent with top-down RGB input")
 	gig_formatter = FuncFormatter(gigabyte)
 	ax.yaxis.set_major_formatter(gig_formatter)
-	ax.set_ylim(bottom=0)
+	#ax.set_ylim(bottom=0)
 	plt.savefig(graphs_dir / f"mem_usage_over_time_{name}.png")
 
 
@@ -424,5 +424,5 @@ if __name__ == "__main__":
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)
 	extract_args_info(experiment_info)
-	plot_mem_usage_over_time(experiment_info["sac_discreteRGB"], "SAC (discrete)", log_dir)
+	plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "DQN (discrete)", log_dir)
 	#plot_replay_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn discrete (high dim)", log_dir)
