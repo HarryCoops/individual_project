@@ -117,14 +117,14 @@ class ReplayBufferDataset(Dataset):
         transition = copy.deepcopy(transition)
         state, action, reward, next_state, done, others = transition
         if self.compression == "zlib":
-            state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.float32)
+            state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.uint8)
             state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
-            next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.float32)
+            next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
         elif self.compression == "lz4":
-            state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(state["top_down_rgb"]), np.float32)
+            state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(state["top_down_rgb"]), np.uint8)
             state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
-            next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.float32)
+            next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
     
         state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(self.device)
@@ -185,12 +185,12 @@ class ImageReplayBuffer:
         low_dim_states = (
             torch.cat(
                 [e["low_dim_states"] for e in states], 
-                dim=0).float()
+                dim=0).float().to(device)
         )
         images = (
             torch.cat(
                 [e["top_down_rgb"] for e in states],
-                dim=0)
+                dim=0).float().to(device)
         )
         out = {
             "top_down_rgb": images,

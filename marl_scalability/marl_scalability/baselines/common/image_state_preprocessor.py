@@ -82,15 +82,15 @@ class ImageStatePreprocessor(StatePreprocessor):
             [torch.from_numpy(e).float() for e in low_dim_states], dim=-1
         )
 
-        rgb_data = state.top_down_rgb.data.astype(np.float32)
+        rgb_data = state.top_down_rgb.data
         if self.image_dimensions[0] == 1:
              img_data = np.dot(
                  rgb_data[...,:3], [0.299, 0.587, 0.114]
-            )
+            ).astype(np.uint8)
              img_data = np.expand_dims(img_data, axis=0)
         else:
-            H, W, C = rgb_data.shape
-            img_data = rgb_data.reshape(C, H, W)
+            H, W, C = state.top_down_rgb.data.shape
+            img_data = state.top_down_rgb.data.reshape(C, H, W)
         # Get image state 
         out = {
             "low_dim_states": low_dim_states.numpy(),
