@@ -113,9 +113,11 @@ class DoubleCritic(nn.Module):
         self.im_feature_1 = nn.Sequential(
             nn.Conv2d(n_in_channels, 16, 8, 4),
             activation(),
-            nn.Conv2d(16, 32, 4, 2),
+            nn.Conv2d(16, 32, 4, 4),
             activation(),
-            nn.Conv2d(32, 64, 3, 1),
+            nn.Conv2d(32, 64, 3, 2),
+            activation(),
+            nn.Conv2d(64, 64, 3, 2),
             activation(),
             Flatten(),
         )
@@ -123,9 +125,11 @@ class DoubleCritic(nn.Module):
         self.im_feature_2 = nn.Sequential(
             nn.Conv2d(n_in_channels, 16, 8, 4),
             activation(),
-            nn.Conv2d(16, 32, 4, 2),
+            nn.Conv2d(16, 32, 4, 4),
             activation(),
-            nn.Conv2d(32, 64, 3, 1),
+            nn.Conv2d(32, 64, 3, 2),
+            activation(),
+            nn.Conv2d(64, 64, 3, 2),
             activation(),
             Flatten(),
         )
@@ -185,6 +189,8 @@ class Actor(nn.Module):
             nn.Conv2d(n_in_channels, 32, 8, 4),
             activation(),
             nn.Conv2d(32, 64, 4, 4),
+            activation(),
+            nn.Conv2d(64, 64, 4, 4),
             activation(),
             Flatten()
         )
