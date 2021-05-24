@@ -45,9 +45,11 @@ class ActorNetwork(nn.Module):
         self.model = nn.Sequential(
             nn.Conv2d(n_in_channels, 32, 8, 4),
             activation(),
-            nn.Conv2d(32, 64, 4, 2),
+            nn.Conv2d(32, 64, 4, 4),
             activation(),
-            nn.Conv2d(64, 64, 3, 1),
+            nn.Conv2d(64, 64, 3, 2),
+            activation(),
+            nn.Conv2d(64, 64, 3, 2),
             activation(),
             Flatten(),
         )
@@ -86,9 +88,11 @@ class CriticNetwork(nn.Module):
         self.model = nn.Sequential(
             nn.Conv2d(n_in_channels, 32, 8, 4),
             activation(),
-            nn.Conv2d(32, 64, 4, 2),
+            nn.Conv2d(32, 64, 4, 4),
             activation(),
-            nn.Conv2d(64, 64, 3, 1),
+            nn.Conv2d(64, 64, 3, 2),
+            activation(),
+            nn.Conv2d(64, 64, 3, 2),
             activation(),
             Flatten(),
         )
