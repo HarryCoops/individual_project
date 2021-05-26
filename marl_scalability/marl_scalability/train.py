@@ -74,7 +74,8 @@ def outer_train(f, *args, **kwargs):
         experiment_name,
         record_vehicle_lifespan,
         record_mem_usage,
-        max_steps
+        max_steps,
+        maintain_agent_numbers,
     ):
         torch.set_num_threads(1)
         total_step = 0
@@ -192,14 +193,12 @@ def outer_train(f, *args, **kwargs):
                 # Update variables for the next step.
                 total_step += 1
                 observations = next_observations
-                
+                if maintain_agent_numbers and len(active_agent_ids) / n_agents < 0.6:
+                    dones["__all__"] = True
                 if record_mem_usage and total_step % mem_usage_interval == 0:
                     process = psutil.Process(os.getpid())
-                    replay_buffer_mem_usage = sum(sys.getsizeof(p.replay) 
-                        if getattr(p, "replay", None) is not None else 0 for p in agents.values() 
-                    )
                     mem_usage.append(
-                        (total_step, process.memory_info().rss, replay_buffer_mem_usage)
+                        (total_step, process.memory_info().rss)
                     )
                 if max_steps and total_step >= max_steps:
                     finished = True
@@ -217,12 +216,11 @@ def outer_train(f, *args, **kwargs):
                 writer = csv.writer(f)
                 writer.writerows(surviving_vehicles_total)
         if record_mem_usage:
-            mem_usage, steps, replay_usage = zip(*mem_usage)
+            mem_usage, steps = zip(*mem_usage)
             mem_usage = pd.DataFrame(
                 {
                     "mem_usage": pd.Series(mem_usage), 
                     "step": pd.Series(steps),
-                    "replay_usage": pd.Series(replay_usage)
                 }
             )
             mem_usage.to_csv(Path(log_dir) / experiment_name / "mem_usage.csv")
@@ -313,7 +311,13 @@ if __name__ == "__main__":
         default=False,
         action="store_true"
     )
-
+    
+    parser.add_argument(
+        "--maintain-agent-numbers",
+        help="Stop episode when less than 60% of agents survive",
+        default=False,
+        action="store_true"
+    )
 
     base_dir = os.path.dirname(__file__)
     pool_path = os.path.join(base_dir, "agent_pool.json")
@@ -354,7 +358,8 @@ if __name__ == "__main__":
         "experiment_name": experiment_name,
         "record_vehicle_lifespan": args.record_vehicle_lifespan,
         "record mem_usage": args.memprof,
-        "max_steps": args.max_steps
+        "max_steps": args.max_steps,
+        "maintain_agent_numbers": args.maintain_agent_numbers
     }
 
     if args.profiler == "pyinstrument":
