@@ -17,4 +17,3 @@ logging_freq: 2
 n_in_channels: 3
 image_height: 256
 image_width: 256
-compression: zlib

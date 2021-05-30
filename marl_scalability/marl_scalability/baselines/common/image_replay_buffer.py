@@ -91,7 +91,6 @@ class ReplayBufferDataset(Dataset):
         elif self.compression == "lz4":
             state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"])
             next_state["top_down_rgb"] = lz4.frame.compress(next_state["top_down_rgb"])
-
         action = np.asarray([action]) if not isinstance(action, Iterable) else action
         reward = np.asarray([reward])
         done = np.asarray([done])

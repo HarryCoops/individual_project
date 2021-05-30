@@ -117,7 +117,7 @@ def outer_train(f, *args, **kwargs):
         mem_usage = []
         mem_usage_interval = 100
         print("Starting training...")
-        for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
+        for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True, max_steps=max_steps):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
             observations = env.reset()
@@ -200,9 +200,6 @@ def outer_train(f, *args, **kwargs):
                     mem_usage.append(
                         (total_step, process.memory_info().rss)
                     )
-                if max_steps and total_step >= max_steps:
-                    finished = True
-                    break
 
             # Normalize the data and record this episode on tensorboard.
             episode.record_episode()
@@ -216,7 +213,7 @@ def outer_train(f, *args, **kwargs):
                 writer = csv.writer(f)
                 writer.writerows(surviving_vehicles_total)
         if record_mem_usage:
-            mem_usage, steps = zip(*mem_usage)
+            steps, mem_usage = zip(*mem_usage)
             mem_usage = pd.DataFrame(
                 {
                     "mem_usage": pd.Series(mem_usage), 
@@ -364,7 +361,7 @@ if __name__ == "__main__":
 
     if args.profiler == "pyinstrument":
         from pyinstrument import Profiler
-        pr = Profiler()
+        pr = Profiler(interval=0.1)
         pr.start()
     elif args.profiler == "cProfile":
         import cProfile 

@@ -118,6 +118,8 @@ class DiscretePPOPolicy(Agent):
             self.n_in_channels = int(policy_params["n_in_channels"])
             self.image_height = int(policy_params["image_height"])
             self.image_width = int(policy_params["image_width"])
+            self.compression = policy_params["compression"] if "compression" in policy_params else ""
+        
             self.state_description = ImageStatePreprocessor.get_state_description(
                 (self.image_height, self.image_width),
             )
@@ -215,8 +217,6 @@ class DiscretePPOPolicy(Agent):
         # dont treat timeout as done equal to True
         max_steps_reached = info["logs"]["events"].reached_max_episode_steps
         action = self.lane_actions.index(action)
-        if max_steps_reached:
-            done = False
 
         # pass social_vehicle_rep through the network
         # state['low_dim_states'] = torch.from_numpy(np.float32(np.append(state['low_dim_states'],self.prev_action))).unsqueeze(0)
@@ -224,10 +224,13 @@ class DiscretePPOPolicy(Agent):
         self.values.append(self.current_value.to(self.device))
         if self.compression == "zlib":
             state = copy.deepcopy(state)
-            state["top_down_rgb"] = zlib.compress(state["top_down_rgb"], 1)
+            state["top_down_rgb"] = zlib.compress(state["top_down_rgb"].cpu().numpy(), 1)
         elif self.compression == "lz4":
             state = copy.deepcopy(state)
-            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"])
+            state["top_down_rgb"] = lz4.frame.compress(state["top_down_rgb"].cpu().numpy().astype(np.uint8))
+        else:
+            state = copy.deepcopy(state)
+            state["top_down_rgb"] = state["top_down_rgb"].cpu()
         self.states.append(state)
         self.rewards.append(torch.FloatTensor([reward]).to(self.device))
         self.actions.append(

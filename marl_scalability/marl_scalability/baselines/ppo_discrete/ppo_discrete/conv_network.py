@@ -129,7 +129,7 @@ class ImagePPONetwork(nn.Module):
         social_feature_encoder_class=None,
         social_feature_encoder_params=None,
     ):
-        super(PPONetwork, self).__init__()
+        super(ImagePPONetwork, self).__init__()
 
         if seed is not None:
             torch.manual_seed(seed)

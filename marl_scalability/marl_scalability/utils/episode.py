@@ -285,7 +285,7 @@ class Episode:
                     pass
 
 
-def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None):
+def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None, max_steps=None):
     col_width = 18
     running_stats = {
             "episode": [],
@@ -310,6 +310,7 @@ def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None
         eval_count = 0
         all_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: [])))
         agents_itr = defaultdict(lambda: 0)
+        total_steps = 0
         for i in range(n):
             e = Episode(
                 index=i,
@@ -323,6 +324,7 @@ def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None
                 log_dir=log_dir,
             )
             yield e
+            total_steps += e.steps
             tb_writer = e.tb_writer
             last_eval_iterations = e.last_eval_iterations
             experiment_name = e.experiment_name
@@ -352,6 +354,8 @@ def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None
                 table(row)
             else:
                 table(("", "", "", "", ""))
+            if max_steps is not None and total_steps >= max_steps:
+                break
     if write_table:
         n = len(running_stats["episode"])
         running_stats["episode"].append("MEAN")
