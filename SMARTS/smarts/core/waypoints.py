@@ -134,6 +134,10 @@ def keyfunc(self, points, waypoints, tree, k=1):
     #print(points[0], type(waypoints[0]), k)
     return hashkey(*[hashkey(*p.tolist()) for p in points], *waypoints, k)
 
+def keyfunc2(self, pose, filter_from_count=10, within_radius=5):
+    #print(points[0], type(waypoints[0]), k)
+    return hashkey(*pose.position.tolist(), filter_from_count, within_radius)
+
 class Waypoints:
     def __init__(self, road_network, spacing, debug=True):
         self.spacing = spacing
@@ -183,6 +187,7 @@ class Waypoints:
 
         return [l_wps[0].wp for l_wps in linked_waypoints]
 
+    #@cached(LRUCache(maxsize=128), key=keyfunc2)
     def closest_waypoint(self, pose, filter_from_count=10, within_radius=10):
         return self.closest_waypoint_batched(
             [pose], filter_from_count, within_radius=within_radius
@@ -328,7 +333,7 @@ class Waypoints:
             for idx, l_wps in enumerate(linked_waypoints)
         ]
     
-    @cached(LRUCache(maxsize=128), key=keyfunc)
+    #@cached(LRUCache(maxsize=128), key=keyfunc)
     def _closest_linked_wp_in_kd_tree_batched(self, points, linked_wps, tree, k=1):
         p2ds = np.array([vec_2d(p) for p in points])
         closest_indices = tree.query(
