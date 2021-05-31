@@ -331,10 +331,12 @@ class Waypoints:
 
         return [[linked_wps[idx] for idx in idxs] for idxs in closest_indices]
 
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=None)
     def _waypoints_starting_at_waypoint(
         self, waypoint: LinkedWaypoint, lookahead, point, filter_edge_ids: tuple
     ):
+        #print(self._waypoints_starting_at_waypoint.cache_info().hits)
+        #print(waypoint.wp, hash(waypoint.wp), hash(self), lookahead, point, filter_edge_ids)
         waypoint_paths = [[waypoint]]
         for _ in range(lookahead):
             next_waypoint_paths = []
@@ -356,10 +358,11 @@ class Waypoints:
                 next_waypoint_paths += branching_paths
 
             waypoint_paths = next_waypoint_paths
+        #print(len(waypoint_paths))
+        return [Waypoints._equally_spaced_path(path, point) for path in waypoint_paths]
 
-        return [self._equally_spaced_path(path, point) for path in waypoint_paths]
-
-    def _equally_spaced_path(self, path, point):
+    def _equally_spaced_path(path, point):
+        #print(point)
         continuous_variables = [
             "ref_wp_positions_x",
             "ref_wp_positions_y",

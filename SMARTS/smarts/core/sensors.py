@@ -208,7 +208,7 @@ class Sensors:
         else:
             waypoint_paths = sim.waypoints.waypoint_paths_at(
                 vehicle.pose,
-                lookahead=1,
+                lookahead=2,
                 within_radius=vehicle.length,
                 filter_from_count=3,  # For calculating distance travelled
             )
