@@ -30,6 +30,8 @@ from functools import lru_cache
 
 import math
 import numpy as np
+from cachetools import cached, LRUCache 
+from cachetools.keys import hashkey 
 
 from .utils.math import inplace_unwrap
 from smarts.core.utils.file import suppress_pkg_resources
@@ -128,6 +130,9 @@ class LinkedWaypoint(NamedTuple):
         ## doesn't return the wrong set of waypoints.
         return hash(self.wp) + sum(hash(nwp.wp) for nwp in self.nexts)
 
+def keyfunc(self, points, waypoints, tree, k=1):
+    #print(points[0], type(waypoints[0]), k)
+    return hashkey(*[hashkey(*p.tolist()) for p in points], *waypoints, k)
 
 class Waypoints:
     def __init__(self, road_network, spacing, debug=True):
@@ -270,7 +275,7 @@ class Waypoints:
 
         sorted_wps = sorted(waypoint_paths, key=lambda p: p[0].lane_index)
         return sorted_wps
-
+    
     def _closest_linked_wp_in_kd_tree_with_pose_batched(
         self, poses, waypoints, tree, within_radius, k=10, keep_all_k=False
     ):
@@ -322,7 +327,8 @@ class Waypoints:
             )
             for idx, l_wps in enumerate(linked_waypoints)
         ]
-
+    
+    @cached(LRUCache(maxsize=128), key=keyfunc)
     def _closest_linked_wp_in_kd_tree_batched(self, points, linked_wps, tree, k=1):
         p2ds = np.array([vec_2d(p) for p in points])
         closest_indices = tree.query(
