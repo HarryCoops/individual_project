@@ -296,7 +296,7 @@ class Sensors:
         lidar = vehicle.lidar_sensor() if vehicle.subscribed_to_lidar_sensor else None
 
         done, events = Sensors._is_done_with_events(
-            sim, agent_id, vehicle, sensor_state
+            sim, agent_id, vehicle, sensor_state, closest_waypoint
         )
 
         if (
@@ -328,7 +328,7 @@ class Sensors:
         return sensor_state.step()
 
     @classmethod
-    def _is_done_with_events(cls, sim, agent_id, vehicle, sensor_state):
+    def _is_done_with_events(cls, sim, agent_id, vehicle, sensor_state, closest_wp=None):
         interface = sim.agent_manager.agent_interface_for_agent_id(agent_id)
         done_criteria = interface.done_criteria
 
@@ -351,7 +351,7 @@ class Sensors:
         reached_goal = cls._agent_reached_goal(sim, vehicle)
         reached_max_episode_steps = sensor_state.reached_max_episode_steps
         is_off_route, is_wrong_way = cls._vehicle_is_off_route_and_wrong_way(
-            sim, vehicle
+            sim, vehicle, closest_wp=closest_wp
         )
 
         done = (
@@ -417,7 +417,7 @@ class Sensors:
         return distance < 1
 
     @classmethod
-    def _vehicle_is_off_route_and_wrong_way(cls, sim, vehicle):
+    def _vehicle_is_off_route_and_wrong_way(cls, sim, vehicle, closest_wp=None):
         """Determines if the agent is on route and on the correct side of the road.
 
         Args:
@@ -453,7 +453,9 @@ class Sensors:
 
         # Route is endless
         if not route_edges:
-            is_wrong_way = cls._vehicle_is_wrong_way(sim, vehicle, nearest_lane.getID())
+            is_wrong_way = cls._vehicle_is_wrong_way(
+                sim, vehicle, nearest_lane.getID(), closest_wp=closest_wp
+            )
             return (False, is_wrong_way)
 
         closest_edges = []
@@ -475,21 +477,22 @@ class Sensors:
             # but the innermost lane will be the last lane in the edge and usually the closest.
             lane_to_check = route_edge_or_oncoming.getLanes()[-1]
             is_wrong_way = cls._vehicle_is_wrong_way(
-                sim, vehicle, lane_to_check.getID()
+                sim, vehicle, lane_to_check.getID(), 
             )
 
         return (is_off_route, is_wrong_way)
 
     @staticmethod
-    def _vehicle_is_wrong_way(sim, vehicle, lane_id):
-        closest_waypoint = sim.scenario.waypoints.closest_waypoint_on_lane(
-            vehicle.pose,
-            lane_id,
-        )
+    def _vehicle_is_wrong_way(sim, vehicle, lane_id, closest_wp=None):
+        if closest_wp is None:
+            closest_wp = sim.scenario.waypoints.closest_waypoint_on_lane(
+                vehicle.pose,
+                lane_id,
+            )
 
         # Check if the vehicle heading is oriented away from the lane heading.
         return (
-            np.fabs(vehicle.pose.heading.relative_to(closest_waypoint.heading))
+            np.fabs(vehicle.pose.heading.relative_to(closest_wp.heading))
             > 0.5 * np.pi
         )
 
