@@ -422,9 +422,10 @@ class LaneFollowingController:
     ):
         # When we reach the end of our target lane, we need to update it
         # to the next lane best lane along the path
+        # Use lookahead of 16 to exploit caching 
         state = controller_state
         paths = sensor_state.mission_planner.waypoint_paths_on_lane_at(
-            vehicle.pose, state.target_lane_id, lookahead=2
+            vehicle.pose, state.target_lane_id, lookahead=16
         )
 
         candidate_next_wps = []

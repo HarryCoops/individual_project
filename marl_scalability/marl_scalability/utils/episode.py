@@ -31,7 +31,6 @@ from collections import defaultdict
 import dill
 import numpy as np
 import tableprint as tp
-from marl_scalability.utils.rllib_log_info import RLlibLogInfo
 from marl_scalability.utils.common import gen_experiment_name
 from tensorboardX import SummaryWriter
 

@@ -21,7 +21,7 @@ import logging
 import time
 from collections import deque, namedtuple
 from dataclasses import dataclass
-from functools import lru_cache
+from fastcache import clru_cache as lru_cache
 from typing import Dict, Iterable, List, NamedTuple, Set, Tuple
 
 import numpy as np
@@ -36,6 +36,7 @@ from panda3d.core import (
     WindowProperties,
 )
 
+from smarts.core.controllers import ActionSpaceType
 from smarts.core.mission_planner import MissionPlanner
 from smarts.core.utils.math import squared_dist, vec_2d
 from smarts.sstudio.types import CutIn, UTurn
@@ -206,9 +207,15 @@ class Sensors:
         if vehicle.subscribed_to_waypoints_sensor:
             waypoint_paths = vehicle.waypoints_sensor()
         else:
+            action_type = sim._agent_manager.agent_interface_for_agent_id(agent_id).action
+            if (action_type == ActionSpaceType.Lane or 
+                    action_type == ActionSpaceType.LaneWithContinuousSpeed):
+                lookahead = 16
+            else:
+                lookahead = 2
             waypoint_paths = sim.waypoints.waypoint_paths_at(
                 vehicle.pose,
-                lookahead=2,
+                lookahead=lookahead,
                 within_radius=vehicle.length,
                 filter_from_count=3,  # For calculating distance travelled
             )

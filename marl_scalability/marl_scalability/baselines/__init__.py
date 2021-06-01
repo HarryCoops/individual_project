@@ -23,11 +23,9 @@ from smarts.zoo.registry import register
 from .sac.sac.policy import SACPolicy
 from .ppo.ppo.policy import PPOPolicy
 from .dqn.dqn.policy import DQNPolicy
-from .td3.td3.policy import TD3Policy
 from .dqn_discrete.dqn_discrete.policy import DiscreteDQNPolicy
 from .ppo_discrete.ppo_discrete.policy import DiscretePPOPolicy
 from .sac_discrete.sac_discrete.policy import DiscreteSACPolicy
-from .bdqn.bdqn.policy import BehavioralDQNPolicy
 from smarts.core.controllers import ActionSpaceType
 from marl_scalability.baselines.agent_spec import BaselineAgentSpec
 
@@ -41,12 +39,6 @@ register(
     locator="ppo-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Continuous, policy_class=PPOPolicy, **kwargs
-    ),
-)
-register(
-    locator="td3-v0",
-    entry_point=lambda **kwargs: BaselineAgentSpec(
-        action_type=ActionSpaceType.Continuous, policy_class=TD3Policy, **kwargs
     ),
 )
 register(
@@ -89,11 +81,5 @@ register(
     locator="ppo_discreteRGB-v0",
     entry_point=lambda **kwargs: BaselineAgentSpec(
         action_type=ActionSpaceType.Lane, image_agent=True, policy_class=DiscretePPOPolicy, **kwargs
-    ),
-)
-register(
-    locator="bdqn-v0",
-    entry_point=lambda **kwargs: BaselineAgentSpec(
-        action_type=ActionSpaceType.Lane, policy_class=BehavioralDQNPolicy, **kwargs
     ),
 )

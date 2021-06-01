@@ -19,26 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
-from collections import defaultdict
-from glob import glob
-from os import path
-from pathlib import Path
-
 from setuptools import find_packages, setup
-
-this_dir = path.abspath(path.dirname(__file__))
-with open(path.join(this_dir, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
-
 
 """ Modified setup.py to include option for changing SMARTS version or, by default,
 the latest stable version SMARTS will used """
 setup(
     name="marl_scalability-rl",
-    description="Unprotected Left Turn for Robust Agents",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
     version="0.2.0",
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
@@ -50,6 +36,7 @@ setup(
         "dill",
         "psutil",
         "pympler",
+        "fastcache",
         "pyinstrument",
         "memory_profiler",
         "black==20.8b1",
