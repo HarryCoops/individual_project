@@ -28,15 +28,14 @@ def extract_experiment_info(runs):
 			run_info["policy"] = f"{run_name_parts[1]}_{run_name_parts[2]}"
 			run_info["n_agents"] = int(run_name_parts[3])
 			run_info["episodes"] = int(run_name_parts[4])
-		if run_info["n_agents"] == 150:
-			continue
+		
 		if run_info["policy"] in info:
 			info[run_info["policy"]].append(run_info)
 		else:
 			info[run_info["policy"]] = [run_info,]
 	for policy in info:
 		info[policy].sort(key=lambda run_info: run_info["n_agents"])
-	return info 
+	return info
 
 def extract_agent_metadata(info):
 	for policy in info:
@@ -106,20 +105,24 @@ def extract_profile_info(info, add_norm=True):
 				total_time = profile.iloc[0]["cumtime"]
 				func_col = "filename:lineno(function)"
 				run["cprofile_stats"] = {}
+				sample_time = profile.loc[
+					profile[func_col] == "/marl/marl_scalability/baselines/common/image_replay_buffer.py:200(sample)"
+				]["cumtime"].iloc[0]
+				run["cprofile_stats"]["sample_time"] = sample_time
 				core_step_time = profile.loc[
 					profile[func_col] == "/src/smarts/core/smarts.py:167(step)"
 				]["cumtime"].iloc[0]
 				run["cprofile_stats"]["core_step_time"] = core_step_time
 				gen_logs_time = profile.loc[
-					profile[func_col] == "/marl/marl_scalability/env/scalability_env.py:64(generate_logs)"
+					profile[func_col] == "/marl/marl_scalability/env/scalability_env.py:66(generate_logs)"
 				]["cumtime"].iloc[0]
 				run["cprofile_stats"]["gen_logs_time"] = gen_logs_time
 				reward_time = profile.loc[
-					profile[func_col] == "/marl/marl_scalability/baselines/adapter.py:153(reward_adapter)"
+					profile[func_col] == "/marl/marl_scalability/baselines/image_adapter.py:92(reward_adapter)"
 				]["cumtime"].iloc[0]
 				run["cprofile_stats"]["reward_time"] = reward_time / 2
 				obs_time = profile.loc[
-					profile[func_col] == "/marl/marl_scalability/baselines/adapter.py:134(observation_adapter)"
+						profile[func_col] == "/marl/marl_scalability/baselines/image_adapter.py:87(observation_adapter)"
 				]["cumtime"].iloc[0]
 				run["cprofile_stats"]["obs_time"] = obs_time
 				policy_step_time = profile.loc[
@@ -137,6 +140,7 @@ def extract_profile_info(info, add_norm=True):
 					run["cprofile_stats_norm"]["obs_time"] = obs_time / total_time
 					run["cprofile_stats_norm"]["policy_step_time"] = policy_step_time / total_time
 					run["cprofile_stats_norm"]["other"] = other_time / total_time
+					run["cprofile_stats_norm"]["sample_time"] = sample_time / total_time
 
 def extract_vehicle_retention_info(info):
 	for policy in info:
@@ -157,15 +161,17 @@ def plot_mem_usage_graph(info, log_dir, errorbars=True):
 	fig, axs = plt.subplots(len(info))
 	#ax.set_xlabel("Number of Ego Agents")
 	#ax.set_ylabel("Memory Usage")
-	colours = ["b", "g", "orange"]
+	#colours = ["b", "g", "orange"]
+	# color=colours[i],
+	# color=colours[i], 
 	for i, policy in enumerate(info):
 		ys = [run["mem_usage"]["mean"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
 		if errorbars:
 			yerr = [run["mem_usage"]["std"] for run in info[policy]]
-			axs[i].errorbar(xs, ys, yerr, color=colours[i], ls="dotted", label=policy)
+			axs[i].errorbar(xs, ys, yerr, ls="dotted", label=policy)
 		else:
-			axs[i].plot(xs, ys, color=colours[i], ls="dotted", label=policy)
+			axs[i].plot(xs, ys, ls="dotted", label=policy)
 		axs[i].set_title(policy)
 	fig.legend()
 	
@@ -177,13 +183,16 @@ def plot_max_mem_usage_graph(info, log_dir):
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	ax.set_xlabel("Number of Ego Agents")
-	ax.set_ylabel("Peak Memory Usage")
+	ax.set_ylabel("Peak Memory Usage (GB)")
 	for policy in info:
 		ys = [run["mem_usage"]["max"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
-		ax.plot(xs, ys, ls="dotted", label=policy)
+		ax.plot(xs, ys, label=policy.split("_")[0].upper())
 	ax.legend()
-	ax.set_title("Maximum memory usage")
+	gig_formatter = FuncFormatter(gigabyte)
+	ax.yaxis.set_major_formatter(gig_formatter)
+	#ax.set_yscale("log")
+	#ax.set_title("Maximum memory usage")
 	plt.savefig(graphs_dir / "max_memory_usage_graph.png")
 
 def plot_episode_steps_sec(info, log_dir, errorbars=True):
@@ -198,14 +207,16 @@ def plot_episode_steps_sec(info, log_dir, errorbars=True):
 		xs = [run["n_agents"] for run in info[policy]]
 		if errorbars:
 			yerr = [run["run_episode_stats"]["steps/sec"]["std"] for run in info[policy]]
-			ax.errorbar(xs, ys, yerr, ls="dotted", label=policy)
+			ax.errorbar(xs, ys, yerr, ls="dotted", label=policy.split("_")[0].upper())
 		else:
-			ax.plot(xs, ys, ls="dotted", label=policy)
+			ax.plot(xs, ys, ls="solid", label=policy.split("_")[0].upper())
 	ax.legend()
-	ax.set_title("Mean Steps/Sec")
+	ax.set_xlim(left=30)
+	ax.set_ylim(top=2, bottom=0)
+	#ax.set_title("Mean Steps/Sec")
 	plt.savefig(graphs_dir / "steps_sec_graph.png")
 
-def plot_episode_sim_wall(info, log_dir, errorbars=True):
+def plot_episode_sim_wall(info, log_dir, errorbars=True, start=None):
 	graphs_dir = log_dir / "graphs"
 	graphs_dir.mkdir(exist_ok=True)
 	fig = plt.figure()
@@ -219,9 +230,9 @@ def plot_episode_sim_wall(info, log_dir, errorbars=True):
 			yerr = [run["run_episode_stats"]["sim/wall"]["std"] for run in info[policy]]
 			ax.errorbar(xs, ys, yerr, ls="dotted", label=policy)
 		else:
-			ax.plot(xs, ys, ls="dotted", label=policy)
+			ax.plot(xs, ys, ls="solid", label=policy.split("_")[0].upper())
 	ax.legend()
-	ax.set_title("Mean Sim/Wall")
+	#ax.set_title("Mean Sim/Wall")
 	plt.savefig(graphs_dir / "sim_wall_graph.png")
 
 
@@ -235,9 +246,9 @@ def plot_episode_sim_wall_min(info, log_dir):
 	for policy in info:
 		ys = [run["run_episode_stats"]["sim/wall"]["min"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]	
-		ax.plot(xs, ys, ls="dotted", label=policy)
+		ax.plot(xs, ys, ls="solid", label=policy.split("_")[0].upper())
 	ax.legend()
-	ax.set_title("Minimum Sim/Wall")
+	#ax.set_title("Minimum Sim/Wall")
 	plt.savefig(graphs_dir / "sim_wall_min_graph.png")
 
 
@@ -308,20 +319,48 @@ def plot_vehicle_retention(policy_exp, name, log_dir, max_steps=None):
 		)
 	ax.legend()
 	ax.set_ylim(bottom=0)
-	ax.set_title(f"Vehicle retention over time for {name}")
+	#ax.set_title(f"Agent survival over time for {name.upper()}")
 	if max_steps is not None:
-		plt.savefig(graphs_dir / f"vehicle_retention_{name}_{max_steps}.png")
+		plt.savefig(graphs_dir / f"agent_survival_{name}_{max_steps}.png")
 	else:
-		plt.savefig(graphs_dir / f"vehicle_retention_{name}.png")
+		plt.savefig(graphs_dir / f"agent_survival_{name}.png")
 
 def gigabyte(y, pos):
-	return "%1.1fGB" % (y*1e-9)
+	return "%2d" % (y*1e-9)
+
+def gigabyte_from_kb(y, pos):
+	return "%1.1fGB" % (y*1e-6)
+
+def gigabyte_from_mb(y, pos):
+	return "%1.1fGB" % (y*1e-3)
 
 def hours(x, pos):
 	seconds = int(x)
 	hours, seconds = divmod(seconds, 3600)
 	minutes, seconds = divmod(seconds, 60)
 	return f"{hours}:{minutes}:{seconds}"
+
+def plot_mem_usage_over_time_(policy_exp, name, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Step")
+	ax.set_ylabel("Memory usage")
+	for run in policy_exp:
+		if "mem_usage" not in run:
+			continue
+		df = run["mem_usage"]["df"]
+		ax.plot(
+			df.index, 
+			df["mem_usage"], 
+			label=name
+		)
+	ax.legend()
+	gig_formatter = FuncFormatter(gigabyte_from_mb)
+	ax.yaxis.set_major_formatter(gig_formatter)
+	#ax.set_ylim(bottom=0)
+	plt.savefig(graphs_dir / f"mem_usage_over_time_{name}.png")
 
 def plot_mem_usage_over_time(policy_exp, name, log_dir):
 	graphs_dir = log_dir / "graphs"
@@ -330,7 +369,7 @@ def plot_mem_usage_over_time(policy_exp, name, log_dir):
 	ax = fig.add_subplot(111)
 	ax.set_xlabel("Step")
 	ax.set_ylabel("Memory usage")
-	labels = ["84", "256_compressed", "256_greyscale", "256", "84_greyscale"]
+	labels = ["uncompressed", "compressed", "256_greyscale", "256", "84_greyscale"]
 	cmap = cm.get_cmap("hsv")
 	colors = cmap(np.linspace(0, .9, len(policy_exp)))
 	for color, run, label in zip(colors, policy_exp, labels):
@@ -348,11 +387,10 @@ def plot_mem_usage_over_time(policy_exp, name, log_dir):
 		ax.plot(
 			df["step"], 
 			df["mem_usage"], 
-			color=color,
 			label=run["train_args"]["desc"] if "train_args" in run else label
 		)
 	ax.legend()
-	ax.set_title(f"Memory usage over time for {name} agent with top-down RGB input")
+	#ax.set_title(f"Memory usage over time for {name} agent with top-down RGB input")
 	gig_formatter = FuncFormatter(gigabyte)
 	ax.yaxis.set_major_formatter(gig_formatter)
 	#ax.set_ylim(bottom=0)
@@ -366,26 +404,44 @@ def plot_replay_usage_over_time(policy_exp, name, log_dir):
 	ax = fig.add_subplot(111)
 	ax.set_xlabel("Step")
 	ax.set_ylabel("Memory usage")
-	labels = ["84", "256_compressed", "256_greyscale", "256", "84_greyscale"]
+	labels = ["compressed", "uncompressed", "256_greyscale", "256", "84_greyscale"]
 	cmap = cm.get_cmap("hsv")
 	colors = cmap(np.linspace(0, .9, len(policy_exp)))
-	for color, run, label in zip(colors, policy_exp, labels):
+	for run, label in zip(policy_exp, labels):
 		if "mem_usage" not in run:
 			continue
 		df = run["mem_usage"]["df"]
+		col_list = list(df)
+		if len(col_list) == 4:
+			ind, mem_usage, step, replay_usage = col_list
+			col_list = [ind, step, mem_usage, replay_usage]
+		df.columns = col_list
 		ax.plot(
 			df["step"], 
 			df["replay_usage"], 
-			color=color,
 			label=run["train_args"]["desc"] if "train_args" in run else label
 		)
 	ax.legend()
-	ax.set_title(f"Replay buffer memory usage over time for {name} agent\n with top-down RGB input")
+	#ax.set_title(f"Replay buffer memory usage over time for {name} agent\n with top-down RGB input")
 	gig_formatter = FuncFormatter(gigabyte)
 	ax.yaxis.set_major_formatter(gig_formatter)
 	ax.set_ylim(bottom=0)
 	plt.savefig(graphs_dir / f"replay_usage_over_time_{name}.png", bbox_inches="tight")
 
+def plot_batch_size_graph(info, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Batch Size")
+	ax.set_ylabel("Total Sample Time (s)")
+	for policy in info:
+		ys = sorted([run["cprofile_stats"]["sample_time"] for run in info[policy]])
+		xs = sorted([int(run["train_args"]["desc"].split("_")[1]) for run in info[policy]])
+		ax.plot(xs, ys, label=policy, linestyle="--", marker="o")
+	ax.legend()
+	ax.set_xticks([x for x in range(0, 257, 32)])
+	plt.savefig(graphs_dir / f"batch_size_vs_execution time.png")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate-graphs")
@@ -399,19 +455,22 @@ if __name__ == "__main__":
 	extract_mem_usage(experiment_info, store_df=True)
 	extract_stats_csv_info(experiment_info)
 	#extract_profile_info(experiment_info)
-	#plot_mem_usage_graph(experiment_info, log_dir)
-	#plot_max_mem_usage_graph(experiment_info, log_dir)
-	#plot_episode_steps_sec(experiment_info, log_dir, errorbars=False)
-	#plot_episode_sim_wall(experiment_info, log_dir, errorbars=False)
-	#plot_episode_sim_wall_min(experiment_info, log_dir)
+	extract_args_info(experiment_info)
+	plot_mem_usage_graph(experiment_info, log_dir)
+	plot_max_mem_usage_graph(experiment_info, log_dir)
+	#plot_batch_size_graph(experiment_info, log_dir)
+	plot_episode_steps_sec(experiment_info, log_dir, errorbars=False)
+	plot_episode_sim_wall(experiment_info, log_dir, errorbars=False)
+	plot_episode_sim_wall_min(experiment_info, log_dir)
 	#plot_profile_chart(experiment_info["sac"], "sac", log_dir)
 	#plot_profile_chart(experiment_info["ppo"], "ppo", log_dir)
 	#plot_profile_chart(experiment_info["dqn"], "dqn", log_dir)
 	#plot_profile_chart(experiment_info["dqn-discrete"], "dqn-discrete", log_dir)
 	#plot_exeuction_time(experiment_info, log_dir)
-
+	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
+	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
+	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
 	#extract_vehicle_retention_info(experiment_info)
-	#plot_vehicle_retention(experiment_info["dqn"], "dqn", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["ppo"], "ppo", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["sac"], "sac", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=100)
@@ -423,6 +482,6 @@ if __name__ == "__main__":
 
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)
-	extract_args_info(experiment_info)
-	plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "DQN (discrete)", log_dir)
+	#extract_args_info(experiment_info)
+	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "DQN (discrete)", log_dir)
 	#plot_replay_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn discrete (high dim)", log_dir)

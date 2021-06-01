@@ -36,7 +36,6 @@ import torch
 
 from smarts.zoo.registry import make
 from marl_scalability.utils.episode import LogInfo, episodes
-from marl_scalability.utils.ray import default_ray_kwargs
 
 num_gpus = 1 if torch.cuda.is_available() else 0
 

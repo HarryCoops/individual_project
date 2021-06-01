@@ -19,11 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-import datetime
 import math
 import os
 import csv
-import sys
 from pathlib import Path
 
 import shutil
@@ -35,11 +33,6 @@ import numpy as np
 import tableprint as tp
 from marl_scalability.utils.rllib_log_info import RLlibLogInfo
 from marl_scalability.utils.common import gen_experiment_name
-
-import tempfile
-from ray.rllib.agents.callbacks import DefaultCallbacks
-from ray.tune.logger import Logger, UnifiedLogger
-
 from tensorboardX import SummaryWriter
 
 
@@ -51,8 +44,6 @@ class LogInfo:
             "dist_center": 0,
             "speed": 0,
             "max_speed_violation": 0,
-            #"ego_num_violations": 0,
-            #"social_num_violations": 0,
             "ego_linear_jerk": 0.0,
             "ego_angular_jerk": 0.0,
             "final_pos": [0, 0],
@@ -73,10 +64,6 @@ class LogInfo:
             1 if infos["logs"]["closest_wp"] is not None and infos["logs"]["speed"] > infos["logs"]["closest_wp"].speed_limit else 0
         )
         self.data["dist_center"] += infos["logs"]["dist_center"] if infos["logs"]["dist_center"] is not None else 0
-        #self.data["ego_num_violations"] += int(infos["logs"]["ego_num_violations"] > 0)
-        #self.data["social_num_violations"] += int(
-        #    infos["logs"]["social_num_violations"] > 0
-        #)
         self.data["ego_linear_jerk"] += infos["logs"]["linear_jerk"]
         self.data["ego_angular_jerk"] += infos["logs"]["angular_jerk"]
         self.data["episode_reward"] += rewards
@@ -108,8 +95,6 @@ class LogInfo:
         self.data["speed"] /= steps
         self.data["ego_linear_jerk"] /= steps
         self.data["ego_angular_jerk"] /= steps
-        #self.data["ego_num_violations"] /= steps
-        #self.data["social_num_violations"] /= steps
         self.data["max_speed_violation"] /= steps
 
 
@@ -367,64 +352,3 @@ def episodes(n, etag=None, log_dir=None, write_table=False, experiment_name=None
             writer = csv.writer(f)
             writer.writerow(running_stats.keys())
             writer.writerows(zip(*running_stats.values()))
-
-
-class Callbacks(DefaultCallbacks):
-    @staticmethod
-    def on_episode_start(
-        worker,
-        base_env,
-        policies,
-        episode,
-        **kwargs,
-    ):
-        episode.user_data = RLlibLogInfo()
-
-    @staticmethod
-    def on_episode_step(
-        worker,
-        base_env,
-        episode,
-        **kwargs,
-    ):
-
-        single_agent_id = list(episode._agent_to_last_obs)[0]
-        policy_id = episode.policy_for(single_agent_id)
-        agent_reward_key = (single_agent_id, policy_id)
-
-        info = episode.last_info_for(single_agent_id)
-        reward = episode.agent_rewards[agent_reward_key]
-        if info:
-            episode.user_data.add(info, reward)
-
-    @staticmethod
-    def on_episode_end(
-        worker,
-        base_env,
-        policies,
-        episode,
-        **kwargs,
-    ):
-        episode.user_data.normalize(episode.length)
-        for key, val in episode.user_data.data.items():
-            if not isinstance(val, (list, tuple, np.ndarray)):
-                episode.custom_metrics[key] = val
-
-        print(
-            f"Episode {episode.episode_id} ended:\nlength:{episode.length},\nenv_score:{episode.custom_metrics['env_score']},\ncollision:{episode.custom_metrics['collision']}, \nreached_goal:{episode.custom_metrics['reached_goal']},\ntimeout:{episode.custom_metrics['timed_out']},\noff_road:{episode.custom_metrics['off_road']},\ndist_travelled:{episode.custom_metrics['dist_travelled']},\ngoal_dist:{episode.custom_metrics['goal_dist']}"
-        )
-        print("--------------------------------------------------------")
-
-
-def log_creator(log_dir):
-    result_dir = log_dir
-    result_dir = Path(result_dir).expanduser().resolve().absolute()
-    logdir_prefix = gen_experiment_name()
-
-    def logger_creator(config):
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir)
-        logdir = tempfile.mkdtemp(prefix=logdir_prefix, dir=result_dir)
-        return UnifiedLogger(config, logdir, loggers=None)
-
-    return logger_creator

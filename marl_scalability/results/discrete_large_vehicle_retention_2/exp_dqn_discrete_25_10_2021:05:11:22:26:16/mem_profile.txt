@@ -1,3 +1,5 @@
+
+
 Filename: marl_scalability/train.py
 
 Line #    Mem usage    Increment  Occurences   Line Contents
@@ -56,7 +58,7 @@ Line #    Mem usage    Increment  Occurences   Line Contents
    106    657.9 MiB      0.0 MiB           1           surviving_vehicles_total = []
    107    809.9 MiB      0.0 MiB          11           for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True):
    108                                                     # Reset the environment and retrieve the initial observations.
-   109    806.2 MiB      0.0 MiB          10               surviving_vehicles = []
+   109    806.2 MiB      0.0 MiB          10               surviving_vehicles = []xq
    110    806.2 MiB     70.1 MiB          10               observations = env.reset()
    111    806.2 MiB      0.0 MiB          10               dones = {"__all__": False}
    112    806.2 MiB      0.0 MiB          10               infos = None

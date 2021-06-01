@@ -1,57 +1,24 @@
-# MIT License
-#
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+import cProfile 
 import json
 import os
-import sys
 import csv
 import psutil
 from pathlib import Path
-
-from marl_scalability.utils.ray import default_ray_kwargs
-
-# Set environment to better support Ray
-os.environ["MKL_NUM_THREADS"] = "1"
 import argparse
 import pickle
-import time
 import pandas as pd 
-
 import dill
 import gym
 import psutil
-import ray
 import torch
-import logging
-
 from smarts.zoo.registry import make
-from marl_scalability.evaluate import evaluation_check
 from marl_scalability.utils.episode import episodes
-
-num_gpus = 1 if torch.cuda.is_available() else 0
-
 from datetime import datetime
 from memory_profiler import profile 
-# @ray.remote(num_gpus=num_gpus / 2, max_calls=1)
-#@ray.remote(num_gpus=num_gpus / 2)
+from pyinstrument import Profiler
+import pstats
+import io
+
 
 def no_op_profile(stream):
     def _no_op_profile(func):
@@ -65,8 +32,6 @@ def outer_train(f, *args, **kwargs):
         n_agents,
         num_episodes,
         max_episode_steps,
-        eval_info,
-        timestep_sec,
         headless,
         policy_class,
         seed,
@@ -141,25 +106,6 @@ def outer_train(f, *args, **kwargs):
                     )
 
             while not dones["__all__"]:
-                # Break if any of the agent's step counts is 1000000 or greater.
-                if any([episode.get_itr(agent_id) >= 1000000 for agent_id in agents]):
-                    finished = True
-                    break
-
-                # Perform the evaluation check.
-                '''
-                evaluation_check(
-                    agents=agents,
-                    agent_ids=agent_ids,
-                    policy_classes=agent_classes,
-                    episode=episode,
-                    log_dir=log_dir,
-                    max_episode_steps=max_episode_steps,
-                    **eval_info,
-                    **env.info,
-                )
-                '''
-
                 # Request and perform actions on each agent that received an observation.
                 actions = {
                     agent_id: agents[agent_id].act(observation, explore=True)
@@ -229,7 +175,7 @@ def outer_train(f, *args, **kwargs):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("intersection-training")
     parser.add_argument(
-        "--scenario", help="Scenario to run", type=str, default="scenarios/loop"
+        "--scenario", help="Scenario to run", type=str, default="scenarios/big_circle"
     )
     parser.add_argument(
         "--n-agents",
@@ -253,9 +199,6 @@ if __name__ == "__main__":
         default=10000,
     )
     parser.add_argument(
-        "--timestep", help="Environment timestep (sec)", type=float, default=0.1
-    )
-    parser.add_argument(
         "--headless", help="Run without envision", action="store_true", default=False
     )
     parser.add_argument(
@@ -268,15 +211,6 @@ if __name__ == "__main__":
         help="Run experiment with a specified exeuction profiler",
         type=str, 
         default=""
-    )
-    parser.add_argument(
-        "--eval-episodes", help="Number of evaluation episodes", type=int, default=200
-    )
-    parser.add_argument(
-        "--eval-rate",
-        help="Evaluation rate based on number of observations",
-        type=int,
-        default=10000,
     )
     parser.add_argument(
         "--record-vehicle-lifespan", 
@@ -343,11 +277,6 @@ if __name__ == "__main__":
         "n_agents": args.n_agents,
         "num_episodes": int(args.episodes),
         "max_episode_steps": int(args.max_episode_steps),
-        "eval_info": {
-            "eval_rate": float(args.eval_rate),
-            "eval_episodes": int(args.eval_episodes),
-        },
-        "timestep_sec": float(args.timestep),
         "headless": args.headless,
         "policy_class": policy_class,
         "seed": args.seed,
@@ -360,11 +289,9 @@ if __name__ == "__main__":
     }
 
     if args.profiler == "pyinstrument":
-        from pyinstrument import Profiler
         pr = Profiler(interval=0.1)
         pr.start()
     elif args.profiler == "cProfile":
-        import cProfile 
         pr = cProfile.Profile()
         pr.enable()
     if args.full_memory_profile:
@@ -373,26 +300,12 @@ if __name__ == "__main__":
         f = None 
         profile = no_op_profile
     outer_train(f, *train_args.values())
-    """
-    if args.memprof:
-        from memory_profiler import memory_usage
-        profile = no_op_profile
-        print(train_args)
-        mem_usage = memory_usage((outer_train, [None,] + list(train_args.values()), {}),1)
-        import pandas as pd 
-        mem_usage = pd.DataFrame({"mem_usage": pd.Series(mem_usage)})
-        mem_usage.to_csv(log_dir / experiment_name / "mem_usage.csv")
-    else:
-        outer_train(f, *train_args.values())
-    """
     
     if args.profiler == "pyinstrument":
         pr.stop()
         with open(log_dir / experiment_name / "profile.html", "w") as f:
             f.write(pr.output_html())
     elif args.profiler == "cProfile":
-        import pstats
-        import io
         result = io.StringIO()
         ps = pstats.Stats(pr, stream=result)
         ps.sort_stats("cumulative")
