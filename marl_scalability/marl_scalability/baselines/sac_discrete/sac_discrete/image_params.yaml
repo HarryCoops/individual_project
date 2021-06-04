@@ -8,7 +8,7 @@ critic_lr: 5e-4
 actor_lr: 1e-6
 critic_update_rate: 5
 policy_update_rate: 10
-warmup: 1000
+warmup: 500
 batch_size: 32
 hidden_units: 512
 tau: 0.005
@@ -20,3 +20,4 @@ image_width: 256
 replay_buffer:
     buffer_size: 1e6
     batch_size: 32
+    compression: lz4

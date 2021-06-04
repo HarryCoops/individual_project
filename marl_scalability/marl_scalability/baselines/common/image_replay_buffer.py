@@ -126,14 +126,14 @@ class ReplayBufferDataset(Dataset):
             next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.uint8)
             next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
     
-        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).to(self.device)
-        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"]).to(self.device)
-        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"]).to(self.device)
-        next_state["low_dimstates"] = torch.from_numpy(next_state["low_dim_states"]).to(self.device)
+        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"]).pin_memory()
+        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"]).pin_memory()
+        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"]).pin_memory()
+        next_state["low_dim_states"] = torch.from_numpy(next_state["low_dim_states"]).pin_memory()
         
-        action = torch.from_numpy(action).to(self.device)
-        done = torch.from_numpy(done).to(self.device)
-        reward = torch.from_numpy(reward).float().to(self.device)
+        action = torch.from_numpy(action).pin_memory()
+        done = torch.from_numpy(done).pin_memory()
+        reward = torch.from_numpy(reward).float().pin_memory()
         return state, action, reward, next_state, done, others
 
 
@@ -184,12 +184,12 @@ class ImageReplayBuffer:
         low_dim_states = (
             torch.cat(
                 [e["low_dim_states"] for e in states], 
-                dim=0).float().to(device)
+                dim=0).to(device, non_blocking=True).float()
         )
         images = (
             torch.cat(
                 [e["top_down_rgb"] for e in states],
-                dim=0).float().to(device)
+                dim=0).to(device, non_blocking=True).float()
         )
         out = {
             "top_down_rgb": images,
@@ -203,7 +203,7 @@ class ImageReplayBuffer:
         states, actions, rewards, next_states, dones, others = zip(*batch)
         states = self.make_state_from_dict(states, device)
         next_states = self.make_state_from_dict(next_states, device)
-        actions = torch.cat(actions, dim=0).float().to(device)
-        rewards = torch.cat(rewards, dim=0).float().to(device)
-        dones = torch.cat(dones, dim=0).float().to(device)
+        actions = torch.cat(actions, dim=0).to(device, non_blocking=True).float()
+        rewards = torch.cat(rewards, dim=0).to(device, non_blocking=True).float()
+        dones = torch.cat(dones, dim=0).to(device, non_blocking=True).float()
         return states, actions, rewards, next_states, dones, others
