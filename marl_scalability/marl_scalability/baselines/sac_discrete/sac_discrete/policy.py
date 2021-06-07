@@ -46,8 +46,11 @@ class DiscreteSACPolicy(Agent):
         self,
         policy_params=None,
         checkpoint_dir=None,
+        marb=None,
+        agent_id=""
     ):
-        # print("LOADING THE PARAMS", policy_params, checkpoint_dir)
+        self.agent_id = agent_id
+        self.marb = marb
         self.lane_actions = ["keep_lane", "slow_down", "change_lane_left", "change_lane_right"]
         self.policy_params = policy_params
         self.agent_type = policy_params["agent_type"]
@@ -101,7 +104,7 @@ class DiscreteSACPolicy(Agent):
             self.social_feature_encoder_params = self.social_vehicle_encoder[
                 "social_feature_encoder_params"
             ]
-        elif self.agent_type == "image":
+        else:
             self.n_in_channels = int(policy_params["n_in_channels"])
             self.image_height = int(policy_params["image_height"])
             self.image_width = int(policy_params["image_width"])
@@ -124,13 +127,15 @@ class DiscreteSACPolicy(Agent):
                 compression=policy_params["replay_buffer"].get("compression", None),
                 dimensions=(self.n_in_channels, self.image_height, self.image_width)
             )
-
-        elif self.agent_type == "social":
+        elif self.marb is None:
             self.memory = ReplayBuffer(
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
             )
+        else:
+            self.marb.add_agent(self.agent_id)
+
         self.current_iteration = 0
         self.steps = 0
         self.init_networks()
@@ -227,21 +232,39 @@ class DiscreteSACPolicy(Agent):
         max_steps_reached = info["logs"]["events"].reached_max_episode_steps
         if max_steps_reached:
             done = False
-        self.memory.add(
-            state=state,
-            action=action,
-            reward=reward,
-            next_state=next_state,
-            done=float(done),
-            others=None,
-            prev_action=self.prev_action,
-        )
+        if self.marb is None:
+            self.memory.add(
+                state=state,
+                action=action,
+                reward=reward,
+                next_state=next_state,
+                done=float(done),
+                others=None,
+                prev_action=self.prev_action,
+            )
+        else:
+            self.marb.add(
+                agent_id=self.agent_id,
+                state=state,
+                action=action_index,
+                reward=reward,
+                next_state=next_state,
+                done=done,
+                others=others,
+                prev_action=self.prev_action
+            )
         self.steps += 1
         output = {}
         if self.steps > max(self.warmup, self.batch_size):
-            states, actions, rewards, next_states, dones, others = self.memory.sample(
-                device=self.device_name
-            )
+            if self.marb is None:
+                states, actions, rewards, next_states, dones, others = self.memory.sample(
+                    device=self.device_name
+                )
+            else:
+                states, actions, rewards, next_states, dones, others = self.marb.collect_sample(
+                    self.agent_id
+                )
+                self.marb.request_sample(self.agent_id)
             if self.steps % self.critic_update_rate == 0:
                 critic_loss = self.update_critic(
                     states, actions, rewards, next_states, dones
