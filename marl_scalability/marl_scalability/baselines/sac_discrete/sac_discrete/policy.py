@@ -246,11 +246,11 @@ class DiscreteSACPolicy(Agent):
             self.marb.add(
                 agent_id=self.agent_id,
                 state=state,
-                action=action_index,
+                action=action,
                 reward=reward,
                 next_state=next_state,
-                done=done,
-                others=others,
+                done=float(done),
+                others=None,
                 prev_action=self.prev_action
             )
         self.steps += 1
