@@ -61,6 +61,7 @@ class BaselineAgentSpec(AgentSpec):
         max_episode_steps=1200,
         experiment_dir=None,
         agent_id="",
+        replay_buffer=None,
     ):
         if experiment_dir:
             print(
@@ -122,7 +123,10 @@ class BaselineAgentSpec(AgentSpec):
                         ),
                     ),
                     agent_params=dict(
-                        policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
+                        policy_params=adapter.policy_params, 
+                        checkpoint_dir=checkpoint_dir,
+                        marb=replay_buffer,
+                        agent_id=agent_id,
                     ),
                     agent_builder=policy_class,
                     observation_adapter=adapter.observation_adapter,
@@ -146,7 +150,8 @@ class BaselineAgentSpec(AgentSpec):
                         ),
                     ),
                     agent_params=dict(
-                        policy_params=adapter.policy_params, checkpoint_dir=checkpoint_dir
+                        policy_params=adapter.policy_params,
+                        checkpoint_dir=checkpoint_dir,
                     ),
                     agent_builder=policy_class,
                     observation_adapter=adapter.observation_adapter,

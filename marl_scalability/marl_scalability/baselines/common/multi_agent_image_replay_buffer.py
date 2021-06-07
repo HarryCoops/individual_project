@@ -114,27 +114,29 @@ class ReplayBufferDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         transition = tuple(self.memory[idx])
-        transition = copy.deepcopy(transition)
+        #transition = copy.deepcopy(transition)
         state, action, reward, next_state, done, others = transition
+        _state = {}
+        _next_state = {}
         if self.compression == "zlib":
-            state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.uint8)
-            state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
-            next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
-            next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
+            _state["top_down_rgb"] = np.frombuffer(zlib.decompress(state["top_down_rgb"]), np.uint8)
+            _state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
+            _next_state["top_down_rgb"] = np.frombuffer(zlib.decompress(next_state["top_down_rgb"]), np.uint8)
+            _next_state["top_down_rgb"] = _next_state["top_down_rgb"].reshape(self.dimensions)
         elif self.compression == "lz4":
-            state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(state["top_down_rgb"]), np.uint8)
-            state["top_down_rgb"] = state["top_down_rgb"].reshape(self.dimensions)
-            next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.uint8)
-            next_state["top_down_rgb"] = next_state["top_down_rgb"].reshape(self.dimensions)
+            _state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(state["top_down_rgb"]), np.uint8)
+            _state["top_down_rgb"] = _state["top_down_rgb"].reshape(self.dimensions)
+            _next_state["top_down_rgb"] = np.frombuffer(lz4.frame.decompress(next_state["top_down_rgb"]), np.uint8)
+            _next_state["top_down_rgb"] = _next_state["top_down_rgb"].reshape(self.dimensions)
     
-        state["low_dim_states"] = torch.from_numpy(state["low_dim_states"])
-        state["top_down_rgb"] = torch.from_numpy(state["top_down_rgb"])
-        next_state["top_down_rgb"] = torch.from_numpy(next_state["top_down_rgb"])
-        next_state["low_dimstates"] = torch.from_numpy(next_state["low_dim_states"])
+        _state["low_dim_states"] = torch.from_numpy(state["low_dim_states"])
+        _state["top_down_rgb"] = torch.from_numpy(_state["top_down_rgb"])
+        _next_state["top_down_rgb"] = torch.from_numpy(_next_state["top_down_rgb"])
+        _next_state["low_dim_states"] = torch.from_numpy(next_state["low_dim_states"])
         action = torch.from_numpy(action)
         done = torch.from_numpy(done)
         reward = torch.from_numpy(reward)
-        return state, action, reward, next_state, done, others
+        return _state, action, reward, _next_state, done, others
 
 
 class MARLImageReplayBuffer:
@@ -152,6 +154,7 @@ class MARLImageReplayBuffer:
         self.agent_dataloaders = {}
         self.agent_datasets = {}
         self.needs_sample = []
+        self.requested_sample = []
         self.compression = compression
         self.batch_size = batch_size
         self.pin_memory = pin_memory
@@ -210,30 +213,39 @@ class MARLImageReplayBuffer:
         self.agent_dataloaders[agent_id] = data_loader
         self.agent_datasets[agent_id] = replay_buffer_dataset
     
+    def len(self, agent_id):
+        return len(self.agent_dataloaders[agent_id])
+
     def generate_samples(self):
-        n_agents = len(self.needs_sample)
+        n_agents = len(self.requested_sample)
+        if n_agents == 0:
+            return 
         image_data = torch.empty(
-            (self.batch_size * n_agents, *self.dimensions), pin_memory=True
+            (self.batch_size * n_agents, *self.dimensions), 
+            pin_memory=True,
+            dtype=torch.uint8,
         )
         low_dim_data = torch.empty(
-            (self.batch_size * n_agents, 12), pin_memory=True
+            (self.batch_size * n_agents, 4), pin_memory=True
         )
         all_actions = torch.empty(
-            (self.batch_size * n_agents, 2), pin_memory=True
+            (self.batch_size * n_agents, 1), pin_memory=True
         )
         all_rewards = torch.empty(
             (self.batch_size * n_agents, 1), pin_memory=True
         )
         next_image_data = torch.empty(
-            (self.batch_size * n_agents, *self.dimensions), pin_memory=True
+            (self.batch_size * n_agents, *self.dimensions), 
+            pin_memory=True,
+            dtype=torch.uint8
         )
         next_low_dim_data = torch.empty(
-            (self.batch_size * n_agents, 11), pin_memory=True
+            (self.batch_size * n_agents, 4), pin_memory=True
         )
         all_dones = torch.empty(
             (self.batch_size * n_agents, 1), pin_memory=True
         )
-        for i, agent_id in enumerate(self.needs_sample):
+        for i, agent_id in enumerate(self.requested_sample):
             agent_batch = list(iter(self.agent_dataloaders[agent_id]))
             states, actions, rewards, next_states, dones, others = zip(*agent_batch)
             for j in range(self.batch_size):
@@ -244,19 +256,40 @@ class MARLImageReplayBuffer:
                 all_rewards[i*self.batch_size+j] = rewards[j]
                 all_dones[i*self.batch_size+j] = dones[j]
                 all_actions[i*self.batch_size+j] = actions[j]
-        self.image_data = image_data.to(self.device).float().split(self.batch_size)
-        self.next_image_data = next_image_data.to(self.device).float().split(self.batch_size)
-        self.actions = all_actions.to(self.device).float().split(self.batch_size)
-        self.low_dim_data = low_dim_data.to(self.device).float().split(self.batch_size)
-        self.next_low_dim_data = next_low_dim_data.to(self.device).float().split(self.batch_size)
-        self.rewards = all_rewards.to(self.device).float().split(self.batch_size)
-        self.dones = all_dones.to(self.device).float().split(self.batch_size)
+        self.image_data = image_data.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.next_image_data = next_image_data.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.actions = all_actions.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.low_dim_data = low_dim_data.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.next_low_dim_data = next_low_dim_data.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.rewards = all_rewards.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.dones = all_dones.to(
+                self.device, non_blocking=True).float().split(self.batch_size)
+        self.needs_sample = self.requested_sample
+        self.requested_sample = []
+
 
     def request_sample(self, agent_id):
-        self.needs_sample.append(agent_id)
+        self.requested_sample.append(agent_id)
+    
+    def reset(self):
+        self.image_data = None
+        self.next_image_data = None
+        self.actions = None
+        self.low_dim_data = None
+        self.next_low_dim_data = None
+        self.rewards = None
+        self.dones = None
+        self.requested_sample += self.needs_sample
 
     def collect_sample(self, agent_id, device=None):
         idx = self.needs_sample.index(agent_id)
+        self.needs_sample.remove(agent_id)
         state = {
             "top_down_rgb": self.image_data[idx],
             "low_dim_states": self.low_dim_data[idx]

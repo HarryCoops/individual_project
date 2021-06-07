@@ -43,7 +43,10 @@ class DiscreteDQNPolicy(Agent):
         self,
         policy_params=None,
         checkpoint_dir=None,
+        marb=None,
+        agent_id="",
     ):
+        self.agent_id = agent_id
         self.policy_params = policy_params
         self.agent_type = policy_params["agent_type"]
         if self.agent_type == "image":
@@ -55,7 +58,7 @@ class DiscreteDQNPolicy(Agent):
         discrete_action_spaces = [[0],[1],[2],[3]]
         action_size = discrete_action_spaces
         self.merge_action_spaces = -1
-
+        self.marb = marb
         self.step_count = 0
         self.update_count = 0
         self.num_updates = 0
@@ -173,7 +176,7 @@ class DiscreteDQNPolicy(Agent):
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
             )
-        else:
+        elif self.marb is None:
             self.replay = ImageReplayBuffer(
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
@@ -181,6 +184,8 @@ class DiscreteDQNPolicy(Agent):
                 compression=policy_params["replay_buffer"].get("compression", None),
                 dimensions=(self.n_in_channels, self.image_height, self.image_width)
             )
+        else:
+            self.marb.add_agent(self.agent_id)
 
     def lane_action_to_index(self, state):
         state = state.copy()
@@ -326,25 +331,48 @@ class DiscreteDQNPolicy(Agent):
         else:
             action_index = self.lane_actions.index(action)
             action = action_index
-        self.replay.add(
-            state=state,
-            action=action_index,
-            reward=reward,
-            next_state=next_state,
-            done=done,
-            others=others,
-            prev_action=self.prev_action,
-        )
-        if (
-            self.step_count % self.train_step == 0
-            and len(self.replay) >= self.batch_size
-            and (self.warmup is None or len(self.replay) >= self.warmup)
-        ):
-            out = self.learn()
-            self.update_count += 1
+        if self.marb is None:
+            self.replay.add(
+                state=state,
+                action=action_index,
+                reward=reward,
+                next_state=next_state,
+                done=done,
+                others=others,
+                prev_action=self.prev_action,
+            )
+            if (
+                self.step_count % self.train_step == 0
+                and len(self.replay) >= self.batch_size
+                and (self.warmup is None or len(self.replay) >= self.warmup)
+            ):
+                out = self.learn()
+                self.update_count += 1
+            else:
+                out = {}
         else:
+            self.marb.add(
+                agent_id=self.agent_id,
+                state=state,
+                action=action_index,
+                reward=reward,
+                next_state=next_state,
+                done=done,
+                others=others,
+                prev_action=self.prev_action
+            )
             out = {}
+            if (
+                self.marb.len(self.agent_id) >= self.batch_size
+                and (self.warmup is None or self.marb.len(self.agent_id) >= self.warmup)
+            ):
+                if self.step_count % self.train_step == self.train_step - 1:
+                    self.marb.request_sample(self.agent_id)
+                elif self.step_count % self.train_step == 0:
+                    out = self.learn()
+                    self.update_count += 1
 
+        
         if self.target_update > 1 and self.step_count % self.target_update == 0:
             self.update_target_network()
         elif self.target_update < 1.0:
@@ -357,9 +385,14 @@ class DiscreteDQNPolicy(Agent):
         return out
 
     def learn(self):
-        states, actions, rewards, next_states, dones, others = self.replay.sample(
-            device=self.device
-        )
+        if self.marb is None:
+            states, actions, rewards, next_states, dones, others = self.replay.sample(
+                device=self.device
+            )
+        else:
+            states, actions, rewards, next_states, dones, others = self.marb.collect_sample(
+                self.agent_id
+            )
         if not self.merge_action_spaces:
             actions = torch.chunk(actions, len(self.num_actions), -1)
         else:

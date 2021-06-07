@@ -18,7 +18,7 @@ from memory_profiler import profile
 from pyinstrument import Profiler
 import pstats
 import io
-
+from marl_scalability.baselines.common.multi_agent_image_replay_buffer import MARLImageReplayBuffer
 
 def no_op_profile(stream):
     def _no_op_profile(func):
@@ -41,6 +41,7 @@ def outer_train(f, *args, **kwargs):
         record_mem_usage,
         max_steps,
         maintain_agent_numbers,
+        use_marb
     ):
         torch.set_num_threads(1)
         total_step = 0
@@ -53,9 +54,24 @@ def outer_train(f, *args, **kwargs):
             agent_id: policy_class
             for agent_id in agent_ids
         }
+        marb = MARLImageReplayBuffer(
+            buffer_size=int(1e6), 
+            batch_size=64,
+            device_name="cuda:2",
+            pin_memory=True,
+            num_workers=0,
+            compression="lz4",
+            dimensions=(3, 256, 256)
+        ) if use_marb else None
+
         # Create the agent specifications matched with their associated ID.
         agent_specs = {
-            agent_id: make(locator=policy_class, max_episode_steps=max_episode_steps)
+            agent_id: make(
+                locator=policy_class, 
+                max_episode_steps=max_episode_steps,
+                replay_buffer=marb,
+                agent_id=agent_id
+            )
             for agent_id, policy_class in agent_classes.items()
         }
         print("Building agents...")
@@ -111,6 +127,8 @@ def outer_train(f, *args, **kwargs):
                     agent_id: agents[agent_id].act(observation, explore=True)
                     for agent_id, observation in observations.items()
                 }
+                if use_marb:
+                    marb.generate_samples()
                 next_observations, rewards, dones, infos = env.step(actions)
                 # Active agents are those that receive observations in this step and the next
                 # step. Step each active agent (obtaining their network loss if applicable).
@@ -127,7 +145,8 @@ def outer_train(f, *args, **kwargs):
                     )
                     for agent_id in active_agent_ids
                 }
-
+                if use_marb:
+                    marb.reset()
                 # Record the data from this episode.
                 episode.record_step(
                     agent_ids_to_record=active_agent_ids,
@@ -249,6 +268,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true"
     )
+    parser.add_argument(
+        "--use-marb",
+        help="Use Multi Agent Replay Buffer",
+        default=False,
+        action="store_true"
+    )
 
     base_dir = os.path.dirname(__file__)
     pool_path = os.path.join(base_dir, "agent_pool.json")
@@ -285,7 +310,8 @@ if __name__ == "__main__":
         "record_vehicle_lifespan": args.record_vehicle_lifespan,
         "record mem_usage": args.memprof,
         "max_steps": args.max_steps,
-        "maintain_agent_numbers": args.maintain_agent_numbers
+        "maintain_agent_numbers": args.maintain_agent_numbers,
+        "use_marb": args.use_marb,
     }
 
     if args.profiler == "pyinstrument":
