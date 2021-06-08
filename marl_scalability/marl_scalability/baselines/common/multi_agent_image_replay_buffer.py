@@ -221,29 +221,29 @@ class MARLImageReplayBuffer:
         if n_agents == 0:
             return 
         image_data = torch.empty(
-            (self.batch_size * n_agents, *self.dimensions), 
+            (self.batch_size, n_agents, *self.dimensions), 
             pin_memory=True,
             dtype=torch.uint8,
         )
         low_dim_data = torch.empty(
-            (self.batch_size * n_agents, 4), pin_memory=True
+            (self.batch_size, n_agents, 4), pin_memory=True
         )
         all_actions = torch.empty(
-            (self.batch_size * n_agents, 1), pin_memory=True
+            (self.batch_size, n_agents, 1), pin_memory=True
         )
         all_rewards = torch.empty(
-            (self.batch_size * n_agents, 1), pin_memory=True
+            (self.batch_size, n_agents, 1), pin_memory=True
         )
         next_image_data = torch.empty(
-            (self.batch_size * n_agents, *self.dimensions), 
+            (self.batch_size, n_agents, *self.dimensions), 
             pin_memory=True,
             dtype=torch.uint8
         )
         next_low_dim_data = torch.empty(
-            (self.batch_size * n_agents, 4), pin_memory=True
+            (self.batch_size, n_agents, 4), pin_memory=True
         )
         all_dones = torch.empty(
-            (self.batch_size * n_agents, 1), pin_memory=True
+            (self.batch_size, n_agents, 1), pin_memory=True
         )
         for i, agent_id in enumerate(self.requested_sample):
             agent_batch = list(iter(self.agent_dataloaders[agent_id]))
