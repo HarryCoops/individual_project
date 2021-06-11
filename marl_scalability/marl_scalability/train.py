@@ -56,9 +56,8 @@ def outer_train(f, *args, **kwargs):
         }
         marb = MARLImageReplayBuffer(
             buffer_size=int(1e6), 
-            batch_size=64,
+            batch_size=32,
             device_name="cuda:2",
-            pin_memory=True,
             num_workers=0,
             compression="lz4",
             dimensions=(3, 256, 256)
