@@ -1,0 +1,37 @@
+usage: marl-scalability-training [-h] [--scenario SCENARIO]
+                                 [--n-agents N_AGENTS] [--policy POLICY]
+                                 [--episodes EPISODES]
+                                 [--max-episode-steps MAX_EPISODE_STEPS]
+                                 [--headless] [--memprof]
+                                 [--profiler PROFILER]
+                                 [--record-vehicle-lifespan] [--seed SEED]
+                                 [--log-dir LOG_DIR] [--max-steps MAX_STEPS]
+                                 [--line-memory-profile]
+                                 [--maintain-agent-numbers] [--use-marb]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --scenario SCENARIO   Scenario to run
+  --n-agents N_AGENTS   Number of ego agents to train
+  --policy POLICY       Policies available : [ppo, sac, dqn]
+  --episodes EPISODES   Number of training episodes
+  --max-episode-steps MAX_EPISODE_STEPS
+                        Maximum number of steps per episode
+  --headless            Run without envision
+  --memprof             Run experiment with a memory profiler
+  --profiler PROFILER   Run experiment with a specified exeuction profiler
+                        [cProfile, pysintrument]
+  --record-vehicle-lifespan
+                        Record the number of vehicles surviving at each
+                        timestep
+  --seed SEED           Environment seed
+  --log-dir LOG_DIR     Log directory location
+  --max-steps MAX_STEPS
+                        Maximum number of environment steps to run in total
+  --line-memory-profile
+                        Run a line by line memory profile (output saved in
+                        logs)
+  --maintain-agent-numbers
+                        Stop episode when less than 60% of agents survive
+  --use-marb            Use Multi Agent Replay Buffer
+pybullet build time: Oct  8 2020 00:10:46
