@@ -45,7 +45,7 @@ class DiscreteDQNPolicy(Agent):
         checkpoint_dir=None,
         marb=None,
         agent_id="",
-        compression=compression,
+        compression=None,
     ):
         self.agent_id = agent_id
         self.policy_params = policy_params
@@ -333,15 +333,6 @@ class DiscreteDQNPolicy(Agent):
             action_index = self.lane_actions.index(action)
             action = action_index
         if self.marb is None:
-            self.replay.add(
-                state=state,
-                action=action_index,
-                reward=reward,
-                next_state=next_state,
-                done=done,
-                others=others,
-                prev_action=self.prev_action,
-            )
             if (
                 self.step_count % self.train_step == 0
                 and len(self.replay) >= self.batch_size
@@ -351,6 +342,15 @@ class DiscreteDQNPolicy(Agent):
                 self.update_count += 1
             else:
                 out = {}
+            self.replay.add(
+                state=state,
+                action=action_index,
+                reward=reward,
+                next_state=next_state,
+                done=done,
+                others=others,
+                prev_action=self.prev_action,
+            )
         else:
             self.marb.add(
                 agent_id=self.agent_id,

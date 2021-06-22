@@ -51,7 +51,8 @@ class RandomRLSampler(Sampler):
 
     def __iter__(self):
         n = len(self.datasource)
-        return iter(torch.randperm(n).tolist()[0 : self.batch_size])
+        sample = torch.randperm(n).tolist()[0 : self.batch_size]
+        return iter(sample)
 
 
 class ReplayBufferDataset(Dataset):
@@ -158,6 +159,7 @@ class ImageReplayBuffer:
         self.data_loader = DataLoader(
             self.replay_buffer_dataset,
             sampler=self.sampler,
+            batch_size=batch_size,
             pin_memory=pin_memory,
             num_workers=num_workers,
         )
