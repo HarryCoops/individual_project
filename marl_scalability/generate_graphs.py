@@ -155,6 +155,106 @@ def extract_vehicle_retention_info(info):
 					run["vehicle_retention"] = list(np.mean(data, axis=0))
 
 
+def extract_execution_time_from_pyinstrument_info(info):
+	for policy in info:
+		for run in info[policy]:
+			pyinstrument_path = Path(run["path"]) / "profile.html"
+			if pyinstrument_path.exists():
+				run["pyinstrument_info"] = {}
+				with open(pyinstrument_path) as f:
+					print(run)
+					html = f.read()
+					duration = float(html.split("\"duration\": ")[1][:4])
+					run["pyinstrument_info"]["duration"] = duration
+					env_step_time = float(
+						html.split(
+							"\"/marl/marl_scalability/env/scalability_env.py\",\"line_no\": 62,\"time\": "
+						)[1][:4]
+					)
+					run["pyinstrument_info"]["env_step_time"] = env_step_time
+					env_reset = html.split(
+						"\"/src/smarts/env/hiway_env.py\",\"line_no\": 186,\"time\":" 
+					)
+					env_reset_time = float(
+						env_reset[1][:4] if len(env_reset) > 1 else 0
+					)
+					run["pyinstrument_info"]["env_reset_time"] = env_reset_time
+					sample_time = html.split(
+						"multi_agent_image_replay_buffer.py\",\"line_no\": 220,\"time\": "
+					)
+					sample_time = float(sample_time[1][:4]) if len(sample_time) > 1 else None
+					sample_time = float(
+						html.split(
+							"image_replay_buffer.py\",\"line_no\": 200,\"time\": " 
+						)[1][:4]
+					) if sample_time is None else sample_time
+					run["pyinstrument_info"]["sample_time"] = sample_time
+					agent_training_time = duration - (env_step_time + env_reset_time)
+					run["pyinstrument_info"]["agent_training_time"] = agent_training_time
+
+
+def plot_pyinst_execution_time(info, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Number of Ego Agents")
+	ax.set_ylabel("Total execution time (s)")
+	for policy in info:
+		ys = [run["pyinstrument_info"]["duration"] for run in info[policy]]
+		xs = [run["n_agents"] for run in info[policy]]
+		ax.plot(xs, ys, label=policy)
+	ax.legend()
+	plt.savefig(graphs_dir / "execution_time_graph.png")
+
+def plot_pyinst_agent_time(info, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Number of Ego Agents")
+	ax.set_ylabel("Agent training time (s)")
+	for policy in info:
+		ys = [run["pyinstrument_info"]["agent_training_time"] for run in info[policy]]
+		xs = [run["n_agents"] for run in info[policy]]
+		ax.plot(xs, ys, label=policy)
+	ax.legend()
+	plt.savefig(graphs_dir / "training_time_graph.png")
+
+
+def plot_pyinst_sample_time(info, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Number of Ego Agents")
+	ax.set_ylabel("Buffer sample time (s)")
+	for policy in info:
+		ys = [run["pyinstrument_info"]["sample_time"] for run in info[policy]]
+		xs = [run["n_agents"] for run in info[policy]]
+		ax.plot(xs, ys, label=policy)
+	ax.legend()
+	plt.savefig(graphs_dir / "sample_time_graph.png")
+
+
+def plot_pyinst_sample_time_propotion(info, log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Number of Ego Agents")
+	ax.set_ylabel("Proportion of training time spent sampling the replay buffer")
+	for policy in info:
+		ys = [
+			run["pyinstrument_info"]["sample_time"] / run["pyinstrument_info"]["duration"]
+			for run in info[policy]
+		]
+		xs = [run["n_agents"] for run in info[policy]]
+		ax.plot(xs, ys, label=policy)
+	ax.legend()
+	plt.savefig(graphs_dir / "sample_time_proportion_graph.png")
+
+
 def plot_mem_usage_graph(info, log_dir, errorbars=True):
 	graphs_dir = log_dir / "graphs"
 	graphs_dir.mkdir(exist_ok=True)
@@ -443,6 +543,8 @@ def plot_batch_size_graph(info, log_dir):
 	ax.set_xticks([x for x in range(0, 257, 32)])
 	plt.savefig(graphs_dir / f"batch_size_vs_execution time.png")
 
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate-graphs")
 	parser.add_argument(
@@ -452,16 +554,21 @@ if __name__ == "__main__":
 	log_dir = Path(args.log_dir)
 	runs = [f.path for f in os.scandir(log_dir) if f.is_dir() and f.name != "graphs"]
 	experiment_info = extract_experiment_info(runs)
-	extract_mem_usage(experiment_info, store_df=True)
-	extract_stats_csv_info(experiment_info)
+	extract_execution_time_from_pyinstrument_info(experiment_info)
+	plot_pyinst_agent_time(experiment_info, log_dir)
+	plot_pyinst_execution_time(experiment_info, log_dir)
+	plot_pyinst_sample_time(experiment_info, log_dir)
+	plot_pyinst_sample_time_propotion(experiment_info, log_dir)
+	#extract_mem_usage(experiment_info, store_df=True)
+	#extract_stats_csv_info(experiment_info)
 	#extract_profile_info(experiment_info)
-	extract_args_info(experiment_info)
-	plot_mem_usage_graph(experiment_info, log_dir)
-	plot_max_mem_usage_graph(experiment_info, log_dir)
+	#extract_args_info(experiment_info)
+	#plot_mem_usage_graph(experiment_info, log_dir)
+	#plot_max_mem_usage_graph(experiment_info, log_dir)
 	#plot_batch_size_graph(experiment_info, log_dir)
-	plot_episode_steps_sec(experiment_info, log_dir, errorbars=False)
-	plot_episode_sim_wall(experiment_info, log_dir, errorbars=False)
-	plot_episode_sim_wall_min(experiment_info, log_dir)
+	#plot_episode_steps_sec(experiment_info, log_dir, errorbars=False)
+	#plot_episode_sim_wall(experiment_info, log_dir, errorbars=False)
+	#plot_episode_sim_wall_min(experiment_info, log_dir)
 	#plot_profile_chart(experiment_info["sac"], "sac", log_dir)
 	#plot_profile_chart(experiment_info["ppo"], "ppo", log_dir)
 	#plot_profile_chart(experiment_info["dqn"], "dqn", log_dir)

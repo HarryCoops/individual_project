@@ -38,9 +38,10 @@ random.seed(seed)
 
 
 class ImageBaselineAdapter:
-    def __init__(self, agent_name):
+    def __init__(self, agent_name, agent_config_path=None):
         self.policy_params = load_yaml(
-            f"marl_scalability/baselines/{agent_name}/{agent_name}/image_params.yaml"
+            (agent_config_path if agent_config_path is not None else
+            f"marl_scalability/baselines/{agent_name}/{agent_name}/image_params.yaml")
         )
         self.num_image_channels = self.policy_params["n_in_channels"]
         self.image_height = self.policy_params["image_height"]

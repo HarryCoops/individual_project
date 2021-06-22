@@ -45,6 +45,7 @@ class DiscreteDQNPolicy(Agent):
         checkpoint_dir=None,
         marb=None,
         agent_id="",
+        compression=compression,
     ):
         self.agent_id = agent_id
         self.policy_params = policy_params
@@ -181,7 +182,7 @@ class DiscreteDQNPolicy(Agent):
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
-                compression=policy_params["replay_buffer"].get("compression", None),
+                compression=compression,
                 dimensions=(self.n_in_channels, self.image_height, self.image_width)
             )
         else:

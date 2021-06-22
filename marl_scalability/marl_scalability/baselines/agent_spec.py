@@ -62,6 +62,7 @@ class BaselineAgentSpec(AgentSpec):
         experiment_dir=None,
         agent_id="",
         replay_buffer=None,
+        compression=""
     ):
         if experiment_dir:
             print(
@@ -127,6 +128,7 @@ class BaselineAgentSpec(AgentSpec):
                         checkpoint_dir=checkpoint_dir,
                         marb=replay_buffer,
                         agent_id=agent_id,
+                        compression=compression
                     ),
                     agent_builder=policy_class,
                     observation_adapter=adapter.observation_adapter,

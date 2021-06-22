@@ -41,7 +41,9 @@ def outer_train(f, *args, **kwargs):
         record_mem_usage,
         max_steps,
         maintain_agent_numbers,
-        use_marb
+        use_marb,
+        batch_size,
+        compression
     ):
         torch.set_num_threads(1)
         total_step = 0
@@ -55,11 +57,11 @@ def outer_train(f, *args, **kwargs):
             for agent_id in agent_ids
         }
         marb = MARLImageReplayBuffer(
-            buffer_size=int(1e6), 
-            batch_size=32,
+            buffer_size=int(1e6),
+            batch_size=batch_size,
             device_name="cuda:2",
             num_workers=0,
-            compression="lz4",
+            compression=compression,
             dimensions=(3, 256, 256)
         ) if use_marb else None
 
@@ -69,7 +71,8 @@ def outer_train(f, *args, **kwargs):
                 locator=policy_class, 
                 max_episode_steps=max_episode_steps,
                 replay_buffer=marb,
-                agent_id=agent_id
+                agent_id=agent_id,
+                compression=compression
             )
             for agent_id, policy_class in agent_classes.items()
         }
@@ -97,7 +100,13 @@ def outer_train(f, *args, **kwargs):
         mem_usage = []
         mem_usage_interval = 100
         print("Starting training...")
-        for episode in episodes(num_episodes, experiment_name=experiment_name, log_dir=log_dir, write_table=True, max_steps=max_steps):
+        for episode in episodes(
+            num_episodes, 
+            experiment_name=experiment_name, 
+            log_dir=log_dir, 
+            write_table=True, 
+            max_steps=max_steps
+        ):
             # Reset the environment and retrieve the initial observations.
             surviving_vehicles = []
             observations = env.reset()
@@ -191,7 +200,7 @@ def outer_train(f, *args, **kwargs):
         f.close()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("intersection-training")
+    parser = argparse.ArgumentParser("MARL Scalability Benchmark")
     parser.add_argument(
         "--scenario", help="Scenario to run", type=str, default="scenarios/big_circle"
     )
@@ -203,7 +212,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--policy",
-        help="Policies available : [ppo, sac, td3, dqn, bdqn]",
+        help="Policies available : [ppo, sac, dqn]",
         type=str,
         default="sac",
     )
@@ -260,7 +269,6 @@ if __name__ == "__main__":
         default=False,
         action="store_true"
     )
-    
     parser.add_argument(
         "--maintain-agent-numbers",
         help="Stop episode when less than 60% of agents survive",
@@ -272,6 +280,18 @@ if __name__ == "__main__":
         help="Use Multi Agent Replay Buffer",
         default=False,
         action="store_true"
+    )
+    parser.add_argument(
+        "--batch-size",
+        help="Batch size to use in the replay buffer",
+        default=64,
+        type=int
+    )
+    parser.add_argument(
+        "--compression", 
+        help="Compression algorithm to use [lz4, zlib]",
+        type=str, 
+        default=None
     )
 
     base_dir = os.path.dirname(__file__)
@@ -311,6 +331,8 @@ if __name__ == "__main__":
         "max_steps": args.max_steps,
         "maintain_agent_numbers": args.maintain_agent_numbers,
         "use_marb": args.use_marb,
+        "batch_size": args.batch_size,
+        "compression": args.compression
     }
 
     if args.profiler == "pyinstrument":

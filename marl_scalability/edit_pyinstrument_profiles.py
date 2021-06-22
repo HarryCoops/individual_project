@@ -13,6 +13,10 @@ def edit_profile_html(html):
 	before, after = html.split('body,html{background-color:')
 	html = before + 'body,html{background-color:' + BACKGROUND_COLOR + after[7:]
 
+	# change default text color
+	before, after = html.split(f'body,html{{background-color:{BACKGROUND_COLOR};color:')
+	html = before + f'body,html{{background-color:{BACKGROUND_COLOR};color:'+ FUNC_NAME_COLOR + after[4:]
+
 	# change func name color
 	before, after = html.split(';cursor:default}.application-code .name[data-v-dcd8e382]{color:')
 	html = before + ';cursor:default}.application-code .name[data-v-dcd8e382]{color:' + FUNC_NAME_COLOR + after[7:]
