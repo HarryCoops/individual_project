@@ -120,7 +120,9 @@ class DiscreteSACPolicy(Agent):
         self.save_codes = (
             policy_params["save_codes"] if "save_codes" in policy_params else None
         )
-        if self.agent_type == "image":
+        if self.marb is not None:
+            self.marb.add_agent(self.agent_id)
+        elif self.agent_type == "image":
             self.memory = ImageReplayBuffer(
                 buffer_size=int(policy_params["replay_buffer"]["buffer_size"]),
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
@@ -134,8 +136,6 @@ class DiscreteSACPolicy(Agent):
                 batch_size=int(policy_params["replay_buffer"]["batch_size"]),
                 device_name=self.device_name,
             )
-        else:
-            self.marb.add_agent(self.agent_id)
 
         self.current_iteration = 0
         self.steps = 0
@@ -233,17 +233,7 @@ class DiscreteSACPolicy(Agent):
         max_steps_reached = info["logs"]["events"].reached_max_episode_steps
         if max_steps_reached:
             done = False
-        if self.marb is None:
-            self.memory.add(
-                state=state,
-                action=action,
-                reward=reward,
-                next_state=next_state,
-                done=float(done),
-                others=None,
-                prev_action=self.prev_action,
-            )
-        else:
+        if self.marb is not None:
             self.marb.add(
                 agent_id=self.agent_id,
                 state=state,
@@ -257,15 +247,18 @@ class DiscreteSACPolicy(Agent):
         self.steps += 1
         output = {}
         if self.steps > max(self.warmup, self.batch_size):
-            if self.marb is None:
-                states, actions, rewards, next_states, dones, others = self.memory.sample(
-                    device=self.device_name
-                )
-            else:
-                states, actions, rewards, next_states, dones, others = self.marb.collect_sample(
-                    self.agent_id
-                )
+            if (self.steps % self.policy_update_rate == self.policy_update_rate - 1 or
+                    self.steps % self.critic_update_rate == self.critic_update_rate -  1) and self.marb is not None: 
                 self.marb.request_sample(self.agent_id)
+            if self.steps % self.critic_update_rate == 0 or self.steps % self.policy_update_rate == 0:
+                if self.marb is None:
+                    states, actions, rewards, next_states, dones, others = self.memory.sample(
+                        device=self.device_name
+                    )
+                else:
+                    states, actions, rewards, next_states, dones, others = self.marb.collect_sample(
+                        self.agent_id
+                    )
             if self.steps % self.critic_update_rate == 0:
                 critic_loss = self.update_critic(
                     states, actions, rewards, next_states, dones
@@ -297,6 +290,16 @@ class DiscreteSACPolicy(Agent):
                 }
                 self.current_iteration += 1
             self.target_soft_update(self.sac_net.critic, self.sac_net.target, self.tau)
+        if self.marb is None: 
+            self.memory.add(
+                state=state,
+                action=action,
+                reward=reward,
+                next_state=next_state,
+                done=float(done),
+                others=None,
+                prev_action=self.prev_action,
+            )
         self.prev_action = action if not done else np.zeros(self.action_size)
         return output
 

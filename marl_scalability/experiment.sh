@@ -1,10 +1,11 @@
 #!/bin/bash
-Algos="dqn_discreteRGB"
-LogDir="tester23"
+Algos="ppo_discreteRGB"
+LogDir="test"
 for algo in $Algos; do
- 	python marl_scalability/train.py --profiler pyinstrument --use-marb --compression lz4 --max-episode-steps 500 --scenario scenarios/loop_4_lane --policy $algo --max-steps 1000 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents 2
-	 python marl_scalability/train.py --compression lz4 --profiler pyinstrument --max-episode-steps 500 --scenario scenarios/loop_4_lane --policy $algo --max-steps 1000 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents 2
-	#for ((i=70; i<=100; i+=10)); do
-    #		python marl_scalability/train.py --max-episode-steps 5000 --scenario scenarios/loop_4_lane --policy $algo --headless --memprof --episodes 100 --log-dir $LogDir --profiler cProfile --n-agents $i
-	#done
+	#python marl_scalability/train.py --maintain-agent-numbers --compression lz4 --profiler pyinstrument --use-marb --max-episode-steps 500 --scenario scenarios/big_circle --policy $algo --max-steps 2500 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents 1	
+	python marl_scalability/train.py --maintain-agent-numbers --profiler pyinstrument --max-episode-steps 500 --scenario scenarios/big_circle --policy $algo --max-steps 2500 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents 1
+	for ((i=15; i<=75; i+=15)); do
+	    #python marl_scalability/train.py --maintain-agent-numbers --compression lz4 --profiler pyinstrument --use-marb --max-episode-steps 500 --scenario scenarios/big_circle --policy $algo --max-steps 2500 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents $i
+	    python marl_scalability/train.py --maintain-agent-numbers --compression lz4 --profiler pyinstrument --max-episode-steps 500 --scenario scenarios/big_circle --policy $algo --max-steps 2500 --headless --memprof --episodes 100 --log-dir $LogDir --n-agents $i
+	done
 done

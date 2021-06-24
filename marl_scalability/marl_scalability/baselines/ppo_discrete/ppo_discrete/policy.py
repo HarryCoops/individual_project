@@ -48,6 +48,9 @@ class DiscretePPOPolicy(Agent):
         self,
         policy_params=None,
         checkpoint_dir=None,
+        marb=None,
+        agent_id="",
+        compression=None
     ):
         self.policy_params = policy_params
         self.agent_type = policy_params["agent_type"]

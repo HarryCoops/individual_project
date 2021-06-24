@@ -1,0 +1,189 @@
+Timer unit: 1e-06 s
+
+Total time: 4.41611 s
+File: /marl/marl_scalability/baselines/common/multi_agent_image_replay_buffer.py
+Function: generate_samples at line 214
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   214                                               @profile 
+   215                                               def generate_samples(self):
+   216         5         11.0      2.2      0.0          n_agents = len(self.needs_sample)
+   217         5         13.0      2.6      0.0          image_data = torch.empty(
+   218         5     387715.0  77543.0      8.8              (self.batch_size * n_agents, *self.dimensions), pin_memory=True
+   219                                                   )
+   220         5         13.0      2.6      0.0          low_dim_data = torch.empty(
+   221         5       2436.0    487.2      0.1              (self.batch_size * n_agents, 12), pin_memory=True
+   222                                                   )
+   223         5          8.0      1.6      0.0          all_actions = torch.empty(
+   224         5         79.0     15.8      0.0              (self.batch_size * n_agents, 2), pin_memory=True
+   225                                                   )
+   226         5          7.0      1.4      0.0          all_rewards = torch.empty(
+   227         5         47.0      9.4      0.0              (self.batch_size * n_agents, 1), pin_memory=True
+   228                                                   )
+   229         5          6.0      1.2      0.0          next_image_data = torch.empty(
+   230         5     326468.0  65293.6      7.4              (self.batch_size * n_agents, *self.dimensions), pin_memory=True
+   231                                                   )
+   232         5         12.0      2.4      0.0          next_low_dim_data = torch.empty(
+   233         5        262.0     52.4      0.0              (self.batch_size * n_agents, 11), pin_memory=True
+   234                                                   )
+   235         5          7.0      1.4      0.0          all_dones = torch.empty(
+   236         5         68.0     13.6      0.0              (self.batch_size * n_agents, 1), pin_memory=True
+   237                                                   )
+   238       105        248.0      2.4      0.0          for i, agent_id in enumerate(self.needs_sample):
+   239       100    3022305.0  30223.0     68.4              agent_batch = list(iter(self.agent_dataloaders[agent_id]))
+   240       100       2237.0     22.4      0.1              states, actions, rewards, next_states, dones, others = zip(*agent_batch)
+   241      3300       4192.0      1.3      0.1              for j in range(self.batch_size):
+   242      3200     271597.0     84.9      6.2                  image_data[i*self.batch_size+j] = states[j]["top_down_rgb"]
+   243      3200      28752.0      9.0      0.7                  low_dim_data[i*self.batch_size+j] = states[j]["low_dim_states"]
+   244      3200     243703.0     76.2      5.5                  next_image_data[i*self.batch_size+j] = next_states[j]["top_down_rgb"]
+   245      3200      28066.0      8.8      0.6                  next_low_dim_data[i*self.batch_size+j] = next_states[j]["low_dim_states"]
+   246      3200      24328.0      7.6      0.6                  all_rewards[i*self.batch_size+j] = rewards[j]
+   247      3200      26401.0      8.3      0.6                  all_dones[i*self.batch_size+j] = dones[j]
+   248      3200      23208.0      7.3      0.5                  all_actions[i*self.batch_size+j] = actions[j]
+   249         5         16.0      3.2      0.0          self.image_data = image_data.to(
+   250         5      18082.0   3616.4      0.4                  self.device, non_blocking=True).float().split(self.batch_size)
+   251         5         12.0      2.4      0.0          self.next_image_data = next_image_data.to(
+   252         5       3334.0    666.8      0.1                  self.device, non_blocking=True).float().split(self.batch_size)
+   253         5          9.0      1.8      0.0          self.actions = all_actions.to(
+   254         5       1249.0    249.8      0.0                  self.device, non_blocking=True).float().split(self.batch_size)
+   255         5          8.0      1.6      0.0          self.low_dim_data = low_dim_data.to(
+   256         5        311.0     62.2      0.0                  self.device, non_blocking=True).float().split(self.batch_size)
+   257         5          7.0      1.4      0.0          self.next_low_dim_data = next_low_dim_data.to(
+   258         5        295.0     59.0      0.0                  self.device, non_blocking=True).float().split(self.batch_size)
+   259         5          9.0      1.8      0.0          self.rewards = all_rewards.to(
+   260         5        298.0     59.6      0.0                  self.device, non_blocking=True).float().split(self.batch_size)
+   261         5          8.0      1.6      0.0          self.dones = all_dones.to(
+   262         5        285.0     57.0      0.0                  self.device, non_blocking=True).float().split(self.batch_size)
+
+Total time: 7.23866 s
+File: replay_comparison.py
+Function: multi_agent_sampling_test at line 20
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    20                                           @profile
+    21                                           def multi_agent_sampling_test(n_agents, tensors):
+    22         1         14.0     14.0      0.0      agents = [f"a_{i}" for i in range(n_agents)]
+    23         1          1.0      1.0      0.0      replay_buffer = MARLImageReplayBuffer(
+    24         1          5.0      5.0      0.0          buffer_size = 500,
+    25         1          1.0      1.0      0.0          batch_size = 32,
+    26         1          1.0      1.0      0.0          device_name="cuda:2",
+    27         1         46.0     46.0      0.0          dimensions=(3, 256, 256)
+    28                                               )
+    29        21         22.0      1.0      0.0      for agent in agents:
+    30        20       1575.0     78.8      0.0          replay_buffer.add_agent(agent)
+    31       501        514.0      1.0      0.0      for i in range(500):
+    32     10500      13794.0      1.3      0.2          for j, agent in enumerate(agents):
+    33     10000       9462.0      0.9      0.1              replay_buffer.add(
+    34     10000       7792.0      0.8      0.1                  agent, 
+    35                                                           { 
+    36     10000      14628.0      1.5      0.2                      "top_down_rgb": tensors[1000*j + i],
+    37     10000      41649.0      4.2      0.6                      "low_dim_states": np.random.rand(10)
+    38                                                           },
+    39     10000      23694.0      2.4      0.3                  np.random.rand(1), 
+    40     10000      23094.0      2.3      0.3                  np.random.rand(1),
+    41                                                           { 
+    42     10000      13944.0      1.4      0.2                      "top_down_rgb": tensors[1000*j + i + 500],
+    43     10000      24574.0      2.5      0.3                      "low_dim_states": np.random.rand(10)
+    44                                                           },
+    45     10000       8284.0      0.8      0.1                  False,
+    46     10000    2600323.0    260.0     35.9                  np.random.rand(2)
+    47                                                       )
+    48         6         10.0      1.7      0.0      for _ in range(N_SAMPLES):
+    49       105        109.0      1.0      0.0          for agent in agents:
+    50       100        192.0      1.9      0.0              replay_buffer.request_sample(agent)
+    51         5    4454218.0 890843.6     61.5          replay_buffer.generate_samples()
+    52       105        118.0      1.1      0.0          for agent in agents:
+    53       100        577.0      5.8      0.0              replay_buffer.collect_sample(agent)
+    54         5         20.0      4.0      0.0          replay_buffer.reset()
+    55         1          1.0      1.0      0.0      del(replay_buffer)
+    56         1          0.0      0.0      0.0      return
+
+Total time: 0 s
+File: replay_comparison.py
+Function: single_agent_sampling_test at line 58
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    58                                           @profile
+    59                                           def single_agent_sampling_test(n_agents, tensors):
+    60                                               agents = {
+    61                                                   f"a_{i}": ImageReplayBuffer(
+    62                                                       buffer_size = 500,
+    63                                                       batch_size = 32,
+    64                                                       device_name="cuda:2",
+    65                                                       dimensions=(3, 256, 256)
+    66                                                   )  
+    67                                                   for i in range(n_agents)
+    68                                               }
+    69                                               for i in range(500):
+    70                                                   for j, agent in enumerate(agents):
+    71                                                       agents[agent].add(
+    72                                                           { 
+    73                                                               "top_down_rgb": tensors[1000*j + i],
+    74                                                               "low_dim_states": np.random.rand(10)
+    75                                                           },
+    76                                                           np.random.rand(1), 
+    77                                                           np.random.rand(1),
+    78                                                           { 
+    79                                                               "top_down_rgb": tensors[1000*j + i + 500],
+    80                                                               "low_dim_states": np.random.rand(10)
+    81                                                           },
+    82                                                           False,
+    83                                                           np.random.rand(2)
+    84                                                       )
+    85                                               for _ in range(N_SAMPLES):
+    86                                                   for agent in agents:
+    87                                                       agents[agent].sample()
+    88                                               return 
+
+Total time: 24.51 s
+File: replay_comparison.py
+Function: main at line 90
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    90                                           @profile
+    91                                           def main():
+    92         1    2930789.0 2930789.0     12.0      torch.cuda.empty_cache()
+    93         1          5.0      5.0      0.0      times = {}
+    94         1        424.0    424.0      0.0      process = psutil.Process(os.getpid())
+    95         1          5.0      5.0      0.0      n_agents = list(range(20, 25, 5))
+    96         2          4.0      2.0      0.0      for f in ("multi",):
+    97         1         25.0     25.0      0.0          pr = Profiler()
+    98         1         61.0     61.0      0.0          pr.start()
+    99         1          1.0      1.0      0.0          _times = []
+   100         2          3.0      1.5      0.0          for n in n_agents:
+   101         1         25.0     25.0      0.0              pr.stop()
+   102         1         12.0     12.0      0.0              torch.cuda.empty_cache()
+   103                                                       tensors = [
+   104         1          2.0      2.0      0.0                      np.random.randint(
+   105                                                                   0, 255, (3, 256, 256), dtype=np.uint8
+   106                                                               )
+   107         1   13043238.0 13043238.0     53.2                      for _ in range(1000 * n)
+   108                                                       ]
+   109         1         61.0     61.0      0.0              pr.start()
+   110         1          2.0      2.0      0.0              t = time.time()
+   111         1          2.0      2.0      0.0              if f == "multi":
+   112         1    7385174.0 7385174.0     30.1                  multi_agent_sampling_test(n, tensors)
+   113                                                       else:
+   114                                                           single_agent_sampling_test(n, tensors)
+   115         1          4.0      4.0      0.0              elapsed = time.time() - t
+   116                                                       #t = timeit.timeit(
+   117                                                       #    f"{f}_agent_sampling_test({n}, tensors)",
+   118                                                       #    setup=f"from __main__ import {f}_agent_sampling_test, tensors",
+   119                                                       #    number=1
+   120                                                       #)
+   121         1          1.0      1.0      0.0              _times.append(elapsed)
+   122         1       8474.0   8474.0      0.0              del(tensors)
+   123         1          2.0      2.0      0.0          times[f] = _times
+   124         1         68.0     68.0      0.0          pr.stop()
+   125         1    1129455.0 1129455.0      4.6          print(pr.output_text(unicode=True, color=True))
+   126                                           
+   127         1       1387.0   1387.0      0.0      df = pd.DataFrame(times, index=n_agents)
+   128         1         59.0     59.0      0.0      test_dir = Path("results", "MARB_testing")
+   129         1         78.0     78.0      0.0      test_dir.mkdir(exist_ok=True, parents=True)
+   130         1       3760.0   3760.0      0.0      df.to_csv(test_dir / "results.csv", index_label="n_agents")
+   131         1       6906.0   6906.0      0.0      print(df)
+

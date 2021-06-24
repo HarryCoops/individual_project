@@ -20,4 +20,3 @@ image_width: 256
 replay_buffer:
     buffer_size: 1e6
     batch_size: 32
-    compression: lz4

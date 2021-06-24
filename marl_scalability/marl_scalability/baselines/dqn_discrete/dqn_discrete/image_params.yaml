@@ -16,4 +16,3 @@ use_ddqn: True
 replay_buffer:
   buffer_size: 1e6
   batch_size: 64
-  compression: lz4
