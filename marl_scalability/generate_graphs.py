@@ -180,15 +180,17 @@ def extract_execution_time_from_pyinstrument_info(info):
 					)
 					run["pyinstrument_info"]["env_reset_time"] = env_reset_time
 					sample_time = html.split(
-						"multi_agent_image_replay_buffer.py\",\"line_no\": 220,\"time\": "
+						"multi_agent_image_replay_buffer.py\",\"line_no\": 221,\"time\": "
 					)
+			
 					sample_time = float(sample_time[1][:4]) if len(sample_time) > 1 else None
 					sample_time = float(
 						html.split(
-							"image_replay_buffer.py\",\"line_no\": 200,\"time\": " 
+							"image_replay_buffer.py\",\"line_no\": 202,\"time\": " 
 						)[1][:4]
 					) if sample_time is None else sample_time
 					run["pyinstrument_info"]["sample_time"] = sample_time
+			
 					agent_training_time = duration - (env_step_time + env_reset_time)
 					run["pyinstrument_info"]["agent_training_time"] = agent_training_time
 
@@ -204,6 +206,7 @@ def plot_pyinst_execution_time(info, log_dir):
 		ys = [run["pyinstrument_info"]["duration"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
 		ax.plot(xs, ys, label=policy)
+		print(xs, ys)
 	ax.legend()
 	plt.savefig(graphs_dir / "execution_time_graph.png")
 
@@ -426,7 +429,7 @@ def plot_vehicle_retention(policy_exp, name, log_dir, max_steps=None):
 		plt.savefig(graphs_dir / f"agent_survival_{name}.png")
 
 def gigabyte(y, pos):
-	return "%2d" % (y*1e-9)
+	return "%1.1fGB" % (y*1e-9)
 
 def gigabyte_from_kb(y, pos):
 	return "%1.1fGB" % (y*1e-6)
@@ -459,7 +462,6 @@ def plot_mem_usage_over_time_(policy_exp, name, log_dir):
 	ax.legend()
 	gig_formatter = FuncFormatter(gigabyte_from_mb)
 	ax.yaxis.set_major_formatter(gig_formatter)
-	#ax.set_ylim(bottom=0)
 	plt.savefig(graphs_dir / f"mem_usage_over_time_{name}.png")
 
 def plot_mem_usage_over_time(policy_exp, name, log_dir):
@@ -489,7 +491,7 @@ def plot_mem_usage_over_time(policy_exp, name, log_dir):
 			df["mem_usage"], 
 			label=run["train_args"]["desc"] if "train_args" in run else label
 		)
-	ax.legend()
+	#ax.legend()
 	#ax.set_title(f"Memory usage over time for {name} agent with top-down RGB input")
 	gig_formatter = FuncFormatter(gigabyte)
 	ax.yaxis.set_major_formatter(gig_formatter)
@@ -562,7 +564,7 @@ if __name__ == "__main__":
 	#extract_mem_usage(experiment_info, store_df=True)
 	#extract_stats_csv_info(experiment_info)
 	#extract_profile_info(experiment_info)
-	#extract_args_info(experiment_info)
+	extract_args_info(experiment_info)
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)
 	#plot_batch_size_graph(experiment_info, log_dir)
@@ -574,18 +576,18 @@ if __name__ == "__main__":
 	#plot_profile_chart(experiment_info["dqn"], "dqn", log_dir)
 	#plot_profile_chart(experiment_info["dqn-discrete"], "dqn-discrete", log_dir)
 	#plot_exeuction_time(experiment_info, log_dir)
-	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
+	#plot_mem_usage_over_time(experiment_info["ppo_discreteRGB"], "ppo_discreteRGB", log_dir)
 	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
 	#plot_mem_usage_over_time(experiment_info["dqn_discreteRGB"], "dqn_discreteRGB", log_dir)
 	#extract_vehicle_retention_info(experiment_info)
 	#plot_vehicle_retention(experiment_info["ppo"], "ppo", log_dir, max_steps=50)
 	#plot_vehicle_retention(experiment_info["sac"], "sac", log_dir, max_steps=50)
-	#plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=100)
-	#plot_vehicle_retention(experiment_info["dqn_discrete"], "dqn discrete", log_dir, max_steps=50)
-	#plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=100)
-	#plot_vehicle_retention(experiment_info["sac_discrete"], "sac discrete", log_dir, max_steps=50)
-	#plot_vehicle_retention(experiment_info["ppo_discrete"], "ppo discrete", log_dir, max_steps=100)
-	#plot_vehicle_retention(experiment_info["ppo_discrete"], "ppo discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["dqn_discreteRGB"], "dqn discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["dqn_discreteRGB"], "dqn discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["sac_discreteRGB"], "sac discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["sac_discreteRGB"], "sac discrete", log_dir, max_steps=50)
+	#plot_vehicle_retention(experiment_info["ppo_discreteRGB"], "ppo discrete", log_dir, max_steps=100)
+	#plot_vehicle_retention(experiment_info["ppo_discreteRGB"], "ppo discrete", log_dir, max_steps=50)
 
 	#plot_mem_usage_graph(experiment_info, log_dir)
 	#plot_max_mem_usage_graph(experiment_info, log_dir)

@@ -332,26 +332,7 @@ class DiscreteDQNPolicy(Agent):
         else:
             action_index = self.lane_actions.index(action)
             action = action_index
-        if self.marb is None:
-            if (
-                self.step_count % self.train_step == 0
-                and len(self.replay) >= self.batch_size
-                and (self.warmup is None or len(self.replay) >= self.warmup)
-            ):
-                out = self.learn()
-                self.update_count += 1
-            else:
-                out = {}
-            self.replay.add(
-                state=state,
-                action=action_index,
-                reward=reward,
-                next_state=next_state,
-                done=done,
-                others=others,
-                prev_action=self.prev_action,
-            )
-        else:
+        if self.marb is not None:
             self.marb.add(
                 agent_id=self.agent_id,
                 state=state,
@@ -362,27 +343,35 @@ class DiscreteDQNPolicy(Agent):
                 others=others,
                 prev_action=self.prev_action
             )
-            out = {}
-            if (
-                self.marb.len(self.agent_id) >= self.batch_size
-                and (self.warmup is None or self.marb.len(self.agent_id) >= self.warmup)
-            ):
-                if self.step_count % self.train_step == self.train_step - 1:
-                    self.marb.request_sample(self.agent_id)
-                elif self.step_count % self.train_step == 0:
-                    out = self.learn()
-                    self.update_count += 1
+        self.step_count += 1
+        out = {}
+        if self.step_count > max(self.batch_size, self.warmup):
+            out = self.learn()
+            self.update_count += 1
+            if (self.step_count % self.train_step == self.train_step - 1 
+                and self.marb is not None):
+                self.marb.request_sample(self.agent_id)
+            if self.step_count % self.train_step == 0:
+                out = self.learn()
+                self.update_count += 1
 
-        
         if self.target_update > 1 and self.step_count % self.target_update == 0:
             self.update_target_network()
         elif self.target_update < 1.0:
             self.soft_update(
                 self.target_q_network, self.online_q_network, self.target_update
             )
-        self.step_count += 1
+        if self.marb is None:
+            self.replay.add(
+                state=state,
+                action=action_index,
+                reward=reward,
+                next_state=next_state,
+                done=done,
+                others=others,
+                prev_action=self,prev_action
+            )
         self.prev_action = action
-
         return out
 
     def learn(self):
