@@ -221,6 +221,7 @@ def plot_pyinst_agent_time(info, log_dir):
 		ys = [run["pyinstrument_info"]["agent_training_time"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
 		ax.plot(xs, ys, label=policy)
+		print(xs, ys)
 	ax.legend()
 	plt.savefig(graphs_dir / "training_time_graph.png")
 
@@ -236,6 +237,7 @@ def plot_pyinst_sample_time(info, log_dir):
 		ys = [run["pyinstrument_info"]["sample_time"] for run in info[policy]]
 		xs = [run["n_agents"] for run in info[policy]]
 		ax.plot(xs, ys, label=policy)
+		print(xs, ys)
 	ax.legend()
 	plt.savefig(graphs_dir / "sample_time_graph.png")
 
@@ -546,6 +548,56 @@ def plot_batch_size_graph(info, log_dir):
 	plt.savefig(graphs_dir / f"batch_size_vs_execution time.png")
 
 
+def plot_marb_testing_resutls(log_dir):
+	graphs_dir = log_dir / "graphs"
+	graphs_dir.mkdir(exist_ok=True)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_xlabel("Number of agents")
+	ax.set_ylabel("Time")
+	xs = [i for i in range(5, 86, 5)]
+	# pased from results/MARB_testing
+	ys_single = [1.5366591453552200,
+		2.9219945907592800,
+		4.399459886550900,
+		5.808904600143430,
+		7.211695384979250,
+		8.569381713867190,
+		10.085122442245500,
+		11.50161771774290,
+		12.870457077026400,
+		14.161080121994000,
+		15.738048410415600,
+		17.25851526260380,
+		18.57430181503300,
+		20.07667851448060,
+		21.49859986305240,
+		23.4522563457489,
+		24.581865119934100,
+	]
+	ys_multi = [0.9051883697509770,
+		1.6909779548645000,
+		2.4877461433410600,
+		3.2607445240020800,
+		4.194561958312990,
+		4.856854772567750,
+		5.681631994247440,
+		6.456468868255620,
+		7.301457643508910,
+		8.237601613998410,
+		8.857369947433470,
+		9.622799110412600,
+		10.423685312271100,
+		11.349633264541600,
+		12.119399976730300,
+		13.08997197151180,
+		13.709798908233600,
+	]
+	ax.plot(xs, ys_single, label="SARB")
+	ax.plot(xs, ys_multi, label="MARB")
+	ax.legend()
+	plt.savefig(graphs_dir / f"marb_testing_time.png")
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser("generate-graphs")
@@ -561,6 +613,7 @@ if __name__ == "__main__":
 	plot_pyinst_execution_time(experiment_info, log_dir)
 	plot_pyinst_sample_time(experiment_info, log_dir)
 	plot_pyinst_sample_time_propotion(experiment_info, log_dir)
+	plot_marb_testing_resutls(log_dir)
 	#extract_mem_usage(experiment_info, store_df=True)
 	#extract_stats_csv_info(experiment_info)
 	#extract_profile_info(experiment_info)
